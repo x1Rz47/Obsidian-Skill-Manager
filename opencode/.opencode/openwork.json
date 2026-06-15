@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "workspace": {
+    "name": "AI",
+    "createdAt": 1780737769121,
+    "preset": "starter"
+  },
+  "authorizedRoots": [
+    "/Users/x1rz47/Desktop/AI"
+  ],
+  "reload": null
+}
