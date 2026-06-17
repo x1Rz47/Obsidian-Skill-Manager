@@ -1,7 +1,8 @@
 .DS_Store
 抖音视频拉片报告_7649743055003585827.md
-README.md
 docs/
 opencode/
 .opencode/
 skills-lock.json
+*.log
+node_modules/
