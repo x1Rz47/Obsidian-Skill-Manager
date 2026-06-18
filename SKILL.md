@@ -1,8 +1,8 @@
 ---
 name: obsidian-skill-manager
 description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the vault's skill documentation needs organizing, renaming, or standardizing. Also use when the vault documentation template changes and all files need syncing to match.
-template_hash: 623d8f431bd73b60bb789b16dec3d9b5
-template_checked: 2026-06-14
+template_hash: eb1b3ad2827c145613e47efa3ba49c90
+template_checked: 2026-06-18
 ---
 
 # Obsidian Skill Manager
@@ -61,22 +61,18 @@ TEMPLATE   = {VAULT_BASE}\00-工具功能介绍模板.md
 
 | Type | Install Source | Target Path |
 |------|---------------|-------------|
-| Skill (通用) | `npx skills add`, `npm install -g` | `{VAULT_BASE}/辅助工具/Skills/开发辅助/` |
+| Skill (开发辅助) | 开发、编码类 skill | `{VAULT_BASE}/辅助工具/Skills/开发辅助/` |
 | Skill (搜索代理) | 搜索、信息获取类 skill | `{VAULT_BASE}/辅助工具/Skills/搜索代理/` |
-| Skill (浏览器) | 浏览器自动化类 skill | `{VAULT_BASE}/辅助工具/Skills/浏览器自动化/` |
-| Skill (媒体) | 视频、动画创作类 skill | `{VAULT_BASE}/辅助工具/Skills/媒体创作/` |
+| Skill (浏览器自动化) | 浏览器自动化类 skill | `{VAULT_BASE}/辅助工具/Skills/浏览器自动化/` |
+| Skill (媒体创作) | 视频、动画创作类 skill | `{VAULT_BASE}/辅助工具/Skills/媒体创作/` |
 | Skill (知识管理) | 知识管理、任务管理类 skill | `{VAULT_BASE}/辅助工具/Skills/知识管理/` |
 | Skill (启动验证) | 创业、商业验证类 skill | `{VAULT_BASE}/辅助工具/Skills/启动验证/` |
 | Skill (效率工具) | 工具类、编排类 skill | `{VAULT_BASE}/辅助工具/Skills/效率工具/` |
-| Skill (平台) | 平台特定 skill (Codex/Claude/Superpowers/Obsidian) | `{VAULT_BASE}/辅助工具/Skills/平台技能/{平台}/` |
+| Skill (API) | API 开发类 skill | `{VAULT_BASE}/辅助工具/Skills/API/` |
+| Skill (办公文档) | 文档处理类 skill | `{VAULT_BASE}/辅助工具/Skills/办公文档/` |
+| 技能包 | 合并后的多文件技能包 | `{VAULT_BASE}/辅助工具/技能包/` |
 | 插件 | vscode, obsidian, browser extensions | `{VAULT_BASE}/辅助工具/插件/` |
 | MCP | MCP server | `{VAULT_BASE}/辅助工具/MCP/` |
-
-**Category Override Rules:**
-- If a skill is clearly related to a specific domain (e.g., 浏览器自动化, 媒体创作), place it in that domain's directory
-- The category directories above are defaults, but domain-specific directories take priority
-- When mapping: check the skill's name, tags, or description to determine the best-fit directory
-- 工作流/流程文档 (Gstack 等) → `{VAULT_BASE}/辅助工具/Skills/工作流指南/`
 
 ## Device Configuration
 
@@ -136,10 +132,9 @@ All skill document filenames in the vault must follow:
 | `辅助工具/Skills/知识管理/` | Sorted by GitHub stars (desc) + alphabetical |
 | `辅助工具/Skills/启动验证/` | Sorted by GitHub stars (desc) + alphabetical |
 | `辅助工具/Skills/效率工具/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/工作流指南/` | Per-subdirectory independent numbering (01-N) |
-| `辅助工具/Skills/平台技能/Superpowers/核心技能/` | Fixed order (01-14, matches superpowers release order) |
-| `辅助工具/Skills/平台技能/Codex/` | Manual (no stars — Codex-native skills) |
-| `辅助工具/Skills/平台技能/Obsidian/` | Sorted by GitHub stars (desc) + alphabetical |
+| `辅助工具/Skills/API/` | Sorted by GitHub stars (desc) + alphabetical |
+| `辅助工具/Skills/办公文档/` | Sorted by GitHub stars (desc) + alphabetical |
+| `辅助工具/技能包/` | Manual (01-N, ordered by stars) |
 | `辅助工具/MCP/` | Sorted by GitHub stars (desc) + alphabetical |
 | `辅助工具/插件/` | Sorted by GitHub stars (desc) + alphabetical |
 
@@ -187,7 +182,7 @@ Collect:
 - Dependencies
 - Any warnings or notes
 
-If GitHub fetch fails (network error, no GitHub repo), set `Github星标: N/A`. Do not block the workflow.
+If GitHub fetch fails (network error, no GitHub repo), set `GitHub星标: N/A`. Do not block the workflow.
 
 ### Step 3: Execute Installation
 
@@ -211,7 +206,7 @@ Before creating a new file:
 
 ### Step 5: Global Sort and Renumber (NEW entries only)
 
-1. Read the `Github星标` frontmatter field from ALL existing files in the target directory
+1. Read the `GitHub星标` frontmatter field from ALL existing files in the target directory
 2. Parse star counts:
    - `12K` → 12000
    - `1.5K` → 1500
@@ -241,26 +236,27 @@ aliases:
 标签:
   - <type-tag>
   - <domain-tags>
-Github连接: <github-url>
-Github星标: <star-count>
+GitHub连接: <github-url>
+GitHub星标: <star-count>
 创建日期: <today>  # 设置后永不更改
 更新日期: <today>  # 每次修改文档时更新到当天
 必用: false
 使用设备:
   - Mac Mini
+使用平台: 全平台
 ---
 ```
 
 **Field order must match the template exactly:**
 ```
-工具名 → aliases → 标签 → Github连接 → Github星标 → 创建日期 → 更新日期 → 必用 → 使用设备
+工具名 → aliases → 标签 → GitHub连接 → GitHub星标 → 创建日期 → 更新日期 → 必用 → 使用设备 → 使用平台
 ```
 
-**`Github连接` must always be populated:**
+**`GitHub连接` must always be populated:**
 - When installing via `npx skills add owner/repo@skill` → derive from `owner/repo` → `https://github.com/owner/repo`
 - When installing via `npm install owner/repo` → derive from `owner/repo`
 - When the install URL is known from the user or the skill source → write it directly
-- NEVER leave `Github连接` as `无` or empty — if truly unknown, set to `⚠️ Unknown` (not `无`)
+- NEVER leave `GitHub连接` as `无` or empty — if truly unknown, set to `⚠️ Unknown` (not `无`)
 - Cross-check against the [Known Repo Mapping](#known-repo-mapping) table below
 
 **Device detection rules:**
@@ -273,14 +269,16 @@ Github星标: <star-count>
 - `使用设备:` tracks actual installation per device (not intent)
 
 **Sections to fill:**
-- **更新功能** — "首次安装" for new tools
 - **Skills简介** — 1-2 sentences summarizing what it does
+- **包含技能** — (技能包专用) 子技能列表
+- **触发条件** — 什么情况下触发
+- **前置依赖** — 需提前安装的依赖
 - **主要解决的问题** — ❌/✅ format, at least 3 pain points
-- **主要使用场景** — Bullet list with **bold** scene names
 - **核心功能** — ### headers with feature descriptions
+- **主要使用场景** — Bullet list with **bold** scene names
 - **常用命令/语法** — Code blocks with actual commands
 - **注意事项** — Important caveats
-- **参考链接** — Official docs, GitHub, related resources
+- **更新功能** — changelog entries at the bottom
 
 ### Step 7: Save and Confirm
 
@@ -343,15 +341,13 @@ Walk ALL `.md` files under `{VAULT_BASE}` (excluding `00-工具功能介绍模�
 | `辅助工具/Skills/知识管理/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/启动验证/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/效率工具/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/工作流指南/` | Per-subdir independent (01-N) | Full template |
-| `辅助工具/Skills/平台技能/Superpowers/核心技能/` | Fixed (01-14) | Full template |
-| `辅助工具/Skills/平台技能/Codex/` | Manual (01-N) | Full template |
-| `辅助工具/Skills/平台技能/Obsidian/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/工作流指南/*/` | Per-subdir independent (01-N) | Full template |
-| `辅助工具/MCP/` | Manual (01-N) | Full template |
-| `辅助工具/插件/` | Manual (01-N) | Full template |
+| `辅助工具/Skills/API/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/办公文档/` | By GitHub stars (desc) | Full template |
+| `辅助工具/技能包/` | Manual (01-N, ordered by stars) | Full template |
+| `辅助工具/MCP/` | By GitHub stars (desc) | Full template |
+| `辅助工具/插件/` | By GitHub stars (desc) | Full template |
 
-For each file, parse its frontmatter and build a manifest: `工具名`, `Github星标`, `使用设备`, `必用`, and install commands.
+For each file, parse its frontmatter and build a manifest: `工具名`, `GitHub星标`, `使用设备`, `必用`, and install commands.
 
 ### Step S3: Detect and Fix Issues Per File
 
@@ -361,10 +357,10 @@ For every file across all directories:
 - **Wrong `使用设备:` format** → YAML list (`  - DeviceName`) or `使用设备: N/A`
 - **Missing `必用:`** → Add `必用: false`
 - **Wrong field name (`常用`)** → Rename to `必用`
-- **Wrong field order** → Reorder to match template: `工具名` → `aliases` → `标签` → `Github连接` → `Github星标` → `创建日期` → `更新日期` → `必用` → `使用设备`
+- **Wrong field order** → Reorder to match template: `工具名` → `aliases` → `标签` → `GitHub连接` → `GitHub星标` → `创建日期` → `更新日期` → `必用` → `使用设备` → `使用平台`
 - **Stale fields (`tags:`)** → Remove (template doesn't have it)
-- **`Github连接` missing or `无`** → Auto-fill from Known Repo Mapping table (see below); if no match found, set to `⚠️ Unknown`
-- **`Github连接` is `⚠️ Unknown`** → Leave as-is (flagged for review, don't auto-fix without confirming)
+- **`GitHub连接` missing or `无`** → Auto-fill from Known Repo Mapping table (see below); if no match found, set to `⚠️ Unknown`
+- **`GitHub连接` is `⚠️ Unknown`** → Leave as-is (flagged for review, don't auto-fix without confirming)
 - **Naming mismatches** → Rename to `{NN}-{Pascal-Kebab-Name}.md`
 - **Malformed frontmatter** → Fix YAML formatting (e.g. comma-separated→list, empty values→N/A, wrong field names)
 
@@ -374,11 +370,11 @@ Used by Recording Step 6 and Sync S3 — extend as new tools are installed.
 Kept in global copy at `~/.config/opencode/skills/obsidian-skill-manager/SKILL.md` so all sessions benefit.
 
 | 工具名 (`工具名`) | GitHub Repo |
-|---|---|
+|---|---|---|
 | `Find Skills` / `find-skills` | `https://github.com/vercel-labs/skills` |
 | `Acquire Codebase Knowledge` / `acquire-codebase-knowledge` | `https://github.com/github/awesome-copilot` |
-| `Create Agents.md` / `create-agentsmd` | `https://github.com/github/awesome-copilot` |
 | `Documentation Writer` / `documentation-writer` | `https://github.com/github/awesome-copilot` |
+| `Create Agents.md` / `create-agentsmd` | `https://github.com/github/awesome-copilot` |
 | `Obsidian Skill Manager` / `obsidian-skill-manager` | `https://github.com/x1Rz47/Obsidian-Skill-Manager` |
 | `Data Visualization` / `data-visualization` | `https://github.com/anthropics/knowledge-work-plugins` |
 | `Memory Management` / `memory-management` | `https://github.com/anthropics/knowledge-work-plugins` |
@@ -394,8 +390,6 @@ Kept in global copy at `~/.config/opencode/skills/obsidian-skill-manager/SKILL.m
 | `Supermemory` / `supermemory` | `https://github.com/anthropics/supermemory` |
 | `Brainstorming` (Superpowers) | `https://github.com/obra/superpowers` |
 | `Goal Prompt Builder` / `goal-prompt-builder` | `https://github.com/win4r/goal-prompt-builder` |
-| `PDF` / `pdf` (Codex) | `Codex 自带` |
-| `Playwright` / `playwright` (Codex) | `Codex 自带` |
 | `Agent Browser` / `agent-browser` | `https://github.com/vercel-labs/agent-browser` |
 | (Add rows as new tools are installed)
 
@@ -418,20 +412,11 @@ Update `使用设备:` per file:
 | Tool NOT installed but `使用设备:` has entries from other devices | Leave existing entries unchanged |
 | Workflow/process doc (Gstack, Superpowers) | Set `使用设备: N/A` (not installable software)
 
-### Step S5: Global Re-Sort (General/ & Knowledge-Work/ & Awesome-Copilot/ & Obsidian/)
+### Step S5: Global Re-Sort
 
-For `辅助工具/Skills/General/`, `辅助工具/Skills/Knowledge-Work/`, `辅助工具/Skills/Awesome-Copilot/`, `辅助工具/Skills/Superpowers/扩展技能/`, and `辅助工具/Skills/Obsidian/` — other directories keep their fixed numbering:
+For all directories sorted by GitHub stars, renumber files:
 
-**When renaming multiple files in a directory, handle rename collisions:**
-- If renaming A→3 and B→A and C→B, use temp names:
-  1. Rename C → temp-C
-  2. Rename B → C
-  3. Rename A → B
-  4. Rename temp-C → A
-- NEVER delete a file and recreate it — you will lose content
-- Verify no 0-byte files after the rename batch completes
-
-1. Sort by `Github星标` descending (N/A → end)
+1. Sort by `GitHub星标` descending (N/A → end)
 2. For equal stars, sort alphabetically by `工具名`
 3. Renumber from `01` upwards
 4. Rename all files to `{NN}-{Pascal-Kebab-Name}.md`
@@ -463,7 +448,7 @@ This workflow runs when the user updates `{TEMPLATE}` and asks for all vault fil
 
 1. Read `{VAULT_BASE}/00-工具功能介绍模板.md`
 2. Parse the frontmatter: capture field names and their exact order
-3. Parse the body: identify section headers (`## 更新功能`, `## Skills简介`, `## 主要解决的问题`, `## 主要使用场景`, `## 核心功能`, `## 常用命令/语法`, `## 注意事项`, `## 参考链接`) and their order
+3. Parse the body: identify section headers (`## Skills简介`, `## 包含技能`, `## 触发条件`, `## 前置依赖`, `## 主要解决的问题`, `## 核心功能`, `## 主要使用场景`, `## 常用命令/语法`, `## 注意事项`, `## 更新功能`) and their order
 4. Note any changes from the previous template state (e.g., field added/removed/renamed, section added/removed/renamed)
 
 ### Step T2: Scan All Vault Files
@@ -477,9 +462,9 @@ For each file's frontmatter:
 | Check | Action |
 |-------|--------|
 | Field order doesn't match template | Reorder fields to match template order exactly |
-| Field name changed (e.g., `常用` → `必用`) | Rename to match template |
+| Field name changed (e.g., `Github连接` → `GitHub连接`, `Github星标` → `GitHub星标`) | Rename to match template |
 | Field removed from template (e.g., `tags:`) | Remove the field from all files |
-| Field added to template | Add the field with default value |
+| Field added to template (e.g., `使用平台:`) | Add the field with default value |
 | `使用设备:` has wrong format | Fix: YAML list (`  - Device`) or `使用设备: N/A` |
 | Missing `使用设备:` | Add based on install detection |
 | Boolean values not lowercase | Fix: `True` → `true`, `False` → `false`, `Yes` → `yes` |
@@ -503,12 +488,11 @@ Update `使用设备:` based on detection result:
 If the template has added, removed, or reordered body sections:
 
 1. Map each file's existing sections to the template's section order
-2. Remove sections that no longer exist in the template
-3. Add new empty sections from the template
+2. Remove sections that no longer exist in the template (e.g., `参考链接`)
+3. Add new empty sections from the template (e.g., `包含技能`)
 4. Reorder sections to match template order
-5. Add `---` separators between sections if the template uses them
 
-Do NOT overwrite or remove content within sections — only add/remove/reorder the section headers and separators.
+Do NOT overwrite or remove content within sections — only add/remove/reorder the section headers.
 
 ### Step T5: Verify and Report
 
@@ -575,8 +559,8 @@ Stop and re-evaluate if you catch yourself thinking:
 | Case | Handling |
 |------|----------|
 | Template file not found | Stop with error: "模板文件不存在：{TEMPLATE}" |
-| GitHub fetch fails | Set `Github星标: N/A`, do not block |
-| No GitHub repository | Set `Github连接: 无`, `Github星标: N/A` |
+| GitHub fetch fails | Set `GitHub星标: N/A`, do not block |
+| No GitHub repository | Set `GitHub连接: ⚠️ Unknown`, `GitHub星标: N/A` |
 | Tool already documented | Update existing file, do not duplicate |
 | Category directory doesn't exist | Create it automatically |
 | Star count format varies | Parse: `12K` → 12000, `1.5K` → 1500, `N/A` → 0 |
@@ -637,5 +621,5 @@ Stop and re-evaluate if you catch yourself thinking:
 - Don't batch-edit frontmatter files without creating backups first — a single script error can corrupt all files in a directory
 - **CRITICAL: Always create a temp backup of all files in a directory before running any batch edit operation.** If using a script, first copy all files to a temp restore folder. Verify the backup exists before making changes.
 - Don't move files between directories without handling both source and target numbering — both directories need renumbering, and file rename conflicts (01→03 when 03 exists) require intermediate temp names
-- Don't assume Obsidian skills belong in General/ — check if the skill is Obsidian-specific and put it in `Obsidian/` instead
+- Don't assume Obsidian skills belong in 开发辅助/ — check if the skill is knowledge-management-specific and put it in `知识管理/` instead
 - Don't use batch string replacement (`-replace`) on YAML frontmatter — the result may silently produce empty files
