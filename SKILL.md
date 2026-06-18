@@ -1,7 +1,7 @@
 ---
 name: obsidian-skill-manager
 description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the vault's skill documentation needs organizing, renaming, or standardizing. Also use when the vault documentation template changes and all files need syncing to match.
-template_hash: eb1b3ad2827c145613e47efa3ba49c90
+template_hash: 46df8d3e430e027259091040fbf9bd35
 template_checked: 2026-06-18
 ---
 
@@ -59,20 +59,7 @@ TEMPLATE   = {VAULT_BASE}\00-工具功能介绍模板.md
 
 ## Category Directories
 
-| Type | Install Source | Target Path |
-|------|---------------|-------------|
-| Skill (开发辅助) | 开发、编码类 skill | `{VAULT_BASE}/辅助工具/Skills/开发辅助/` |
-| Skill (搜索代理) | 搜索、信息获取类 skill | `{VAULT_BASE}/辅助工具/Skills/搜索代理/` |
-| Skill (浏览器自动化) | 浏览器自动化类 skill | `{VAULT_BASE}/辅助工具/Skills/浏览器自动化/` |
-| Skill (媒体创作) | 视频、动画创作类 skill | `{VAULT_BASE}/辅助工具/Skills/媒体创作/` |
-| Skill (知识管理) | 知识管理、任务管理类 skill | `{VAULT_BASE}/辅助工具/Skills/知识管理/` |
-| Skill (启动验证) | 创业、商业验证类 skill | `{VAULT_BASE}/辅助工具/Skills/启动验证/` |
-| Skill (效率工具) | 工具类、编排类 skill | `{VAULT_BASE}/辅助工具/Skills/效率工具/` |
-| Skill (API) | API 开发类 skill | `{VAULT_BASE}/辅助工具/Skills/API/` |
-| Skill (办公文档) | 文档处理类 skill | `{VAULT_BASE}/辅助工具/Skills/办公文档/` |
-| 技能包 | 合并后的多文件技能包 | `{VAULT_BASE}/辅助工具/技能包/` |
-| 插件 | vscode, obsidian, browser extensions | `{VAULT_BASE}/辅助工具/插件/` |
-| MCP | MCP server | `{VAULT_BASE}/辅助工具/MCP/` |
+See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical directory list and numbering rules.
 
 ## Device Configuration
 
@@ -90,13 +77,12 @@ To determine the current device, check `hostname` and map it using this table. I
 | 工具类型 | 判定方式 | 示例 |
 |---------|---------|------|
 | agent skill | `npx skills list -g` 可见，或在 `~/.config/opencode/skills/` (Mac) / `~\.agents\skills\` (Windows) 目录下 | `video-use` → `- Mac Mini` / `- WPC` |
-| superpowers 整合包 | 包已安装 (npm cache)，技能在缓存目录存在 | `brainstorming` → `- Mac Mini` |
 | MCP server | `opencode.jsonc` 的 `mcpServers` 中已配置 | `markitdown-mcp` → `- Mac Mini` |
 | CLI 工具 | `which <tool>` (Mac) / `where.exe <tool>` (Windows) 能找到 | `ffmpeg` → `- Mac Mini` / `- WPC` |
 | brew 包 | `brew list <pkg>` 成功 (仅 Mac) | `gh` → `- Mac Mini` |
 | npm 全局包 | `npm list -g <pkg>` 可见 | `bun` → `- Mac Mini` / `- WPC` |
 | pip 包 | `pip3 list \| grep <pkg>` (Mac) / `pip list \| findstr <pkg>` (Windows) 有结果 | `openai-whisper` → `- Mac Mini` |
-| 工作流/流程文档 | 不可安装，永远不写设备名 | Gstack、Obsidian 语法参考 → `N/A` |
+| 工作流/流程文档 / Skills-Packs | 不可安装，永远不写设备名 | GStack、Superpowers、Anthropic 等 → `N/A` |
 
 **常见的错误模式（禁止）：**
 - Obsidian App 已安装 ≠ `kepano/obsidian-skills` 仓库的 agent skill 已安装
@@ -122,23 +108,7 @@ All skill document filenames in the vault must follow:
 - Strip vendor prefix: Remove redundant vendor/framework prefixes (e.g., `opencode-X` → `X`, `vscode-X` → `X`) unless the prefix is part of the tool's official identity
 - Template files (`00-*`) are excluded from the numbering convention
 
-**Independent numbering per directory:**
-| Directory | Numbering Rule |
-|-----------|---------------|
-| `辅助工具/Skills/开发辅助/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/搜索代理/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/浏览器自动化/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/媒体创作/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/知识管理/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/启动验证/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/效率工具/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/API/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/Skills/办公文档/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/技能包/` | Manual (01-N, ordered by stars) |
-| `辅助工具/MCP/` | Sorted by GitHub stars (desc) + alphabetical |
-| `辅助工具/插件/` | Sorted by GitHub stars (desc) + alphabetical |
-
-When moving or renaming files, always parse frontmatter `工具名` and convert to Pascal-kebab-case.
+**Independent numbering per directory (including 3rd-level subdirectories):** See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical directory list and numbering rules. When moving or renaming files, always parse frontmatter `工具名` and convert to Pascal-kebab-case.
 
 ## Common Pre-Check (Step 0: Template Hash Validation)
 
@@ -170,7 +140,7 @@ Determine:
 - **Name**: What is it called?
 - **Type**: skill / 插件 / MCP / npm package / config / other
 - **Source**: GitHub / npm / brew / pip / direct download
-- **Category**: Map source to target directory using the table above. Check Category Override Rules first before falling back to the source-based mapping.
+- **Category**: Map source to target directory using the [Sync S2 table](#step-s2-scan-all-vault-directories).
 
 ### Step 2: Gather Information
 
@@ -216,7 +186,7 @@ Before creating a new file:
    - Secondary: tool name alphabetically (for equal star counts)
 4. Assign new numbers: `01`, `02`, `03`...
 5. Determine the filename from `工具名` in frontmatter:
-   - Convert to Pascal-kebab-case: `Find Skills` → `Find-Skills`, `Create Agents.md` → `Create-Agentsmd`
+   - Convert to Pascal-kebab-case: `Find Skills` → `Find-Skills`, `Create Agents` → `Create-Agents`
    - Result: `{NN}-{Pascal-Kebab-Name}.md`
 6. Rename files on disk to match: `{NN}-{Pascal-Kebab-Name}.md`
 
@@ -334,16 +304,34 @@ Walk ALL `.md` files under `{VAULT_BASE}` (excluding `00-工具功能介绍模�
 
 | Directory | Numbering Rule | Frontmatter Required |
 |-----------|---------------|---------------------|
-| `辅助工具/Skills/开发辅助/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/搜索代理/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/浏览器自动化/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/媒体创作/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/知识管理/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/开发辅助/架构与Agent框架/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/搜索代理/跨平台搜索/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/搜索代理/代码探索/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/浏览器自动化/通用浏览自动化/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/浏览器自动化/测试框架/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/媒体创作/视频制作/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/媒体创作/内容创作/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/知识管理/Obsidian生态/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/知识管理/文档协作/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/知识管理/个人效能/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/效率工具/提示沟通/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/效率工具/Agent编排/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/启动验证/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/效率工具/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/API/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/办公文档/` | By GitHub stars (desc) | Full template |
-| `辅助工具/技能包/` | Manual (01-N, ordered by stars) | Full template |
+| `辅助工具/Skills-Packs/01-Superpowers/规划/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/01-Superpowers/执行/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/01-Superpowers/协作/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/01-Superpowers/工作流/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/01-Superpowers/质量/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/01-Superpowers/元技能/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/02-Anthropic/API与开发/` | Manual (01-N, ordered by stars) | Full template |
+| `辅助工具/Skills-Packs/02-Anthropic/文档处理/` | Manual (01-N, ordered by stars) | Full template |
+| `辅助工具/Skills-Packs/02-Anthropic/创意设计/` | Manual (01-N, ordered by stars) | Full template |
+| `辅助工具/Skills-Packs/02-Anthropic/沟通协作/` | Manual (01-N, ordered by stars) | Full template |
+| `辅助工具/Skills-Packs/03-MattPocock/工程开发/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/03-MattPocock/工作效率/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/03-MattPocock/其他/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/04-GStack/{category}/` | Manual (01-N, ordered at creation) | Full template |
+| `辅助工具/Skills-Packs/05-Awesome-Copilot/` | Manual (01-N, ordered by stars) | Full template |
 | `辅助工具/MCP/` | By GitHub stars (desc) | Full template |
 | `辅助工具/插件/` | By GitHub stars (desc) | Full template |
 
@@ -374,7 +362,7 @@ Kept in global copy at `~/.config/opencode/skills/obsidian-skill-manager/SKILL.m
 | `Find Skills` / `find-skills` | `https://github.com/vercel-labs/skills` |
 | `Acquire Codebase Knowledge` / `acquire-codebase-knowledge` | `https://github.com/github/awesome-copilot` |
 | `Documentation Writer` / `documentation-writer` | `https://github.com/github/awesome-copilot` |
-| `Create Agents.md` / `create-agentsmd` | `https://github.com/github/awesome-copilot` |
+| `Create Agents` / `create-agents` | `https://github.com/github/awesome-copilot` |
 | `Obsidian Skill Manager` / `obsidian-skill-manager` | `https://github.com/x1Rz47/Obsidian-Skill-Manager` |
 | `Data Visualization` / `data-visualization` | `https://github.com/anthropics/knowledge-work-plugins` |
 | `Memory Management` / `memory-management` | `https://github.com/anthropics/knowledge-work-plugins` |
@@ -382,7 +370,9 @@ Kept in global copy at `~/.config/opencode/skills/obsidian-skill-manager/SKILL.m
 | `Technical Documentation` / `technical-documentation` | `https://github.com/anthropics/knowledge-work-plugins` |
 | `Repomix Explorer` / `repomix-explorer` | `https://github.com/yamadashy/repomix` |
 | `Documentation And Adrs` / `documentation-and-adrs` | `https://github.com/addyosmani/agent-skills` |
-| `Improve Codebase Architecture` / `improve-codebase-architecture` | `https://github.com/mattpocock/skills` |
+| (All `mattpocock/skills` skills — 工程开发 12) | `https://github.com/mattpocock/skills` |
+| (All `mattpocock/skills` skills — 工作效率 5) | `https://github.com/mattpocock/skills` |
+| (All `mattpocock/skills` skills — 其他 4) | `https://github.com/mattpocock/skills` |
 | `GBrain` / `gbrain` | `https://github.com/garrytan/gbrain` |
 | `Video Use` / `video-use` | `https://github.com/instafluff/video-use` |
 | `Manim Video` / `manim-video` | `https://github.com/anthropics/manim-video` |
@@ -391,6 +381,7 @@ Kept in global copy at `~/.config/opencode/skills/obsidian-skill-manager/SKILL.m
 | `Brainstorming` (Superpowers) | `https://github.com/obra/superpowers` |
 | `Goal Prompt Builder` / `goal-prompt-builder` | `https://github.com/win4r/goal-prompt-builder` |
 | `Agent Browser` / `agent-browser` | `https://github.com/vercel-labs/agent-browser` |
+| (All `anthropics/skills` skills) | `https://github.com/anthropics/skills` |
 | (Add rows as new tools are installed)
 
 ### Step S4: Device Tracking
@@ -410,7 +401,7 @@ Update `使用设备:` per file:
 | Tool IS installed | Add `  - <DeviceName>` under `使用设备:` |
 | Tool NOT installed and `使用设备:` is empty or has no entries | Set `使用设备: N/A` |
 | Tool NOT installed but `使用设备:` has entries from other devices | Leave existing entries unchanged |
-| Workflow/process doc (Gstack, Superpowers) | Set `使用设备: N/A` (not installable software)
+| Workflow/process doc / Skills-Packs | Set `使用设备: N/A` (not installable software)
 
 ### Step S5: Global Re-Sort
 
@@ -429,15 +420,30 @@ Present a summary:
 ```
 🔍 同步完成 — 全 vault
   - 当前设备: Mac Mini
-  - 扫描目录: 8
-  - 扫描文件: 82
-  - 修复 frontmatter: 3
-  - 设备标记更新: 2
-  - General/ 新编号范围: 01-05
-  - Knowledge-Work/ 新编号范围: 01-04
-  - Awesome-Copilot/ 新编号范围: 01-03
-  - Obsidian/ 新编号范围: 01-05
-  - Codex/ 当前范围: 01-02
+  - 扫描目录: <N>
+  - 扫描文件: <N>
+  - 修复 frontmatter: <N>
+  - 设备标记更新: <N>
+  - Skills/开发辅助/架构与Agent框架/ 新编号范围: 01-<N>
+  - Skills/搜索代理/跨平台搜索/ 新编号范围: 01-<N>
+  - Skills/搜索代理/代码探索/ 新编号范围: 01-<N>
+  - Skills/浏览器自动化/通用浏览自动化/ 新编号范围: 01-<N>
+  - Skills/浏览器自动化/测试框架/ 新编号范围: 01-<N>
+  - Skills/媒体创作/视频制作/ 新编号范围: 01-<N>
+  - Skills/媒体创作/内容创作/ 新编号范围: 01-<N>
+  - Skills/知识管理/Obsidian生态/ 新编号范围: 01-<N>
+  - Skills/知识管理/文档协作/ 新编号范围: 01-<N>
+  - Skills/知识管理/个人效能/ 新编号范围: 01-<N>
+  - Skills/效率工具/提示沟通/ 新编号范围: 01-<N>
+  - Skills/效率工具/Agent编排/ 新编号范围: 01-<N>
+  - Skills/启动验证/ 新编号范围: 01-<N>
+  - Skills-Packs/01-Superpowers/ 所有子目录: 01-<N>
+  - Skills-Packs/02-Anthropic/ 所有子目录: 01-<N>
+  - Skills-Packs/03-MattPocock/ 所有子目录: 01-<N>
+  - Skills-Packs/04-GStack/ 所有子目录: 01-<N>
+  - Skills-Packs/05-Awesome-Copilot/: 01-<N>
+  - MCP/: 01-<N>
+  - 插件/: 01-<N>
 ```
 
 ## Template Sync Workflow
@@ -448,7 +454,7 @@ This workflow runs when the user updates `{TEMPLATE}` and asks for all vault fil
 
 1. Read `{VAULT_BASE}/00-工具功能介绍模板.md`
 2. Parse the frontmatter: capture field names and their exact order
-3. Parse the body: identify section headers (`## Skills简介`, `## 包含技能`, `## 触发条件`, `## 前置依赖`, `## 主要解决的问题`, `## 核心功能`, `## 主要使用场景`, `## 常用命令/语法`, `## 注意事项`, `## 更新功能`) and their order
+3. Parse the body: identify section headers (`## Skills简介`, `## 触发条件`, `## 前置依赖`, `## 主要解决的问题`, `## 常用命令/语法`, `## 主要使用场景`, `## 注意事项`, `## 更新功能`) and their order
 4. Note any changes from the previous template state (e.g., field added/removed/renamed, section added/removed/renamed)
 
 ### Step T2: Scan All Vault Files
@@ -489,10 +495,36 @@ If the template has added, removed, or reordered body sections:
 
 1. Map each file's existing sections to the template's section order
 2. Remove sections that no longer exist in the template (e.g., `参考链接`)
-3. Add new empty sections from the template (e.g., `包含技能`)
+3. Add new empty sections from the template (e.g., `常用命令/语法`)
 4. Reorder sections to match template order
 
 Do NOT overwrite or remove content within sections — only add/remove/reorder the section headers.
+
+### Step T4b: 辅助工具/ 全库模板化 + 汉化
+
+**Scope:** ALL `.md` files under `辅助工具/` (Skills, Skills-Packs, MCP, 插件, 工具). Does NOT apply to files outside `辅助工具/`.
+
+**Goal:** Every file must use only the 8 template sections (`Skills简介 → 触发条件 → 前置依赖 → 主要解决的问题 → 常用命令/语法 → 主要使用场景 → 注意事项 → 更新功能`). All English section headers and content must be translated to Chinese. Only code blocks, URLs, and technical proper nouns (SDK, API, etc.) stay untranslated.
+
+**Two-pass execution:**
+
+**Pass 1 — Content restructuring:** Map all non-template sections into template sections using keyword-based heuristics:
+- `开始之前` / `Before You Start` / `Precondition` / `安装` → `触发条件` + `前置依赖`
+- `子命令` / `Output` / `语法` / `Usage` / `Example` / `阶段` / `流程` / `Steps` → `常用命令/语法`
+- `Overview` / `目的` / `Introduction` / `What to build` → `主要解决的问题`
+- `When` / `何时` / `Use Case` → `主要使用场景`
+- `Common Pitfall` / `Failure mode` / `反模式` → `注意事项`
+- `Changelog` / `版本` → `更新功能`
+- Unmappable sections (design principles, brand guidelines, etc.): promote to `### Subsection` within `Skills简介`
+
+**Pass 2 — Content translation:** Translate all remaining English prose to Chinese using Google Translate API via `deep-translator`. Handle files over 5000 chars by splitting into chunks. Protect code blocks, inline code, URLs, and HTML comments from translation.
+
+**SKills-Packs imported skills (Anthropic/MattPocock/Superpowers/GStack/Awesome-Copilot):**
+- Original sections are restructured into template sections via heuristic mapping
+- Content is translated to Chinese (prose only, code and terms preserved)
+- Cannot-mapped content goes into `Skills简介` as `### 子节`
+
+**Reference:** The section-mapping keyword rules and translation logic are maintained in the execution scripts. When encountering a new section type, add its keyword mapping to the script and re-run.
 
 ### Step T5: Verify and Report
 
@@ -506,11 +538,11 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
 
 ```
 📋 模板同步完成
-  - 总文件: 80
-  - 字段重排: 75
-  - 字段重命名: 78
-  - 使用设备更新: 14
-  - 布尔值修复: 若干
+  - 总文件: <N>
+  - 字段重排: <N>
+  - 字段重命名: <N>
+  - 使用设备更新: <N>
+  - 布尔值修复: <N>
   - 错误: 0
 ```
 
@@ -531,7 +563,6 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
 - Sections should follow template structure
 - No placeholder text left in the document
 - After renumbering, verify no file is missing or has a wrong number
-- **Before ANY batch operation** (sync, re-sort, batch edit), create a temp backup of all files in the target directory. Verify backup exists before proceeding.
 
 ## Red Flags
 
@@ -550,8 +581,7 @@ Stop and re-evaluate if you catch yourself thinking:
 | "这个工具就在这台电脑上用的，不用写设备名" | 必须写！sync 会自动检测补充 |
 | "模板只改了一点点，不用同步" | 模板变了必须运行 Template Sync，即使改动很小 — 字段会被慢慢遗忘 |
 | "PowerShell 脚本改 YAML 没问题" | 必须用结构化 YAML 解析，字符串替换可能产生空文件 |
-| "这个 Obsidian 技能放到 General/ 就行了" | Obsidian 相关的技能必须放到 Obsidian/ 目录 |
-| "先批量改了再说，备份不重要" | 批量修改前必须先创建备份，否则一个错误就毁了全部文件 |
+| "这个 Obsidian 技能放哪都行" | Obsidian 生态类 skill 必须放到 知识管理/Obsidian生态/ |
 | "移动文件到另一个目录，改个数字就行" | 同时涉及源目录和目标目录的编号更新，重命名可能有冲突 |
 
 ## Edge Cases
@@ -585,10 +615,9 @@ Stop and re-evaluate if you catch yourself thinking:
 | User declines template sync | Update `template_hash` to current, skip syncing |
 | Moving file between directories | **BOTH** source and target need renumbering. Source: remove and compress numbering. Target: insert file and renumber entire directory. NEVER just rename — you must rename ALL files in both directories if sorting changes. |
 | File rename collision (rename A→3 when 3 exists) | Use an intermediate temp name: A→temp, B→A, C→B, temp→C |
-| Batch editing frontmatter files | ALWAYS create a temp backup first: copy all files to `{dir}/.backup/` before any changes. If an edit produces a 0-byte file, restore from backup immediately. |
 | Superpowers core skills (核心技能) | Detectable via npm cache (`{npm-cache}/superpowers/skills/`). On Windows: `$env:USERPROFILE\.cache\opencode\packages\superpowers@git+https_\github.com\obra\superpowers.git\node_modules\superpowers\skills\`. On Mac: via npm cache. NOT found via `npx skills list -g`. |
-| Script-based batch edit produces 0-byte files | CRITICAL: Stop immediately. Restore all files from temp backup. Do NOT attempt to recreate from memory — you will lose content. Use `git checkout` or the backup folder. |
-| Skill is Obsidian/MCP/Gstack/Codex domain-specific | Place in the domain's directory, NOT General/. See Category Override Rules. |
+| Skill is domain-specific (Obsidian/MCP/GStack/Codex) | Place in the correct domain directory per the S2 table, not a generic one. |
+| Skill exists in both `Skills/` and `Skills-Packs/` | **Pack version wins.** Delete from `Skills/` (individual). Pack members take priority. Never keep duplicates. |
 
 ## Rationalization Table
 
@@ -618,8 +647,7 @@ Stop and re-evaluate if you catch yourself thinking:
 - Don't leave `使用设备: False` (YAML boolean corruption) — fix to `no` or proper list format
 - Don't treat template syncing as optional — when the template changes, all files must follow
 - Don't use PowerShell string manipulation (regex, -replace, string concatenation) to edit YAML frontmatter — YAML is structured data, use proper YAML parsing or read/write the whole frontmatter block carefully
-- Don't batch-edit frontmatter files without creating backups first — a single script error can corrupt all files in a directory
-- **CRITICAL: Always create a temp backup of all files in a directory before running any batch edit operation.** If using a script, first copy all files to a temp restore folder. Verify the backup exists before making changes.
+- Don't keep duplicate skills across `Skills/` and `Skills-Packs/` — if a pack covers a skill, the Skills/ copy must be deleted
 - Don't move files between directories without handling both source and target numbering — both directories need renumbering, and file rename conflicts (01→03 when 03 exists) require intermediate temp names
 - Don't assume Obsidian skills belong in 开发辅助/ — check if the skill is knowledge-management-specific and put it in `知识管理/` instead
 - Don't use batch string replacement (`-replace`) on YAML frontmatter — the result may silently produce empty files
