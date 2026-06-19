@@ -420,29 +420,52 @@ Kept in global copy at `~/.config/opencode/skills/obsidian-skill-manager/SKILL.m
 
 | 工具名 (`工具名`) | GitHub Repo |
 |---|---|---|
-| `Find Skills` / `find-skills` | `https://github.com/vercel-labs/skills` |
-| `Acquire Codebase Knowledge` / `acquire-codebase-knowledge` | `https://github.com/github/awesome-copilot` |
-| `Documentation Writer` / `documentation-writer` | `https://github.com/github/awesome-copilot` |
-| `Create Agents` / `create-agents` | `https://github.com/github/awesome-copilot` |
-| `Obsidian Skill Manager` / `obsidian-skill-manager` | `https://github.com/x1Rz47/Obsidian-Skill-Manager` |
+| `Agent Browser` / `agent-browser` | `https://github.com/vercel-labs/agent-browser` |
+| `Agent Reach` / `agent-reach` | `https://github.com/Panniantong/Agent-Reach` |
+| `AISuite` / `aisuite` | `https://github.com/andrewyng/aisuite` |
+| `AiToEarn` / `ai-to-earn` | `https://github.com/yikart/AiToEarn` |
+| `BrowserAct` / `browser-act` | `https://github.com/browser-act/skills` |
+| `Cheat on Content` / `cheat-on-content` | `https://github.com/XBuilderLAB/cheat-on-content` |
+|content` |
+| `Chronos` / `chronos-forecasting` | `https://github.com/amazon-science/chronos-forecasting` |
+| `CodeGraph` / `codegraph` | `https://github.com/colbymchenry/codegraph` |
 | `Data Visualization` / `data-visualization` | `https://github.com/anthropics/knowledge-work-plugins` |
+| `Deep Agents` / `deep-agents` | `https://github.com/langchain-ai/deepagents` |
+| `Defuddle` / `defuddle` | `https://github.com/kepano/defuddle` |
+| `Douyin to Text` / `douyin-to-text` | `https://github.com/bibigod/douyin-to-text` |
+| `Find Skills` / `find-skills` | `https://github.com/vercel-labs/skills` |
+| `GBrain` / `gbrain` | `https://github.com/garrytan/gbrain` |
+| `Goal Prompt Builder` / `goal-prompt-builder` | `https://github.com/win4r/goal-prompt-builder` |
+| `Last30Days` / `last30days` | `https://github.com/mvanhorn/last30days-skill` |
+| `Last30Days CN` / `last30days-cn` | `https://github.com/Jesseovo/last30days-skill-cn` |
+| `Manim Video` / `manim-video` | `https://github.com/obra/superpowers` |
+| `MarkItDown` / `markitdown` | `https://github.com/microsoft/markitdown/tree/main/packages/markitdown-mcp` |
 | `Memory Management` / `memory-management` | `https://github.com/anthropics/knowledge-work-plugins` |
+| `Obsidian Bases` / `obsidian-bases` | `https://github.com/kepano/obsidian-skills` |
+| `Obsidian CLI` / `obsidian-cli` | `https://github.com/kepano/obsidian-skills` |
+| `Obsidian Markdown` / `obsidian-markdown` | `https://github.com/kepano/obsidian-skills` |
+| `Obsidian Skill Manager` / `obsidian-skill-manager` | `https://github.com/x1Rz47/Obsidian-Skill-Manager` |
+| `Oh My Openagent` / `oh-my-openagent` | `https://github.com/code-yeongyu/oh-my-openagent` |
+| `OpenCode Supermemory` / `opencode-supermemory` | `https://github.com/supermemoryai/opencode-supermemory` |
+| `OpenMontage` / `openmontage` | `https://github.com/calesthio/OpenMontage` |
+| `Playwright` / `playwright-skill` | `https://github.com/testdino-hq/playwright-skill` |
+| `Repomix Explorer` / `repomix-explorer` | `https://github.com/yamadashy/repomix` |
+| `SkillOpt` / `skillopt` | `https://github.com/microsoft/SkillOpt` |
+| `SkillSpector` / `skillspector` | `https://github.com/NVIDIA/SkillSpector` |
+| `Startup Pressure Test` / `startup-pressure-test` | `https://github.com/Kappaemme-git/codex-startup-pressure-test-skill` |
+| `Synapse` / `synapse` | `https://github.com/akillness/synapse-skill` |
 | `Task Management` / `task-management` | `https://github.com/anthropics/knowledge-work-plugins` |
 | `Technical Documentation` / `technical-documentation` | `https://github.com/anthropics/knowledge-work-plugins` |
-| `Repomix Explorer` / `repomix-explorer` | `https://github.com/yamadashy/repomix` |
-| `Documentation And Adrs` / `documentation-and-adrs` | `https://github.com/addyosmani/agent-skills` |
+| `Video Use` / `video-use` | `https://github.com/obra/superpowers` |
+| `Yt-Dlp` / `yt-dlp` | `https://github.com/yt-dlp/yt-dlp` |
 | (All `mattpocock/skills` skills — 工程开发 12) | `https://github.com/mattpocock/skills` |
 | (All `mattpocock/skills` skills — 工作效率 5) | `https://github.com/mattpocock/skills` |
 | (All `mattpocock/skills` skills — 其他 4) | `https://github.com/mattpocock/skills` |
-| `GBrain` / `gbrain` | `https://github.com/garrytan/gbrain` |
-| `Video Use` / `video-use` | `https://github.com/instafluff/video-use` |
-| `Manim Video` / `manim-video` | `https://github.com/anthropics/manim-video` |
-| `MarkItDown` / `markitdown` | `https://github.com/microsoft/markitdown` |
-| `Supermemory` / `supermemory` | `https://github.com/anthropics/supermemory` |
-| `Brainstorming` (Superpowers) | `https://github.com/obra/superpowers` |
-| `Goal Prompt Builder` / `goal-prompt-builder` | `https://github.com/win4r/goal-prompt-builder` |
-| `Agent Browser` / `agent-browser` | `https://github.com/vercel-labs/agent-browser` |
 | (All `anthropics/skills` skills) | `https://github.com/anthropics/skills` |
+| (All `addyosmani/agent-skills` skills) | `https://github.com/addyosmani/agent-skills` |
+| (All `vercel-labs/skills` skills) | `https://github.com/vercel-labs/skills` |
+| (All `kepano/obsidian-skills` skills) | `https://github.com/kepano/obsidian-skills` |
+| (All `obra/superpowers` skills) | `https://github.com/obra/superpowers` |
 | (Add rows as new tools are installed)
 
 ### Step S4: Device Tracking
