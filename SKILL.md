@@ -9,7 +9,7 @@ template_checked: 2026-06-18
 
 ## Overview
 
-Six workflows:
+Seven workflows:
 
 **Install:** When installing a new tool, check vault for existing docs (skip if found), install it, and mark the device. Does not modify vault files.
 
@@ -19,19 +19,15 @@ Six workflows:
 
 **Deployment:** Scan vault for `必用: true` tools and install them on the current device.
 
-**Deployment:** Scan vault for `必用: true` tools and install them on the current device.
+**Fix:** Scan vault for known format issues and fix them — no template sync, no data refresh, no renumbering.
 
 **Sync:** Full vault scan — fix numbering, validate frontmatter, update device tracking, re-sort by stars.
 
 **Template Sync:** When the vault template changes, propagate new field order, section structure, and defaults to every file.
 
-**Sync:** When the user says "执行" or "sync", scan the vault for deleted or renamed files, detect gaps in numbering, and globally re-sort everything to maintain consistency.
-
-**Template Sync:** When the vault documentation template (`00-工具功能介绍模板.md`) changes, sync all vault files to match — normalize frontmatter field order, field names, section structure, and device tracking values.
-
 ## Triggering
 
-This skill activates in five modes:
+This skill activates in six modes:
 
 | Mode | Trigger phrases |
 |------|----------------|
@@ -39,8 +35,9 @@ This skill activates in five modes:
 | **Document** | "记录 [工具]"、"给 [工具] 写个文档"、"doc [tool]" |
 | **Combined** | "安装并记录 [工具]"、"install and doc [tool]" |
 | **Deployment** | "部署/安装必用/安装常用/同步技能"、"deploy/setup this machine" |
+| **Fix** | "更新文档/修复文档/检查格式"、"fix docs/fix format" |
 | **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
-| **Template Sync** | "模板变了/更新模板/同步模板/更新所有文档/刷新所有文档"、"template changed/sync template/refresh all docs" |
+| **Template Sync** | "模板变了/更新模板/同步模板"、"template changed/sync template" |
 
 ## Vault Configuration
 
@@ -639,7 +636,7 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
 
 ### Step T4a2: 模板节内容 — 全量刷新模式
 
-**Triggers:** `"更新所有文档"` / `"refresh all docs"` — skips T1/T3/T4, runs T4a2 + T4b only.
+**When used:** Part of Template Sync — for a full content re-check, run Template Sync and confirm when asked. Skips T1/T3/T4, runs T4a2 + T4b only.
 
 **Scope:** ALL `.md` files under `辅助工具/`.
 
@@ -710,6 +707,39 @@ No per-file confirmation needed — batch and report.
 2. Update `template_hash` in this SKILL.md's frontmatter to the new hash
 3. Update `template_checked` to today's date
 4. Confirm to the user: "模板哈希已更新，后续将自动检测变更"
+
+## Fix Workflow
+
+Triggered by `"更新文档"` / `"fix docs"`. Scans vault for known format issues and fixes them. Does NOT renumber, refresh data, or sync templates.
+
+### Step F1: Scan All Vault Files
+
+Walk ALL `.md` files under `{VAULT_BASE}` (excluding the template itself).
+
+### Step F2: Check and Fix Known Issues
+
+| Check | Detection | Fix |
+|-------|-----------|-----|
+| `aliases` 含 `@` 前缀 | Parse frontmatter, aliases value starts with `@` | Remove `@` prefix, keep rest of text |
+
+*(Add rows to this table as new format issues are identified.)*
+
+For each file:
+- Detect which checks trigger
+- Apply fixes
+- Track what was changed
+
+### Step F3: Report
+
+```
+✅ 文档修复完成
+  - 检查文件: <N>
+  - 发现问题: <N>
+  - 已修复: <N>
+    - <filepath> → <fix description>
+```
+
+If no issues found: "✅ 文档格式检查通过，未发现问题"
 
 ## Quality Checks
 
