@@ -40,7 +40,7 @@ This skill activates in five modes:
 | **Combined** | "安装并记录 [工具]"、"install and doc [tool]" |
 | **Deployment** | "部署/安装必用/安装常用/同步技能"、"deploy/setup this machine" |
 | **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
-| **Template Sync** | "模板变了/更新模板/同步模板"、"template changed/sync template" |
+| **Template Sync** | "模板变了/更新模板/同步模板/更新所有文档/刷新所有文档"、"template changed/sync template/refresh all docs" |
 
 ## Vault Configuration
 
@@ -601,7 +601,7 @@ If the template has added, removed, or reordered body sections:
 
 Do NOT overwrite or remove content within sections — only add/remove/reorder the section headers.
 
-### Step T4a: 模板节内容补全（网上搜索）
+### Step T4a: 模板节内容 — 补空模式
 
 **Scope:** ALL `.md` files under `辅助工具/` that have empty or missing template sections (触发条件, 前置依赖, 主要解决的问题, 主要使用场景, 注意事项, 更新功能, 常用命令/语法).
 
@@ -636,6 +636,37 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
    - After filling, verify the file reads naturally as a complete document
 
 **Batching:** Process files in parallel by category (Skills/, Skills-Packs/*, 工具/, MCP/, 插件/). For large packs (GStack 45, AddyOsmani 24), split into sub-batches.
+
+### Step T4a2: 模板节内容 — 全量刷新模式
+
+**Triggers:** `"更新所有文档"` / `"refresh all docs"` — skips T1/T3/T4, runs T4a2 + T4b only.
+
+**Scope:** ALL `.md` files under `辅助工具/`.
+
+**Goal:** Every section in every file is re-checked against current source material. Existing content is kept unless new information is found.
+
+**Execution:**
+
+1. For each file, extract `工具名` and `GitHub连接`.
+
+2. **Research current source:**
+   - Has `GitHub连接` → fetch README, compare against current vault content section by section
+   - From a known collection → search web for updated documentation
+   - CLI/package → check official docs for changes
+
+3. **Update sections where new info found:**
+   - `触发条件` — new use cases or trigger scenarios
+   - `主要解决的问题` — new pain points added, old ones obsolete
+   - `常用命令/语法` — new flags, subcommands, or examples
+   - `主要使用场景` — additional use cases
+   - `注意事项` — new caveats or deprecations
+   - Only write if there is new information — otherwise leave unchanged
+
+4. **Append to `更新功能`:**
+   - If any section was updated → add entry: `"YYYY-MM-DD: 更新 [section]"`.
+   - If no changes → no new entry (T4b handles the `"无"` case).
+
+**No per-file confirmation — batch and report.
 
 ### Step T4b: 数据刷新
 
