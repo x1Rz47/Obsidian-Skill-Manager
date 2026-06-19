@@ -720,19 +720,13 @@ Stop and re-evaluate if you catch yourself thinking:
 | "记录到目录就行了，不用管编号" | 必须全局排序并重编号 |
 | "它就是一个小工具，不用查 GitHub" | 每个工具都要查，无 GitHub 的标 N/A |
 | "这跟已有的工具很像，直接跳过" | 必须检查确切匹配，不能猜 |
-| "手动删了几个文件，编号我手动改一下就好" | 用 sync 工作流自动处理，不要手动改编号 |
-| "这个工具就在这台电脑上用的，不用写设备名" | 必须写！sync 会自动检测补充 |
-| "模板只改了一点点，不用同步" | 模板变了必须运行 Template Sync，即使改动很小 — 字段会被慢慢遗忘 |
-| "PowerShell 脚本改 YAML 没问题" | 必须用结构化 YAML 解析，字符串替换可能产生空文件 |
-| "这个 Obsidian 技能放哪都行" | Obsidian 生态类 skill 必须放到 知识管理/Obsidian生态/ |
-| "这不是个 npx skills add 装的吗，放 Skills 没错" | **不是所有从 GitHub 装的东西都是 agent skill** — npm CLI 工具（pip/brew/npm包）放 工具/ |
-| "Agent Browser 是浏览器自动化，放浏览器自动化目录合理" | Agent Browser 是 vercel 的 npm CLI 包（36K stars），不是 SKILL.md 格式的 agent skill，应放 工具/ |
-| "Deep Agents 是 agent 框架，放 架构与Agent框架 目录合理" | Deep Agents 是 pip 安装的 Python 框架（24.6K stars），不是 agent skill，应放 工具/ |
-| "Repomix 用于代码探索，放 搜索代理/代码探索 合理" | Repomix 是 npm CLI 工具（2.4K stars），不是 agent skill，应放 工具/ |
-| "SkillOpt 名字带 Skill，放 Skills 目录合理" | SkillOpt 是 pip 安装的 Python 工具（7.1K stars），虽然名字带 "Skill" 但本质是工具，应放 工具/ |
-| "Defuddle 用于内容提取，放 知识管理/Obsidian生态 合理" | Defuddle 是 Obsidian 插件（7K stars），运行在 Agent 外部，应放 工具/ |
-| "浏览器自动化/测试框架/ 只有1个文件，但分类更精确" | **1-2 个文件不值得三级目录** — 拍平到 浏览器自动化/，等同类文件到 3+ 个时再考虑分三级 |
-| "移动文件到另一个目录，改个数字就行" | 同时涉及源目录和目标目录的编号更新，重命名可能有冲突 |
+| "手动删了几个文件，编号我手动改一下就好" | 用 sync 工作流自动处理 |
+| "这个工具就在这台电脑上用的，不用写设备名" | 必须写，sync 会自动检测补充 |
+| "模板只改了一点点，不用同步" | 模板变了必须运行 Template Sync |
+| "PowerShell 脚本改 YAML 没问题" | 必须用结构化 YAML 解析 |
+| "移动文件到另一个目录，改个数字就行" | 同时涉及源和目标目录的编号更新，重命名可能有冲突 |
+
+> 分类误放案例见 [Known Misclassifications](#known-misclassifications反面教材) 表。
 
 ## Edge Cases
 
@@ -768,42 +762,41 @@ Stop and re-evaluate if you catch yourself thinking:
 | Superpowers core skills (核心技能) | Detectable via npm cache (`{npm-cache}/superpowers/skills/`). On Windows: `$env:USERPROFILE\.cache\opencode\packages\superpowers@git+https_\github.com\obra\superpowers.git\node_modules\superpowers\skills\`. On Mac: via npm cache. NOT found via `npx skills list -g`. |
 | Skill is domain-specific (Obsidian/MCP/GStack/Codex) | Place in the correct domain directory per the S2 table, not a generic one. |
 | Skill exists in both `Skills/` and `Skills-Packs/` | **Pack version wins.** Delete from `Skills/` (individual). Pack members take priority. Never keep duplicates. |
-| Directory depth decision | Ask: does this 3rd-level dir have ≥3 files AND a clearly distinct sub-domain? If not, flatten to 2-level. |
-
-## Rationalization Table
-
-| Excuse | Reality |
-|--------|---------|
-| "I know this tool well enough" | What you know ≠ what belongs in documentation. Fetch fresh info. |
-| "The stars are roughly correct" | Roughly ≈ wrong. Fetch exact count. |
-| "Renumbering is tedious, I'll skip it" | Without sorting, the numbering system breaks. Never skip. |
-| "This is just a small utility" | Small tools need documentation too. Follow the full workflow. |
-| "The template is overkill for this" | The template exists for a reason. Use it. Every time. |
+| `工具名` format mismatch with filename | 工具名 应使用英文首字母大写的自然名称（如 `Agent Browser`），文件名自动从中推导 Pascal-kebab |
+| `GitHub连接` format | 必须使用 HTTPS 格式 `https://github.com/owner/repo`，不用 `git@` 或裸 `owner/repo` |
+| `创建日期` / `更新日期` format | 固定 `YYYY-MM-DD`，不用 `YYYY/MM/DD` 或 `YYYY.MM.DD` |
+| `使用平台` values | 取值限定：`全平台` / `macOS` / `Windows` / `Web`，不要自定义 |
+| `npx skills add` 安装失败 | 检查网络/权限/npm 缓存，记录错误后继续，不阻塞工作流 |
+| Cross-device sync conflict | 设备 A 修改文件后推送 → 设备 B 拉取后需重新运行 Sync 工作流校验 |
 
 ## Anti-Patterns
 
-- Don't skip info gathering ("I know this tool already")
+**安装前后：**
 - Don't write the doc before confirming installation succeeded
-- Don't use star counts from memory — always fetch fresh
-- Don't skip the template — user has a specific format they want
-- Don't skip creating category directories if they don't exist
-- Don't skip global renumbering — it's required on every new addition
-- Don't guess about tool existence — read frontmatter to check
-- Don't install tools the user didn't mark as `必用` — only deploy what's explicitly flagged
+- Don't install tools the user didn't mark as `必用`
 - Don't reinstall already-present tools without asking
-- Don't manually edit file numbers — use sync workflow instead
-- Don't skip frontmatter validation during sync — catch missing fields
+- Don't guess about tool existence — read frontmatter to check
+
+**目录与编号：**
+- Don't skip creating category directories if they don't exist
+- Don't move files between directories without handling both source and target numbering — use intermediate temp names to resolve rename collisions
+- Don't create 3-level directories for 1-2 files
+
+**模板与字段：**
+- Don't skip frontmatter validation during sync
 - Don't assume field order doesn't matter — it must match the template exactly
 - Don't keep stale fields when the template removes or renames them
 - Don't leave `使用设备: False` (YAML boolean corruption) — fix to `no` or proper list format
-- Don't treat template syncing as optional — when the template changes, all files must follow
-- Don't use PowerShell string manipulation (regex, -replace, string concatenation) to edit YAML frontmatter — YAML is structured data, use proper YAML parsing or read/write the whole frontmatter block carefully
-- Don't keep duplicate skills across `Skills/` and `Skills-Packs/` — if a pack covers a skill, the Skills/ copy must be deleted
-- Don't move files between directories without handling both source and target numbering — both directories need renumbering, and file rename conflicts (01→03 when 03 exists) require intermediate temp names
-- Don't assume Obsidian skills belong in 开发辅助/ — check if the skill is knowledge-management-specific and put it in `知识管理/` instead
-- Don't use batch string replacement (`-replace`) on YAML frontmatter — the result may silently produce empty files
-- Don't classify by name or domain alone ("名称带 Skill" / "用于浏览器自动化" / "用于代码探索") — classify by execution context: Agent 外部 → 工具/, Agent 内部 + SKILL.md → Skills/, Agent 内部 + 运行时注入 → 插件/
-- Don't put CLI tools / Python frameworks / npm packages in Skills/ just because they relate to AI agents — if it's `pip install`able, it's a 工具, not a skill
-- Don't put Obsidian plugins in Skills/ or 插件/ — Obsidian 插件运行在 Agent 外部，应放 工具/。只有 `kepano/obsidian-skills` agent skills 才放 Skills/知识管理/Obsidian生态/
-- Don't create 3-level directories for 1-2 files — 三级目录只应在同类文件 ≥3 个且子类领域明显不同时使用，否则拍平到二级目录
-- Don't confuse 插件/ with 工具/ — 插件/ 只放注入 Agent 运行时（修改 Agent 行为/能力）的软件。Obsidian 插件、VS Code 扩展、独立 CLI 都放 工具/
+- Don't leave `GitHub连接: 无` — use `⚠️ Unknown` or the actual URL
+
+**YAML：**
+- Don't use PowerShell/batch string manipulation (regex, -replace, string concatenation) on YAML frontmatter — use proper YAML parsing or read/write the whole block
+
+**分类：**
+- Don't classify by name or domain alone — classify by execution context: Agent 外部 → 工具/, Agent 内部 + SKILL.md → Skills/, Agent 内部 + 运行时注入 → 插件/
+- Don't put CLI tools / Python frameworks / npm packages in Skills/
+- Don't put Obsidian plugins in Skills/ or 插件/ — 运行在 Agent 外部就是 工具/
+- Don't confuse 插件/ with 工具/ — 插件/ 只放注入 Agent 运行时的软件
+
+**去重：**
+- Don't keep duplicate skills across `Skills/` and `Skills-Packs/` — pack version wins, delete from Skills/
