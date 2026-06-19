@@ -37,7 +37,7 @@ This skill activates in six modes:
 | **Deployment** | "部署/安装必用/安装常用/同步技能"、"deploy/setup this machine" |
 | **Fix** | "修复文档/修复所有文档/修复格式/检查格式"、"fix docs/fix format" |
 | **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
-| **Template Sync** | "模板变了/更新模板/同步模板"、"template changed/sync template" |
+| **Template Sync** | "模板变了/更新模板/同步模板/更新所有文档/刷新所有文档"、"template changed/sync template/refresh all docs" |
 
 ## Vault Configuration
 
@@ -553,7 +553,11 @@ Present a summary:
 
 ## Template Sync Workflow
 
-This workflow runs when the user updates `{TEMPLATE}` and asks for all vault files to be synchronized to match. It normalizes frontmatter field order, field names, device tracking, body section structure, and refreshes live data (stars, dates, changelog).
+**Routing:**
+- `"模板变了"` / `"更新模板"` / `"同步模板"` / `"template changed"` → full run T1→T6
+- `"更新所有文档"` / `"刷新所有文档"` / `"refresh all docs"` → skip T1/T3/T4, run T4a2 + T4b + T5, skip T6
+
+This workflow normalizes frontmatter field order, field names, device tracking, body section structure, and refreshes live data (stars, dates, changelog).
 
 ### Step T1: Read the Template
 
@@ -636,7 +640,7 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
 
 ### Step T4a2: 模板节内容 — 全量刷新模式
 
-**When used:** Part of Template Sync — for a full content re-check, run Template Sync and confirm when asked. Skips T1/T3/T4, runs T4a2 + T4b only.
+**Triggers:** `"更新所有文档"` / `"refresh all docs"` — skips T1/T3/T4, runs T4a2 + T4b only.
 
 **Scope:** ALL `.md` files under `辅助工具/`.
 
