@@ -77,7 +77,7 @@ See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical direc
 │  ├─ 单 skill（npx skills add owner/repo@skill）                   → Skills/
 │  └─ 多 skill 包（npx skills add owner/repo）                       → Skills-Packs/
 ├─ 运行在 Agent 内部但非 SKILL.md 形式
-│  ├─ 注入 Agent 运行时 / 描述含 "OpenCode plugin" / "inject into"  → 插件/
+│  ├─ 注入 Agent 运行时 / 描述含 "plugin" / "inject into agent"  → 插件/
 │  └─ 以 MCP 协议形式接入（配置在 opencode.jsonc mcpServers）        → MCP/
 └─ 以上都不匹配 → 默认进入 工具/ 类别：
     ├─ 独立 CLI / 库 / Obsidian 插件 / VS Code 扩展 / 下载的二进制  → 工具/
@@ -90,7 +90,7 @@ See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical direc
 |------|---|------|
 | 安装后修改了 Agent 的行为/能力（记忆/编辑加速/类型检查/脱敏） | **插件/** | supermemory, morph, type-inject, vibeguard |
 | 安装后独立可执行，Agent 不依赖它 | **工具/** | yt-dlp, repomix, deepagents, agent-browser |
-| 描述含 "OpenCode plugin" / "inject into agent" | **插件/** | oh-my-openagent, vibeguard |
+| 描述含 "plugin" / "inject into agent"（注入 Agent 运行时，不论平台） | **插件/** | oh-my-openagent, vibeguard |
 | 描述含 "Obsidian community plugin"、"standalone CLI" | **工具/** | Defuddle |
 | 安装到 `~/.opencode/plugins/` 或类似 Agent 插件目录 | **插件/** | — |
 | Obsidian 插件 / VS Code 扩展 | **工具/** | 运行在 Agent 外部，不修改 Agent 行为 |
@@ -113,7 +113,7 @@ See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical direc
 | **MCP Server** | Agent 内部（协议） | 描述含 "MCP server" / "Model Context Protocol"；包名含 `-mcp` | MarkItDown-MCP, CodeGraph, GBrain |
 | **Agent Skill** | Agent 内部（指令集） | 描述含 "skill"；仓库有 SKILL.md + 触发条件；安装：npx skills add | Playwright-skill, BrowserAct-skill, Find-Skills, Agent-Reach |
 | **Skill Pack** | Agent 内部（指令集） | 多 skill 仓库；安装：npx skills add owner/repo | Superpowers, Anthropic, MattPocock, GStack |
-| **插件** | Agent 内部（运行时注入） | 描述含 "OpenCode plugin" / "inject"；安装后修改 Agent 能力 | oh-my-openagent, supermemory, type-inject, morph |
+| **插件** | Agent 内部（运行时注入） | 描述含 "plugin" / "inject into agent"；安装后修改 Agent 能力，不论针对哪个平台 | oh-my-openagent, supermemory, type-inject, morph |
 | **工具** | Agent **外部** | 以上都不符合的可安装软件，不论具体形态 | yt-dlp, repomix, deepagents, agent-browser, Defuddle |
 
 > **工具/ 是兜底分类。** 只要不是 MCP server、不是 agent skill、也不是注入 Agent 运行时的插件，全部归入 工具/。Obsidian 插件、VS Code 扩展、OpenCode 插件中不注入运行时的部分，都是 工具/。
@@ -141,7 +141,7 @@ Skills-Packs 按技能包来源划分，不受此限。
 | 仓库描述含 "MCP server" / "Model Context Protocol" | **MCP/** |
 | 仓库有 SKILL.md + 触发条件 | **Skills/** |
 | 安装命令是 `npx skills add` | **Skills/** |
-| 描述含 "OpenCode plugin" / "inject into agent" / 安装到 Agent 插件目录 | **插件/** |
+| 描述含 "plugin" / "inject into agent" / 安装到 Agent 插件目录（运行时注入，不论平台） | **插件/** |
 | 描述含 "Obsidian plugin" / "standalone CLI" / "library" / "framework" / "package" | **工具/** |
 | 以上都不明确 | **问用户** |
 
@@ -399,8 +399,7 @@ Walk ALL `.md` files under `{VAULT_BASE}` (excluding `00-工具功能介绍模�
 | Directory | Numbering Rule | Frontmatter Required |
 |-----------|---------------|---------------------|
 | `辅助工具/Skills/浏览器自动化/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/媒体创作/视频制作/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/媒体创作/内容创作/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/媒体创作/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/搜索代理/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/效率工具/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/启动验证/` | By GitHub stars (desc) | Full template |
