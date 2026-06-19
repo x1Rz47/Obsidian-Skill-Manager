@@ -1,37 +1,39 @@
 # Obsidian Skill Manager
 
-An OpenCode skill that manages tool documentation in an Obsidian vault. Automatically records installed tools, tracks device status, syncs documentation, and keeps all files aligned with a standardized template.
+[![GitHub](https://img.shields.io/badge/GitHub-x1Rz47%2FObsidian--Skill--Manager-blue)](https://github.com/x1Rz47/Obsidian-Skill-Manager)
 
-[→ SKILL.md](obsidian-skill-manager/SKILL.md)
+OpenCode skill — 自动管理工具文档到 Obsidian 知识库，支持多设备追踪和模板同步。
 
-## Install
+[→ SKILL.md](SKILL.md)
+
+## 安装
 
 ```bash
-npx skills add x1Rz47/Obsidian-Skill-Manager@obsidian-skill-manager -g -y
+npx skills add x1Rz47/Obsidian-Skill-Manager -g -y
 ```
 
-## Quick Start
+## 快速使用
 
-| Command | Description |
-|---------|-------------|
-| `安装 <tool>` | 自动记录到 Obsidian 知识库 |
-| `部署到这台电脑` | 安装标记为 `必用: true` 的工具 |
-| `执行` | 同步 vault 文档状态 |
+| 命令 | 说明 |
+|------|------|
+| `安装 <tool>` | 安装工具并自动记录到 Obsidian |
+| `部署到这台电脑` | 在新设备安装 `必用: true` 的工具 |
+| `执行` / `sync` | 扫描并修复 vault 文档状态 |
 | `模板变了` | 同步所有文档到最新模板格式 |
 
-## Features
+## 四个工作流
 
-- **Recording** — Install any tool, auto-generate standardized docs with GitHub star sorting
-- **Deployment** — Set up new devices from your `必用: true` list
-- **Sync** — Re-index vault docs, fix frontmatter, update device tracking
-- **Template Sync** — Normalize all vault files when template changes
+- **Recording** — 安装时自动归类、按 GitHub Star 排号、生成标准化文档
+- **Deployment** — 跨设备部署标记为 `必用` 的工具
+- **Sync** — 修复 frontmatter、编号、设备标记
+- **Template Sync** — 模板变更时级联更新所有 vault 文件
 
-## Structure
+## 目录结构
 
 ```
-obsidian-skill-manager/
-├── SKILL.md         ← Main skill definition
-├── README.md        ← Detailed skill documentation
+Obsidian-Skill-Manager/
+├── SKILL.md      主技能定义
+├── README.md     本文档
 └── .gitignore
 ```
 
