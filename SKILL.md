@@ -1,6 +1,6 @@
 ---
 name: obsidian-skill-manager
-description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the vault's skill documentation needs organizing, renaming, or standardizing. Also use when the vault documentation template changes and all files need syncing to match.
+description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the vault's skill documentation needs organizing, renaming, standardizing, fixing, or format-checking. Also use when the vault documentation template changes and all files need syncing to match. Also use when the user says fix docs, fix format, 修复文档, 修复格式, or 检查格式.
 template_hash: 46df8d3e430e027259091040fbf9bd35
 template_checked: 2026-06-18
 ---
@@ -41,10 +41,10 @@ This skill activates in six modes:
 
 ## Vault Configuration
 
-`hostname` determines the active config:
+`hostname -s` determines the active config:
 
 ```
-if hostname == "x1Rz47-A1213":    # Mac Mini (macOS)
+if `hostname -s` == "x1Rz47-A1213":    # Mac Mini (macOS)
   VAULT_BASE = /Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖
   TEMPLATE   = {VAULT_BASE}/00-工具功能介绍模板.md
 elif hostname == "WPC-x1Rz47":    # WPC (Windows)
@@ -85,21 +85,6 @@ See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical direc
 | 三级目录 3+ 文件但子类相近 | 考虑拍平 |
 
 Skills-Packs 按技能包来源划分，不受此限。
-
-### Key Discriminators（速查卡）
-
-| 问题 | → |
-|------|----|
-| 运行在 Agent **外部**（独立可执行，不依赖 Agent 运行时）？ | **工具/** |
-| 运行在 Agent **内部**，以 SKILL.md 指令集形式？ | **Skills/** 或 **Skills-Packs/** |
-| 运行在 Agent **内部**，以注入运行时插件形式？ | **插件/** |
-| 运行在 Agent **内部**，以 MCP 协议工具形式？ | **MCP/** |
-| 仓库描述含 "MCP server" / "Model Context Protocol" | **MCP/** |
-| 仓库有 SKILL.md + 触发条件 | **Skills/** |
-| 安装命令是 `npx skills add` | **Skills/** |
-| 描述含 "plugin" / "inject into agent" / 安装到 Agent 插件目录（运行时注入，不论平台） | **插件/** |
-| 描述含 "Obsidian plugin" / "standalone CLI" / "library" / "framework" / "package" | **工具/** |
-| 以上都不明确 | **问用户** |
 
 ### Known Misclassifications（反面教材）
 
@@ -363,7 +348,7 @@ This workflow runs independently. Use it when you've manually added, deleted, or
 
 ### Step S1: Determine Current Device
 
-1. Run `hostname` to get the current machine's hostname
+1. Run `hostname -s` (macOS) or `hostname` (Windows) to get the current machine's hostname
 2. Look up the device name in the Device Configuration table
 3. If the hostname is not mapped, ask the user to identify the device
 
@@ -783,8 +768,6 @@ Stop and re-evaluate if you catch yourself thinking:
 
 **模板与字段：**
 - Don't skip frontmatter validation during sync
-- Don't assume field order doesn't matter — it must match the template exactly
-- Don't keep stale fields when the template removes or renames them
 - Don't leave `使用设备: False` (YAML boolean corruption) — fix to `no` or proper list format
 - Don't leave `GitHub连接: 无` — use `⚠️ Unknown` or the actual URL
 
@@ -792,10 +775,7 @@ Stop and re-evaluate if you catch yourself thinking:
 - Don't use PowerShell/batch string manipulation (regex, -replace, string concatenation) on YAML frontmatter — use proper YAML parsing or read/write the whole block
 
 **分类：**
-- Don't classify by name or domain alone — classify by execution context: Agent 外部 → 工具/, Agent 内部 + SKILL.md → Skills/, Agent 内部 + 运行时注入 → 插件/
-- Don't put CLI tools / Python frameworks / npm packages in Skills/
-- Don't put Obsidian plugins in Skills/ or 插件/ — 运行在 Agent 外部就是 工具/
-- Don't confuse 插件/ with 工具/ — 插件/ 只放注入 Agent 运行时的软件
+- Don't guess classification — use the [Classification Guide](#classification-guide) table.
 
 **去重：**
 - Don't keep duplicate skills across `Skills/` and `Skills-Packs/` — pack version wins, delete from Skills/
