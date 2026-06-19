@@ -32,7 +32,7 @@ This skill activates in six modes:
 | **Install** | "安装/下载 [工具]"、"install/setup/add [tool]" |
 | **Document** | "记录 [工具]"、"给 [工具] 写个文档"、"doc [tool]" |
 | **Combined** | "安装并记录 [工具]"、"install and doc [tool]" |
-| **Deployment** | "部署到这台电脑/安装常用/同步技能"、"deploy/setup this machine" |
+| **Deployment** | "部署/安装必用/安装常用/同步技能"、"deploy/setup this machine" |
 | **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
 | **Template Sync** | "模板变了/更新模板/同步模板"、"template changed/sync template" |
 
@@ -351,9 +351,9 @@ Confirm to the user that the tool is documented.
 1. Run [Install Workflow](#install-workflow安装不动-vault) Steps I1-I4
 2. After installation, if no existing document was found in Step I3, run [Document Workflow](#document-workflow记录不安装) Steps W2-W4 (skip W1, info was already gathered in I2)
 
-## Deployment Workflow (New Device Setup)
+## Deployment Workflow（部署必用工具）
 
-This workflow runs independently. Use it when setting up a new machine.
+Scan the vault for `必用: true` tools and install them on the current device.
 
 ### Step D1: Scan for Favorites
 
