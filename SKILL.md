@@ -63,68 +63,97 @@ See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical direc
 
 ## Classification Guide (Skills vs 工具 vs 插件 vs MCP)
 
-Every file placed in the vault must go in the correct directory. Use these rules to classify unambiguously.
+### 核心原则
 
-### Decision Tree
+按 **执行上下文** 分类：工具运行在 Agent **外部**（独立可执行）还是 **内部**（注入 Agent 运行时）？
+
+### Phase 1: 预判（安装前）
 
 ```
-Is it installed via `npx skills add <owner/repo>@<skill>` or copied as a SKILL.md?
-  ├─ YES → Skills/ or Skills-Packs/
-  ├─ NO  → Is it installed via `pip install` / `npm install -g` / `brew install` / `cargo install` / direct download?
-  │       ├─ YES → Is it an MCP server (configured in opencode.jsonc `mcpServers`)?
-  │       │       ├─ YES → MCP/
-  │       │       └─ NO  → 工具/
-  │       └─ NO  → Is it an editor/IDE/app plugin (Obsidian, VS Code, JetBrains)?
-  │               ├─ YES → 插件/
-  │               └─ NO  → Ask user for clarification
-  └─ (Also: process/workflow documents that aren't installable software → Skills-Packs/)
+看 GitHub 仓库描述 / README 首段 / README.md 标题（按优先级）：
+┌─ 含 "MCP server" / "Model Context Protocol" / 包名含 -mcp 后缀 → MCP/
+├─ 含 "skill" / "agent skill" / "opencode skill"
+│  或仓库根目录有 SKILL.md（YAML frontmatter + ## 触发条件）
+│  ├─ 单 skill（npx skills add owner/repo@skill）                   → Skills/
+│  └─ 多 skill 包（npx skills add owner/repo）                       → Skills-Packs/
+├─ 运行在 Agent 内部但非 SKILL.md 形式
+│  ├─ 注入 Agent 运行时 / 描述含 "OpenCode plugin" / "inject into"  → 插件/
+│  └─ 以 MCP 协议形式接入（配置在 opencode.jsonc mcpServers）        → MCP/
+└─ 以上都不匹配 → 默认进入 工具/ 类别：
+    ├─ 独立 CLI / 库 / Obsidian 插件 / VS Code 扩展 / 下载的二进制  → 工具/
+    └─ 不明 → 问用户："这个工具运行在 Agent 内部还是外部？"
 ```
+
+**判断 插件/ vs 工具/ 的辅助规则：**
+
+| 特征 | → | 例子 |
+|------|---|------|
+| 安装后修改了 Agent 的行为/能力（记忆/编辑加速/类型检查/脱敏） | **插件/** | supermemory, morph, type-inject, vibeguard |
+| 安装后独立可执行，Agent 不依赖它 | **工具/** | yt-dlp, repomix, deepagents, agent-browser |
+| 描述含 "OpenCode plugin" / "inject into agent" | **插件/** | oh-my-openagent, vibeguard |
+| 描述含 "Obsidian community plugin"、"standalone CLI" | **工具/** | Defuddle |
+| 安装到 `~/.opencode/plugins/` 或类似 Agent 插件目录 | **插件/** | — |
+| Obsidian 插件 / VS Code 扩展 | **工具/** | 运行在 Agent 外部，不修改 Agent 行为 |
+
+### Phase 2: 验证（安装后）
+
+| Phase 1 | 实际在 Agent 外部 | 实际在 Agent 内部 |
+|---------|-----------------|------------------|
+| **工具/** | ✅ 一致 | ❌ 冲突 → 标记复核 |
+| **插件/** | ❌ 冲突 | ✅ 一致 |
+| **Skills/** | ❌ 冲突 | ✅ 取决于具体形式 |
+| **MCP/** | — | 检查 opencode.jsonc → ✅ |
+
+冲突时标记 `⚠️ 分类存疑，需人工确认`，不自动纠正。
 
 ### Concrete Rules
 
-| Type | Install Method | Target Directory | Examples |
-|------|---------------|-----------------|----------|
-| **Agent Skill** | `npx skills add owner/repo@skill` or manual SKILL.md copy | `Skills/` (single) or `Skills-Packs/` (pack) | Playwright-skill, BrowserAct-skill, Find-Skills, Agent-Reach, Video-Use, Manim-Video |
-| **CLI Tool** | `brew install`, `npm install -g`, `pip install`, `cargo install`, direct download | `工具/` | yt-dlp, ffmpeg, gh, bun, repomix, skillopt, deepagents |
-| **Library/Package** | `pip install`, `npm install` (local), `cargo add` | `工具/` | openai-whisper, aisuite, beautifulsoup |
-| **MCP Server** | `npx -y @org/mcp-server` or same, configured in `opencode.jsonc` `mcpServers` | `MCP/` | MarkItDown-MCP, CodeGraph, GBrain |
-| **Editor Plugin** | Obsidian community plugin / VS Code extension marketplace | `插件/` | Defuddle, Supermemory, Oh-My-Openagent |
-| **Skill Pack** | `npx skills add owner/repo` (multi-skill repo) or manual copy | `Skills-Packs/{NN}-{Name}/` | Superpowers, Anthropic, MattPocock, GStack, Awesome-Copilot |
-| **Process Doc / Workflow** | Not installable software | `Skills-Packs/` (if part of a pack) | GStack workflow docs |
+| 类型 | 运行位置 | 识别方式 | 例子 |
+|------|---------|---------|------|
+| **MCP Server** | Agent 内部（协议） | 描述含 "MCP server" / "Model Context Protocol"；包名含 `-mcp` | MarkItDown-MCP, CodeGraph, GBrain |
+| **Agent Skill** | Agent 内部（指令集） | 描述含 "skill"；仓库有 SKILL.md + 触发条件；安装：npx skills add | Playwright-skill, BrowserAct-skill, Find-Skills, Agent-Reach |
+| **Skill Pack** | Agent 内部（指令集） | 多 skill 仓库；安装：npx skills add owner/repo | Superpowers, Anthropic, MattPocock, GStack |
+| **插件** | Agent 内部（运行时注入） | 描述含 "OpenCode plugin" / "inject"；安装后修改 Agent 能力 | oh-my-openagent, supermemory, type-inject, morph |
+| **工具** | Agent **外部** | 以上都不符合的可安装软件，不论具体形态 | yt-dlp, repomix, deepagents, agent-browser, Defuddle |
+
+> **工具/ 是兜底分类。** 只要不是 MCP server、不是 agent skill、也不是注入 Agent 运行时的插件，全部归入 工具/。Obsidian 插件、VS Code 扩展、OpenCode 插件中不注入运行时的部分，都是 工具/。
 
 ### Directory Depth Rule
 
-**Skills/ 下避免 3 级目录**（最多 2 级）。只有当某个二级分类下有 **≥3 个文件** 且子类之间领域明显不同时，才保留 3 级。否则合并到二级目录：
+**Skills/ 下避免 3 级目录**（最多 2 级）。只有当某个二级分类下有 **≥3 个文件** 且子类之间领域明显不同时，才保留 3 级：
 
 | 场景 | 做法 |
 |------|------|
-| 三级目录仅 1-2 个文件 | 拍平到二级，如 `浏览器自动化/测试框架/`(1) + `通用浏览自动化/`(1) → `浏览器自动化/` |
-| 三级目录 ≥3 个文件，且子类不同 | 保留三级，如 `媒体创作/视频制作/`(3) + `内容创作/`(2) |
-| 三级目录 3+ 文件但子类相近 | 考虑拍平  |
+| 三级目录仅 1-2 个文件 | 拍平到二级 |
+| 三级目录 ≥3 个文件，且子类不同 | 保留三级，如 `媒体创作/视频制作/` + `内容创作/` |
+| 三级目录 3+ 文件但子类相近 | 考虑拍平 |
 
-**例外：** Skills-Packs 按技能包来源划分（Superpowers / Anthropic 等），不受此限。
+Skills-Packs 按技能包来源划分，不受此限。
 
-### Key Discriminators
+### Key Discriminators（速查卡）
 
-- **GitHub repo describes itself as:** "library", "CLI", "framework", "package", "tool", "SDK" → **工具/**
-- **GitHub repo describes itself as:** "skill", "agent skill", "opencode skill", "claude code skill", "cursor skill" → **Skills/**
-- **Contains a `SKILL.md` with trigger conditions** → **Skills/**
-- **Install command is `pip install`, `npm install -g`, `brew install`** → **工具/**
-- **Install command is `npx skills add`** → **Skills/**
-- **Used inside Obsidian/VS Code as a plugin** → **插件/**
-- **Configured in `mcpServers` of opencode.jsonc** → **MCP/**
+| 问题 | → |
+|------|----|
+| 运行在 Agent **外部**（独立可执行，不依赖 Agent 运行时）？ | **工具/** |
+| 运行在 Agent **内部**，以 SKILL.md 指令集形式？ | **Skills/** 或 **Skills-Packs/** |
+| 运行在 Agent **内部**，以注入运行时插件形式？ | **插件/** |
+| 运行在 Agent **内部**，以 MCP 协议工具形式？ | **MCP/** |
+| 仓库描述含 "MCP server" / "Model Context Protocol" | **MCP/** |
+| 仓库有 SKILL.md + 触发条件 | **Skills/** |
+| 安装命令是 `npx skills add` | **Skills/** |
+| 描述含 "OpenCode plugin" / "inject into agent" / 安装到 Agent 插件目录 | **插件/** |
+| 描述含 "Obsidian plugin" / "standalone CLI" / "library" / "framework" / "package" | **工具/** |
+| 以上都不明确 | **问用户** |
 
-### Known Misclassifications (avoid repeating)
+### Known Misclassifications（反面教材）
 
-These were previously miscategorized and moved. Use them as negative examples:
-
-| File | Was In | Reason | Moved To |
-|------|--------|--------|----------|
-| `01-Agent-Browser.md` | Skills/浏览器自动化/通用浏览自动化/ | `vercel-labs/agent-browser` is an npm CLI tool (36K stars), not an agent skill | 工具/ |
-| `02-Repomix-Explorer.md` | Skills/搜索代理/代码探索/ | `yamadashy/repomix` is an npm CLI tool (2.4K stars), not an agent skill | 工具/ |
-| `01-Deep-Agents.md` | Skills/开发辅助/架构与Agent框架/ | `langchain-ai/deepagents` is a Python framework (24.6K stars), not an agent skill | 工具/ |
-| `02-SkillOpt.md` | Skills/开发辅助/架构与Agent框架/ | `microsoft/SkillOpt` is a pip Python tool (7.1K stars), not an agent skill | 工具/ |
-| `01-Defuddle.md` | Skills/知识管理/Obsidian生态/ | `kepano/defuddle` is an Obsidian plugin (7K stars), not an agent skill | 插件/ |
+| 文件 | 错放在 | 原因 | 正确分类 |
+|------|--------|------|---------|
+| `Agent-Browser.md` | Skills/ | `vercel-labs/agent-browser` 是独立 npm CLI（36K），运行在 Agent 外部 | **工具/** |
+| `Repomix-Explorer.md` | Skills/ | `yamadashy/repomix` 是独立 npm CLI（2.4K），运行在 Agent 外部 | **工具/** |
+| `Deep-Agents.md` | Skills/ | `langchain-ai/deepagents` 是独立 Python 框架（24.6K），运行在 Agent 外部 | **工具/** |
+| `SkillOpt.md` | Skills/ | `microsoft/SkillOpt` 是独立 pip 工具（7.1K），运行在 Agent 外部 | **工具/** |
+| `Defuddle.md` | 插件/ 或 Skills/ | `kepano/defuddle` 是 Obsidian 插件（7K），运行在 Agent **外部** | **工具/** |
 
 ## Device Configuration
 
@@ -702,7 +731,7 @@ Stop and re-evaluate if you catch yourself thinking:
 | "Deep Agents 是 agent 框架，放 架构与Agent框架 目录合理" | Deep Agents 是 pip 安装的 Python 框架（24.6K stars），不是 agent skill，应放 工具/ |
 | "Repomix 用于代码探索，放 搜索代理/代码探索 合理" | Repomix 是 npm CLI 工具（2.4K stars），不是 agent skill，应放 工具/ |
 | "SkillOpt 名字带 Skill，放 Skills 目录合理" | SkillOpt 是 pip 安装的 Python 工具（7.1K stars），虽然名字带 "Skill" 但本质是工具，应放 工具/ |
-| "Defuddle 用于内容提取，放 知识管理/Obsidian生态 合理" | Defuddle 是 Obsidian 插件（7K stars），不是 agent skill，应放 插件/ |
+| "Defuddle 用于内容提取，放 知识管理/Obsidian生态 合理" | Defuddle 是 Obsidian 插件（7K stars），运行在 Agent 外部，应放 工具/ |
 | "浏览器自动化/测试框架/ 只有1个文件，但分类更精确" | **1-2 个文件不值得三级目录** — 拍平到 浏览器自动化/，等同类文件到 3+ 个时再考虑分三级 |
 | "移动文件到另一个目录，改个数字就行" | 同时涉及源目录和目标目录的编号更新，重命名可能有冲突 |
 
@@ -774,7 +803,8 @@ Stop and re-evaluate if you catch yourself thinking:
 - Don't move files between directories without handling both source and target numbering — both directories need renumbering, and file rename conflicts (01→03 when 03 exists) require intermediate temp names
 - Don't assume Obsidian skills belong in 开发辅助/ — check if the skill is knowledge-management-specific and put it in `知识管理/` instead
 - Don't use batch string replacement (`-replace`) on YAML frontmatter — the result may silently produce empty files
-- Don't classify by name or domain alone ("名称带 Skill" / "用于浏览器自动化" / "用于代码探索") — classify by install method and repo description: `npx skills add` → Skills, `pip/npm/brew install` → 工具, Obsidian plugin → 插件
+- Don't classify by name or domain alone ("名称带 Skill" / "用于浏览器自动化" / "用于代码探索") — classify by execution context: Agent 外部 → 工具/, Agent 内部 + SKILL.md → Skills/, Agent 内部 + 运行时注入 → 插件/
 - Don't put CLI tools / Python frameworks / npm packages in Skills/ just because they relate to AI agents — if it's `pip install`able, it's a 工具, not a skill
-- Don't put Obsidian plugins in Skills/ — Obsidian community plugins go to 插件/, only `kepano/obsidian-skills` agent skills go to Skills/知识管理/Obsidian生态/
+- Don't put Obsidian plugins in Skills/ or 插件/ — Obsidian 插件运行在 Agent 外部，应放 工具/。只有 `kepano/obsidian-skills` agent skills 才放 Skills/知识管理/Obsidian生态/
 - Don't create 3-level directories for 1-2 files — 三级目录只应在同类文件 ≥3 个且子类领域明显不同时使用，否则拍平到二级目录
+- Don't confuse 插件/ with 工具/ — 插件/ 只放注入 Agent 运行时（修改 Agent 行为/能力）的软件。Obsidian 插件、VS Code 扩展、独立 CLI 都放 工具/
