@@ -61,6 +61,59 @@ TEMPLATE   = {VAULT_BASE}\00-工具功能介绍模板.md
 
 See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical directory list and numbering rules.
 
+## Classification Guide (Skills vs 工具 vs 插件 vs MCP)
+
+Every file placed in the vault must go in the correct directory. Use these rules to classify unambiguously.
+
+### Decision Tree
+
+```
+Is it installed via `npx skills add <owner/repo>@<skill>` or copied as a SKILL.md?
+  ├─ YES → Skills/ or Skills-Packs/
+  ├─ NO  → Is it installed via `pip install` / `npm install -g` / `brew install` / `cargo install` / direct download?
+  │       ├─ YES → Is it an MCP server (configured in opencode.jsonc `mcpServers`)?
+  │       │       ├─ YES → MCP/
+  │       │       └─ NO  → 工具/
+  │       └─ NO  → Is it an editor/IDE/app plugin (Obsidian, VS Code, JetBrains)?
+  │               ├─ YES → 插件/
+  │               └─ NO  → Ask user for clarification
+  └─ (Also: process/workflow documents that aren't installable software → Skills-Packs/)
+```
+
+### Concrete Rules
+
+| Type | Install Method | Target Directory | Examples |
+|------|---------------|-----------------|----------|
+| **Agent Skill** | `npx skills add owner/repo@skill` or manual SKILL.md copy | `Skills/` (single) or `Skills-Packs/` (pack) | Playwright-skill, BrowserAct-skill, Find-Skills, Agent-Reach, Video-Use, Manim-Video |
+| **CLI Tool** | `brew install`, `npm install -g`, `pip install`, `cargo install`, direct download | `工具/` | yt-dlp, ffmpeg, gh, bun, repomix, skillopt, deepagents |
+| **Library/Package** | `pip install`, `npm install` (local), `cargo add` | `工具/` | openai-whisper, aisuite, beautifulsoup |
+| **MCP Server** | `npx -y @org/mcp-server` or same, configured in `opencode.jsonc` `mcpServers` | `MCP/` | MarkItDown-MCP, CodeGraph, GBrain |
+| **Editor Plugin** | Obsidian community plugin / VS Code extension marketplace | `插件/` | Defuddle, Supermemory, Oh-My-Openagent |
+| **Skill Pack** | `npx skills add owner/repo` (multi-skill repo) or manual copy | `Skills-Packs/{NN}-{Name}/` | Superpowers, Anthropic, MattPocock, GStack, Awesome-Copilot |
+| **Process Doc / Workflow** | Not installable software | `Skills-Packs/` (if part of a pack) | GStack workflow docs |
+
+### Key Discriminators
+
+- **GitHub repo describes itself as:** "library", "CLI", "framework", "package", "tool", "SDK" → **工具/**
+- **GitHub repo describes itself as:** "skill", "agent skill", "opencode skill", "claude code skill", "cursor skill" → **Skills/**
+- **Contains a `SKILL.md` with trigger conditions** → **Skills/**
+- **Install command is `pip install`, `npm install -g`, `brew install`** → **工具/**
+- **Install command is `npx skills add`** → **Skills/**
+- **Used inside Obsidian/VS Code as a plugin** → **插件/**
+- **Configured in `mcpServers` of opencode.jsonc** → **MCP/**
+
+### Known Misclassifications (avoid repeating)
+
+These were previously miscategorized and moved. Use them as negative examples:
+
+| File | Was In | Reason | Moved To |
+|------|--------|--------|----------|
+| `01-Agent-Browser.md` | Skills/浏览器自动化/通用浏览自动化/ | `vercel-labs/agent-browser` is an npm CLI tool (36K stars), not an agent skill | 工具/ |
+| `02-Repomix-Explorer.md` | Skills/搜索代理/代码探索/ | `yamadashy/repomix` is an npm CLI tool (2.4K stars), not an agent skill | 工具/ |
+| `01-Deep-Agents.md` | Skills/开发辅助/架构与Agent框架/ | `langchain-ai/deepagents` is a Python framework (24.6K stars), not an agent skill | 工具/ |
+| `02-SkillOpt.md` | Skills/开发辅助/架构与Agent框架/ | `microsoft/SkillOpt` is a pip Python tool (7.1K stars), not an agent skill | 工具/ |
+| `01-Defuddle.md` | Skills/知识管理/Obsidian生态/ | `kepano/defuddle` is an Obsidian plugin (7K stars), not an agent skill | 插件/ |
+
 ## Device Configuration
 
 | Hostname | Device Name |
@@ -582,6 +635,12 @@ Stop and re-evaluate if you catch yourself thinking:
 | "模板只改了一点点，不用同步" | 模板变了必须运行 Template Sync，即使改动很小 — 字段会被慢慢遗忘 |
 | "PowerShell 脚本改 YAML 没问题" | 必须用结构化 YAML 解析，字符串替换可能产生空文件 |
 | "这个 Obsidian 技能放哪都行" | Obsidian 生态类 skill 必须放到 知识管理/Obsidian生态/ |
+| "这不是个 npx skills add 装的吗，放 Skills 没错" | **不是所有从 GitHub 装的东西都是 agent skill** — npm CLI 工具（pip/brew/npm包）放 工具/ |
+| "Agent Browser 是浏览器自动化，放浏览器自动化目录合理" | Agent Browser 是 vercel 的 npm CLI 包（36K stars），不是 SKILL.md 格式的 agent skill，应放 工具/ |
+| "Deep Agents 是 agent 框架，放 架构与Agent框架 目录合理" | Deep Agents 是 pip 安装的 Python 框架（24.6K stars），不是 agent skill，应放 工具/ |
+| "Repomix 用于代码探索，放 搜索代理/代码探索 合理" | Repomix 是 npm CLI 工具（2.4K stars），不是 agent skill，应放 工具/ |
+| "SkillOpt 名字带 Skill，放 Skills 目录合理" | SkillOpt 是 pip 安装的 Python 工具（7.1K stars），虽然名字带 "Skill" 但本质是工具，应放 工具/ |
+| "Defuddle 用于内容提取，放 知识管理/Obsidian生态 合理" | Defuddle 是 Obsidian 插件（7K stars），不是 agent skill，应放 插件/ |
 | "移动文件到另一个目录，改个数字就行" | 同时涉及源目录和目标目录的编号更新，重命名可能有冲突 |
 
 ## Edge Cases
@@ -651,3 +710,6 @@ Stop and re-evaluate if you catch yourself thinking:
 - Don't move files between directories without handling both source and target numbering — both directories need renumbering, and file rename conflicts (01→03 when 03 exists) require intermediate temp names
 - Don't assume Obsidian skills belong in 开发辅助/ — check if the skill is knowledge-management-specific and put it in `知识管理/` instead
 - Don't use batch string replacement (`-replace`) on YAML frontmatter — the result may silently produce empty files
+- Don't classify by name or domain alone ("名称带 Skill" / "用于浏览器自动化" / "用于代码探索") — classify by install method and repo description: `npx skills add` → Skills, `pip/npm/brew install` → 工具, Obsidian plugin → 插件
+- Don't put CLI tools / Python frameworks / npm packages in Skills/ just because they relate to AI agents — if it's `pip install`able, it's a 工具, not a skill
+- Don't put Obsidian plugins in Skills/ — Obsidian community plugins go to 插件/, only `kepano/obsidian-skills` agent skills go to Skills/知识管理/Obsidian生态/
