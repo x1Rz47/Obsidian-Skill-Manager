@@ -92,6 +92,18 @@ Is it installed via `npx skills add <owner/repo>@<skill>` or copied as a SKILL.m
 | **Skill Pack** | `npx skills add owner/repo` (multi-skill repo) or manual copy | `Skills-Packs/{NN}-{Name}/` | Superpowers, Anthropic, MattPocock, GStack, Awesome-Copilot |
 | **Process Doc / Workflow** | Not installable software | `Skills-Packs/` (if part of a pack) | GStack workflow docs |
 
+### Directory Depth Rule
+
+**Skills/ 下避免 3 级目录**（最多 2 级）。只有当某个二级分类下有 **≥3 个文件** 且子类之间领域明显不同时，才保留 3 级。否则合并到二级目录：
+
+| 场景 | 做法 |
+|------|------|
+| 三级目录仅 1-2 个文件 | 拍平到二级，如 `浏览器自动化/测试框架/`(1) + `通用浏览自动化/`(1) → `浏览器自动化/` |
+| 三级目录 ≥3 个文件，且子类不同 | 保留三级，如 `媒体创作/视频制作/`(3) + `内容创作/`(2) |
+| 三级目录 3+ 文件但子类相近 | 考虑拍平  |
+
+**例外：** Skills-Packs 按技能包来源划分（Superpowers / Anthropic 等），不受此限。
+
 ### Key Discriminators
 
 - **GitHub repo describes itself as:** "library", "CLI", "framework", "package", "tool", "SDK" → **工具/**
@@ -357,19 +369,14 @@ Walk ALL `.md` files under `{VAULT_BASE}` (excluding `00-工具功能介绍模�
 
 | Directory | Numbering Rule | Frontmatter Required |
 |-----------|---------------|---------------------|
-| `辅助工具/Skills/开发辅助/架构与Agent框架/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/搜索代理/跨平台搜索/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/搜索代理/代码探索/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/浏览器自动化/通用浏览自动化/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/浏览器自动化/测试框架/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/浏览器自动化/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/媒体创作/视频制作/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/媒体创作/内容创作/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/知识管理/Obsidian生态/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/知识管理/文档协作/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/知识管理/个人效能/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/效率工具/提示沟通/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/效率工具/Agent编排/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/搜索代理/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/效率工具/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills/启动验证/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/知识管理/Obsidian生态/` | By GitHub stars (desc) | Full template |
+| `辅助工具/Skills/知识管理/个人效能/` | By GitHub stars (desc) | Full template |
 | `辅助工具/Skills-Packs/01-Superpowers/规划/` | Manual (01-N, ordered at creation) | Full template |
 | `辅助工具/Skills-Packs/01-Superpowers/执行/` | Manual (01-N, ordered at creation) | Full template |
 | `辅助工具/Skills-Packs/01-Superpowers/协作/` | Manual (01-N, ordered at creation) | Full template |
@@ -478,19 +485,14 @@ Present a summary:
   - 扫描文件: <N>
   - 修复 frontmatter: <N>
   - 设备标记更新: <N>
-  - Skills/开发辅助/架构与Agent框架/ 新编号范围: 01-<N>
-  - Skills/搜索代理/跨平台搜索/ 新编号范围: 01-<N>
-  - Skills/搜索代理/代码探索/ 新编号范围: 01-<N>
-  - Skills/浏览器自动化/通用浏览自动化/ 新编号范围: 01-<N>
-  - Skills/浏览器自动化/测试框架/ 新编号范围: 01-<N>
+  - Skills/浏览器自动化/ 新编号范围: 01-<N>
+  - Skills/搜索代理/ 新编号范围: 01-<N>
+  - Skills/效率工具/ 新编号范围: 01-<N>
+  - Skills/启动验证/ 新编号范围: 01-<N>
   - Skills/媒体创作/视频制作/ 新编号范围: 01-<N>
   - Skills/媒体创作/内容创作/ 新编号范围: 01-<N>
   - Skills/知识管理/Obsidian生态/ 新编号范围: 01-<N>
-  - Skills/知识管理/文档协作/ 新编号范围: 01-<N>
   - Skills/知识管理/个人效能/ 新编号范围: 01-<N>
-  - Skills/效率工具/提示沟通/ 新编号范围: 01-<N>
-  - Skills/效率工具/Agent编排/ 新编号范围: 01-<N>
-  - Skills/启动验证/ 新编号范围: 01-<N>
   - Skills-Packs/01-Superpowers/ 所有子目录: 01-<N>
   - Skills-Packs/02-Anthropic/ 所有子目录: 01-<N>
   - Skills-Packs/03-MattPocock/ 所有子目录: 01-<N>
@@ -642,6 +644,7 @@ Stop and re-evaluate if you catch yourself thinking:
 | "Repomix 用于代码探索，放 搜索代理/代码探索 合理" | Repomix 是 npm CLI 工具（2.4K stars），不是 agent skill，应放 工具/ |
 | "SkillOpt 名字带 Skill，放 Skills 目录合理" | SkillOpt 是 pip 安装的 Python 工具（7.1K stars），虽然名字带 "Skill" 但本质是工具，应放 工具/ |
 | "Defuddle 用于内容提取，放 知识管理/Obsidian生态 合理" | Defuddle 是 Obsidian 插件（7K stars），不是 agent skill，应放 插件/ |
+| "浏览器自动化/测试框架/ 只有1个文件，但分类更精确" | **1-2 个文件不值得三级目录** — 拍平到 浏览器自动化/，等同类文件到 3+ 个时再考虑分三级 |
 | "移动文件到另一个目录，改个数字就行" | 同时涉及源目录和目标目录的编号更新，重命名可能有冲突 |
 
 ## Edge Cases
@@ -678,6 +681,7 @@ Stop and re-evaluate if you catch yourself thinking:
 | Superpowers core skills (核心技能) | Detectable via npm cache (`{npm-cache}/superpowers/skills/`). On Windows: `$env:USERPROFILE\.cache\opencode\packages\superpowers@git+https_\github.com\obra\superpowers.git\node_modules\superpowers\skills\`. On Mac: via npm cache. NOT found via `npx skills list -g`. |
 | Skill is domain-specific (Obsidian/MCP/GStack/Codex) | Place in the correct domain directory per the S2 table, not a generic one. |
 | Skill exists in both `Skills/` and `Skills-Packs/` | **Pack version wins.** Delete from `Skills/` (individual). Pack members take priority. Never keep duplicates. |
+| Directory depth decision | Ask: does this 3rd-level dir have ≥3 files AND a clearly distinct sub-domain? If not, flatten to 2-level. |
 
 ## Rationalization Table
 
@@ -714,3 +718,4 @@ Stop and re-evaluate if you catch yourself thinking:
 - Don't classify by name or domain alone ("名称带 Skill" / "用于浏览器自动化" / "用于代码探索") — classify by install method and repo description: `npx skills add` → Skills, `pip/npm/brew install` → 工具, Obsidian plugin → 插件
 - Don't put CLI tools / Python frameworks / npm packages in Skills/ just because they relate to AI agents — if it's `pip install`able, it's a 工具, not a skill
 - Don't put Obsidian plugins in Skills/ — Obsidian community plugins go to 插件/, only `kepano/obsidian-skills` agent skills go to Skills/知识管理/Obsidian生态/
+- Don't create 3-level directories for 1-2 files — 三级目录只应在同类文件 ≥3 个且子类领域明显不同时使用，否则拍平到二级目录
