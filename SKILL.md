@@ -686,12 +686,11 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
 
 ## Quality Checks
 
-- Verify the file was written correctly (read back first few lines)
-- GitHub star count should be accurate (fetched, not guessed)
-- Installation commands must be the actual commands used
-- Sections should follow template structure
-- No placeholder text left in the document
-- After renumbering, verify no file is missing or has a wrong number
+- 写入后回读前几行，确认内容正确
+- 安装命令必须是实际使用过的命令
+- 文档节结构必须匹配模板
+- 删除文档中的占位符文本
+- 重编号后检查是否有文件丢失或编号错误
 
 ## Red Flags
 
