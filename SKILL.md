@@ -238,7 +238,7 @@ If GitHub fetch fails (network error, no GitHub repo), set `GitHub星标: N/A`. 
 
 Run the installation command. Wait for it to complete. Verify success.
 
-After installation, determine the current device name from the Device Configuration table. Add the device name to `使用设备` in the frontmatter: `使用设备:\n  - Mac Mini`. If the tool doesn't support direct binary detection (like process workflows), set `使用设备: N/A`.
+After installation, note the current device name from Device Configuration. Device detection follows the [使用设备 判定规则](#使用设备-判定规则) table.
 
 ### Step 4: Check for Existing Document
 
@@ -256,21 +256,7 @@ Before creating a new file:
 
 ### Step 5: Global Sort and Renumber (NEW entries only)
 
-1. Read the `GitHub星标` frontmatter field from ALL existing files in the target directory
-2. Parse star counts:
-   - `12K` → 12000
-   - `1.5K` → 1500
-   - `N/A` → 0 (sorts to end)
-3. Sort all entries (new + existing) by:
-   - Primary: star count descending
-   - Secondary: tool name alphabetically (for equal star counts)
-4. Assign new numbers: `01`, `02`, `03`...
-5. Determine the filename from `工具名` in frontmatter:
-   - Convert to Pascal-kebab-case: `Find Skills` → `Find-Skills`, `Create Agents` → `Create-Agents`
-   - Result: `{NN}-{Pascal-Kebab-Name}.md`
-6. Rename files on disk to match: `{NN}-{Pascal-Kebab-Name}.md`
-
-Edge case — tools with `N/A` stars: always sort to the end, ordered alphabetically among themselves.
+Follow [Sync Step S5](#step-s5-global-re-sort) for the target directory only.
 
 ### Step 6: Generate Obsidian Document
 
@@ -309,10 +295,7 @@ GitHub星标: <star-count>
 - NEVER leave `GitHub连接` as `无` or empty — if truly unknown, set to `⚠️ Unknown` (not `无`)
 - Cross-check against the [Known Repo Mapping](#known-repo-mapping) table below
 
-**Device detection rules:**
-- If the tool is installed on the current device → add `  - <DeviceName>` under `使用设备:`
-- If the tool is NOT installed → set `使用设备: N/A`
-- Determine install status via: `which`, `brew list`, `npm list -g`, `pip list`, `npx skills list -g`
+**Device detection:** Follow the [使用设备 判定规则](#使用设备-判定规则) table to determine install status per device.
 
 **When verifying a file's frontmatter:**
 - `必用:` controls deployment behavior (`必用: true` = deploy to new devices)
@@ -484,13 +467,7 @@ Kept in global copy at `~/.config/opencode/skills/obsidian-skill-manager/SKILL.m
 
 ### Step S4: Device Tracking
 
-For each skill, infer its install command and check if the tool is installed on the current device:
-- `which <command>` for CLI tools
-- `brew list` for Homebrew packages
-- `npm list -g` for global npm packages
-- `pip list` for Python packages
-- `npx skills list -g` for opencode skills
-- MCP config in `opencode.jsonc` for MCP servers
+Follow [使用设备 判定规则](#使用设备-判定规则) to detect each tool's install status on the current device.
 
 Update `使用设备:` per file:
 
@@ -505,10 +482,10 @@ Update `使用设备:` per file:
 
 For all directories sorted by GitHub stars, renumber files:
 
-1. Sort by `GitHub星标` descending (N/A → end)
-2. For equal stars, sort alphabetically by `工具名`
-3. Renumber from `01` upwards
-4. Rename all files to `{NN}-{Pascal-Kebab-Name}.md`
+1. Read `GitHub星标` from each file; parse counts: `12K` → 12000, `1.5K` → 1500, `N/A` → 0
+2. Sort by star count descending (N/A → end); equal stars → alphabetically by `工具名`
+3. Assign new numbers `01`, `02`, `03`...
+4. Rename files to `{NN}-{Pascal-Kebab-Name}.md`
 5. Fix any files with missing frontmatter fields
 
 ### Step S6: Report
@@ -526,8 +503,7 @@ Present a summary:
   - Skills/搜索代理/ 新编号范围: 01-<N>
   - Skills/效率工具/ 新编号范围: 01-<N>
   - Skills/启动验证/ 新编号范围: 01-<N>
-  - Skills/媒体创作/视频制作/ 新编号范围: 01-<N>
-  - Skills/媒体创作/内容创作/ 新编号范围: 01-<N>
+  - Skills/媒体创作/ 新编号范围: 01-<N>
   - Skills/知识管理/Obsidian生态/ 新编号范围: 01-<N>
   - Skills/知识管理/个人效能/ 新编号范围: 01-<N>
   - Skills-Packs/01-Superpowers/ 所有子目录: 01-<N>
@@ -569,14 +545,7 @@ For each file's frontmatter:
 | Boolean values not lowercase | Fix: `True` → `true`, `False` → `false`, `Yes` → `yes` |
 | YAML parse errors | Fix frontmatter formatting |
 
-**Device detection for `使用设备:`:**
-For each file, detect if the documented tool is actually installed:
-- `which <tool>` for CLI tools
-- `brew list <tool>` for Homebrew packages
-- `npm list -g <package>` for global npm packages
-- `pip3 list` | grep for Python packages
-- `npx skills list -g` for global skills
-- MCP config in `opencode.jsonc` for MCP servers
+**Device detection:** Follow [使用设备 判定规则](#使用设备-判定规则) for each file.
 
 Update `使用设备:` based on detection result:
 - Installed → `使用设备:\n  - Mac Mini`
@@ -593,7 +562,7 @@ If the template has added, removed, or reordered body sections:
 
 Do NOT overwrite or remove content within sections — only add/remove/reorder the section headers.
 
-### Step T4c: 模板节内容补全（网上搜索）
+### Step T4a: 模板节内容补全（网上搜索）
 
 **Scope:** ALL `.md` files under `辅助工具/` that have empty or missing template sections (触发条件, 前置依赖, 主要解决的问题, 主要使用场景, 注意事项, 更新功能, 常用命令/语法).
 
