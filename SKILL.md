@@ -58,62 +58,21 @@ else:
 
 See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical directory list and numbering rules.
 
-## Classification Guide (Skills vs 工具 vs 插件 vs MCP)
-
-### 核心原则
+## Classification Guide
 
 按 **执行上下文** 分类：工具运行在 Agent **外部**（独立可执行）还是 **内部**（注入 Agent 运行时）？
-
-### Phase 1: 预判（安装前）
-
-```
-看 GitHub 仓库描述 / README 首段 / README.md 标题（按优先级）：
-┌─ 含 "MCP server" / "Model Context Protocol" / 包名含 -mcp 后缀 → MCP/
-├─ 含 "skill" / "agent skill" / "opencode skill"
-│  或仓库根目录有 SKILL.md（YAML frontmatter + ## 触发条件）
-│  ├─ 单 skill（npx skills add owner/repo@skill）                   → Skills/
-│  └─ 多 skill 包（npx skills add owner/repo）                       → Skills-Packs/
-├─ 运行在 Agent 内部但非 SKILL.md 形式
-│  ├─ 注入 Agent 运行时 / 描述含 "plugin" / "inject into agent"  → 插件/
-│  └─ 以 MCP 协议形式接入（配置在 opencode.jsonc mcpServers）        → MCP/
-└─ 以上都不匹配 → 默认进入 工具/ 类别：
-    ├─ 独立 CLI / 库 / Obsidian 插件 / VS Code 扩展 / 下载的二进制  → 工具/
-    └─ 不明 → 问用户："这个工具运行在 Agent 内部还是外部？"
-```
-
-**判断 插件/ vs 工具/ 的辅助规则：**
-
-| 特征 | → | 例子 |
-|------|---|------|
-| 安装后修改了 Agent 的行为/能力（记忆/编辑加速/类型检查/脱敏） | **插件/** | supermemory, morph, type-inject, vibeguard |
-| 安装后独立可执行，Agent 不依赖它 | **工具/** | yt-dlp, repomix, deepagents, agent-browser |
-| 描述含 "plugin" / "inject into agent"（注入 Agent 运行时，不论平台） | **插件/** | oh-my-openagent, vibeguard |
-| 描述含 "Obsidian community plugin"、"standalone CLI" | **工具/** | Defuddle |
-| 安装到 `~/.opencode/plugins/` 或类似 Agent 插件目录 | **插件/** | — |
-| Obsidian 插件 / VS Code 扩展 | **工具/** | 运行在 Agent 外部，不修改 Agent 行为 |
-
-### Phase 2: 验证（安装后）
-
-| Phase 1 | 实际在 Agent 外部 | 实际在 Agent 内部 |
-|---------|-----------------|------------------|
-| **工具/** | ✅ 一致 | ❌ 冲突 → 标记复核 |
-| **插件/** | ❌ 冲突 | ✅ 一致 |
-| **Skills/** | ❌ 冲突 | ✅ 取决于具体形式 |
-| **MCP/** | — | 检查 opencode.jsonc → ✅ |
-
-冲突时标记 `⚠️ 分类存疑，需人工确认`，不自动纠正。
-
-### Concrete Rules
 
 | 类型 | 运行位置 | 识别方式 | 例子 |
 |------|---------|---------|------|
 | **MCP Server** | Agent 内部（协议） | 描述含 "MCP server" / "Model Context Protocol"；包名含 `-mcp` | MarkItDown-MCP, CodeGraph, GBrain |
 | **Agent Skill** | Agent 内部（指令集） | 描述含 "skill"；仓库有 SKILL.md + 触发条件；安装：npx skills add | Playwright-skill, BrowserAct-skill, Find-Skills, Agent-Reach |
 | **Skill Pack** | Agent 内部（指令集） | 多 skill 仓库；安装：npx skills add owner/repo | Superpowers, Anthropic, MattPocock, GStack |
-| **插件** | Agent 内部（运行时注入） | 描述含 "plugin" / "inject into agent"；安装后修改 Agent 能力，不论针对哪个平台 | oh-my-openagent, supermemory, type-inject, morph |
+| **插件** | Agent 内部（运行时注入） | 描述含 "plugin" / "inject into agent"；安装后修改 Agent 能力，不论平台 | supermemory, morph, type-inject, vibeguard |
 | **工具** | Agent **外部** | 以上都不符合的可安装软件，不论具体形态 | yt-dlp, repomix, deepagents, agent-browser, Defuddle |
 
-> **工具/ 是兜底分类。** 只要不是 MCP server、不是 agent skill、也不是注入 Agent 运行时的插件，全部归入 工具/。Obsidian 插件、VS Code 扩展、OpenCode 插件中不注入运行时的部分，都是 工具/。
+> **工具/ 是兜底分类。** 只要不是 MCP server、不是 agent skill、也不是注入 Agent 运行时的插件，全部归入 工具/。 Obsidian 插件、VS Code 扩展、OpenCode 插件中不注入运行时的部分，都是 工具/。
+>
+> 安装后与之前判断冲突 → 标记 `⚠️ 分类存疑，需人工确认`，不自动纠正。
 
 ### Directory Depth Rule
 
@@ -784,20 +743,13 @@ Stop and re-evaluate if you catch yourself thinking:
 | GitHub fetch fails | Set `GitHub星标: N/A`, do not block |
 | No GitHub repository | Set `GitHub连接: ⚠️ Unknown`, `GitHub星标: N/A` |
 | Tool already documented | Update existing file, do not duplicate |
-| Category directory doesn't exist | Create it automatically |
 | Star count format varies | Parse: `12K` → 12000, `1.5K` → 1500, `N/A` → 0 |
 | Empty non-template files (e.g. OPENdesign.md) | Skip — no frontmatter, not a tool document |
 | Multiple files share the same star count | Sort alphabetically by tool name |
 | File rename fails during renumbering | Stop and report which file failed |
 | No existing files in directory | Number new file as `01` |
-| No `必用: true` tools found during deployment | Report "没有标记必用的工具" and stop |
-| Install command is ambiguous | Ask user to clarify before proceeding |
-| Tool is already installed | Skip, do not reinstall |
-| Install command fails | Record the error, continue with next tool |
 | User manually deleted files | Sync workflow detects and renumbers around them |
 | Numbering has gaps | Sync workflow closes all gaps |
-| Frontmatter fields out of order | Reorder to match template order |
-| Stale frontmatter field found | Rename/remove to match template |
 | File was renamed but not numbered | Sanitize name to match convention |
 | Hostname not found in Device Configuration | Ask user to identify the current device |
 | Tool install detection is ambiguous | Check multiple methods (`which`, `brew list`, etc.) |
@@ -806,17 +758,15 @@ Stop and re-evaluate if you catch yourself thinking:
 | Template hash mismatch detected | Ask user whether to run Template Sync |
 | Template hash not set in SKILL.md | Compute and set during first Template Sync run |
 | User declines template sync | Update `template_hash` to current, skip syncing |
-| Moving file between directories | **BOTH** source and target need renumbering. Source: remove and compress numbering. Target: insert file and renumber entire directory. NEVER just rename — you must rename ALL files in both directories if sorting changes. |
-| File rename collision (rename A→3 when 3 exists) | Use an intermediate temp name: A→temp, B→A, C→B, temp→C |
-| Superpowers core skills (核心技能) | Detectable via npm cache (`{npm-cache}/superpowers/skills/`). On Windows: `$env:USERPROFILE\.cache\opencode\packages\superpowers@git+https_\github.com\obra\superpowers.git\node_modules\superpowers\skills\`. On Mac: via npm cache. NOT found via `npx skills list -g`. |
-| Skill is domain-specific (Obsidian/MCP/GStack/Codex) | Place in the correct domain directory per the S2 table, not a generic one. |
-| Skill exists in both `Skills/` and `Skills-Packs/` | **Pack version wins.** Delete from `Skills/` (individual). Pack members take priority. Never keep duplicates. |
-| `工具名` format mismatch with filename | 工具名 应使用英文首字母大写的自然名称（如 `Agent Browser`），文件名自动从中推导 Pascal-kebab |
-| `GitHub连接` format | 必须使用 HTTPS 格式 `https://github.com/owner/repo`，不用 `git@` 或裸 `owner/repo` |
-| `创建日期` / `更新日期` format | 固定 `YYYY-MM-DD`，不用 `YYYY/MM/DD` 或 `YYYY.MM.DD` |
-| `使用平台` values | 取值限定：`全平台` / `macOS` / `Windows` / `Web`，不要自定义 |
-| `npx skills add` 安装失败 | 检查网络/权限/npm 缓存，记录错误后继续，不阻塞工作流 |
-| Cross-device sync conflict | 设备 A 修改文件后推送 → 设备 B 拉取后需重新运行 Sync 工作流校验 |
+| Superpowers core skills (核心技能) | Detectable via npm cache. NOT found via `npx skills list -g`. |
+| Skill is domain-specific (Obsidian/MCP/GStack/Codex) | Place in the correct domain directory per the S2 table. |
+| Skill exists in both `Skills/` and `Skills-Packs/` | **Pack version wins.** Delete from `Skills/` (individual). |
+| `工具名` format mismatch with filename | 工具名 应使用英文首字母大写的自然名称，文件名自动推导 Pascal-kebab |
+| `GitHub连接` format | 必须使用 HTTPS 格式 `https://github.com/owner/repo` |
+| `创建日期` / `更新日期` format | 固定 `YYYY-MM-DD` |
+| `使用平台` values | 取值：`全平台` / `macOS` / `Windows` / `Web` |
+| `npx skills add` 安装失败 | 检查网络/权限/npm 缓存，记录错误后继续 |
+| Cross-device sync conflict | 设备 A 修改后推送 → 设备 B 需重新运行 Sync |
 
 ## Anti-Patterns
 
