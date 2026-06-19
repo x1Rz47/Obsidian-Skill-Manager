@@ -611,7 +611,7 @@ This workflow runs when the user updates `{TEMPLATE}` and asks for all vault fil
 
 ### Step T2: Scan All Vault Files
 
-Walk ALL `.md` files under `{VAULT_BASE}` (excluding the template itself and empty files like `OPENdesign.md`).
+Walk ALL `.md` files under `{VAULT_BASE}` (excluding the template itself).
 
 ### Step T3: Normalize Frontmatter Per File
 
@@ -681,32 +681,6 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
 
 **Batching:** Process files in parallel by category (Skills/, Skills-Packs/*, 工具/, MCP/, 插件/). For large packs (GStack 45, AddyOsmani 24), split into sub-batches.
 
-### Step T4b: 辅助工具/ 全库模板化 + 汉化
-
-**Scope:** ALL `.md` files under `辅助工具/` (Skills, Skills-Packs, MCP, 插件, 工具). Does NOT apply to files outside `辅助工具/`.
-
-**Goal:** Every file must use only the 8 template sections (`Skills简介 → 触发条件 → 前置依赖 → 主要解决的问题 → 常用命令/语法 → 主要使用场景 → 注意事项 → 更新功能`). All English section headers and content must be translated to Chinese. Only code blocks, URLs, and technical proper nouns (SDK, API, etc.) stay untranslated.
-
-**Two-pass execution:**
-
-**Pass 1 — Content restructuring:** Map all non-template sections into template sections using keyword-based heuristics:
-- `开始之前` / `Before You Start` / `Precondition` / `安装` → `触发条件` + `前置依赖`
-- `子命令` / `Output` / `语法` / `Usage` / `Example` / `阶段` / `流程` / `Steps` → `常用命令/语法`
-- `Overview` / `目的` / `Introduction` / `What to build` → `主要解决的问题`
-- `When` / `何时` / `Use Case` → `主要使用场景`
-- `Common Pitfall` / `Failure mode` / `反模式` → `注意事项`
-- `Changelog` / `版本` → `更新功能`
-- Unmappable sections (design principles, brand guidelines, etc.): promote to `### Subsection` within `Skills简介`
-
-**Pass 2 — Content translation:** Translate all remaining English prose to Chinese using Google Translate API via `deep-translator`. Handle files over 5000 chars by splitting into chunks. Protect code blocks, inline code, URLs, and HTML comments from translation.
-
-**SKills-Packs imported skills (Anthropic/MattPocock/Superpowers/GStack/Awesome-Copilot):**
-- Original sections are restructured into template sections via heuristic mapping
-- Content is translated to Chinese (prose only, code and terms preserved)
-- Cannot-mapped content goes into `Skills简介` as `### 子节`
-
-**Reference:** The section-mapping keyword rules and translation logic are maintained in the execution scripts. When encountering a new section type, add its keyword mapping to the script and re-run.
-
 ### Step T5: Verify and Report
 
 1. Re-read every modified file and verify the YAML parses correctly
@@ -775,6 +749,7 @@ Stop and re-evaluate if you catch yourself thinking:
 | Tool already documented | Update existing file, do not duplicate |
 | Category directory doesn't exist | Create it automatically |
 | Star count format varies | Parse: `12K` → 12000, `1.5K` → 1500, `N/A` → 0 |
+| Empty non-template files (e.g. OPENdesign.md) | Skip — no frontmatter, not a tool document |
 | Multiple files share the same star count | Sort alphabetically by tool name |
 | File rename fails during renumbering | Stop and report which file failed |
 | No existing files in directory | Number new file as `01` |
