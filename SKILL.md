@@ -194,7 +194,9 @@ Before ANY workflow (Recording, Deployment, Sync, Template Sync), check if the v
 
 ### Step 0.1: Compute Current Template Hash
 
-Run `md5 -q "{VAULT_BASE}/00-工具功能介绍模板.md"` to get the current MD5 hash of the template file.
+Run the appropriate command for the current OS to get the MD5 hash of `{TEMPLATE}`:
+- **Mac:** `md5 -q "{TEMPLATE}"`
+- **Windows:** `certutil -hashfile "{TEMPLATE}" MD5 | findstr /v "MD5"`
 
 ### Step 0.2: Compare with Stored Hash
 
