@@ -386,6 +386,7 @@ Walk ALL `.md` files under `{VAULT_BASE}` (excluding `00-工具功能介绍模�
 | `辅助工具/Skills-Packs/04-GStack/{category}/` | Manual (01-N, ordered at creation) | Full template |
 | `辅助工具/Skills-Packs/05-Awesome-Copilot/` | Manual (01-N, ordered by stars) | Full template |
 | `辅助工具/MCP/` | By GitHub stars (desc) | Full template |
+| `辅助工具/工具/` | By GitHub stars (desc) | Full template |
 | `辅助工具/插件/` | By GitHub stars (desc) | Full template |
 
 For each file, parse its frontmatter and build a manifest: `工具名`, `GitHub星标`, `使用设备`, `必用`, and install commands.
