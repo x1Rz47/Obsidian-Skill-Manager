@@ -9,13 +9,21 @@ template_checked: 2026-06-18
 
 ## Overview
 
-Four workflows:
+Seven workflows:
 
 **Install:** When installing a new tool, check vault for existing docs (skip if found), install it, and mark the device. Does not modify vault files.
 
 **Document:** When recording a tool, scan vault for existing docs (update if found, create if new), gather info, and generate an Obsidian document. Does not install anything.
 
 **Combined:** Install first, then document if no existing doc was found.
+
+**Deployment:** Scan vault for `必用: true` tools and install them on the current device.
+
+**Device Sync:** Scan vault to update device tracking — add or remove the current device name based on actual install status. Does not renumber or fix frontmatter.
+
+**Sync:** Full vault scan — fix numbering, validate frontmatter, update device tracking, re-sort by stars.
+
+**Template Sync:** When the vault template changes, propagate new field order, section structure, and defaults to every file.
 
 **Deployment:** When setting up a new device, scan the vault for commonly-used tools (`必用: true`), infer the install commands from each document, execute them, and deploy corresponding opencode skills.
 
@@ -33,6 +41,7 @@ This skill activates in six modes:
 | **Document** | "记录 [工具]"、"给 [工具] 写个文档"、"doc [tool]" |
 | **Combined** | "安装并记录 [工具]"、"install and doc [tool]" |
 | **Deployment** | "部署/安装必用/安装常用/同步技能"、"deploy/setup this machine" |
+| **Device Sync** | "同步设备/更新设备/同步设备标记"、"device sync" |
 | **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
 | **Template Sync** | "模板变了/更新模板/同步模板"、"template changed/sync template" |
 
@@ -196,7 +205,7 @@ All skill document filenames in the vault must follow:
 
 ## Common Pre-Check (Step 0: Template Hash Validation)
 
-Before ANY workflow (Install, Document, Combined, Deployment, Sync, Template Sync), check if the vault template has changed:
+Before ANY workflow (Install, Document, Combined, Deployment, Device Sync, Sync, Template Sync), check if the vault template has changed:
 
 ### Step 0.1: Compute Current Template Hash
 
@@ -527,7 +536,7 @@ Present a summary:
 
 ```
 🔍 同步完成 — 全 vault
-  - 当前设备: Mac Mini
+  - 当前设备: {从 S1 获取}
   - 扫描目录: <N>
   - 扫描文件: <N>
   - 修复 frontmatter: <N>
@@ -546,6 +555,47 @@ Present a summary:
   - Skills-Packs/05-Awesome-Copilot/: 01-<N>
   - MCP/: 01-<N>
   - 插件/: 01-<N>
+```
+
+## Device Sync Workflow（设备同步）
+
+Quick device-tracking-only scan. Does not renumber or fix frontmatter.
+
+### Step DS1: Determine Current Device
+
+1. Run `hostname` to get the current machine's hostname
+2. Look up the device name in the Device Configuration table
+3. If the hostname is not mapped, ask the user to identify the device
+
+### Step DS2: Check Install Status
+
+For each `.md` file under `{VAULT_BASE}/辅助工具/` (excluding template and empty files):
+
+1. Determine the tool type from its category directory
+2. Run the appropriate detection command per [使用设备 判定规则](#使用设备-判定规则)
+3. Record whether the tool IS or IS NOT installed on the current device
+
+### Step DS3: Update Device Field
+
+For each file:
+
+| Current State | Action |
+|---------------|--------|
+| Tool IS installed, device name NOT in `使用设备` | Add `  - <DeviceName>` |
+| Tool IS installed, device name already in `使用设备` | No change |
+| Tool NOT installed, device name IS in `使用设备` | Remove `  - <DeviceName>` from list |
+| Tool NOT installed, `使用设备: N/A` | No change |
+| Tool NOT installed, `使用设备` has entries from other devices | No change |
+| Workflow/Skills-Packs (not installable) | Leave as `N/A` |
+
+### Step DS4: Report
+
+```
+📱 设备同步完成
+  - 当前设备: <DeviceName>
+  - 扫描文件: <N>
+  - 新增设备标记: <N>
+  - 移除设备标记: <N>
 ```
 
 ## Template Sync Workflow

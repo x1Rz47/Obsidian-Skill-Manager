@@ -17,8 +17,10 @@ npx skills add x1Rz47/Obsidian-Skill-Manager@obsidian-skill-manager
 | **Install** | Installs a tool, checks vault for existing docs first (skips doc if found), marks the device. Does not touch vault files |
 | **Document** | Creates or updates a vault doc for a tool. Does not install anything |
 | **Combined** | Install + auto-document if no existing doc found |
+| **Deployment** | Scans vault for `必用: true` tools and installs them |
 | **Deployment** | Scans the vault for `必用: true` tools, infers install commands, and sets them up on a new machine |
-| **Sync** | Scans all vault files, fixes numbering gaps, re-sorts by stars, validates frontmatter, and updates device tracking |
+| **Device Sync** | Scans vault to update device tracking — adds/removes current device name based on actual install status. Fast (~10s), no renumbering |
+| **Sync** | Full vault scan — renumbers, validates frontmatter, updates device tracking, re-sorts by stars |
 | **Template Sync** | When `00-工具功能介绍模板.md` changes, propagates the new field order, section structure, and defaults to every file |
 
 ## Vault Structure
