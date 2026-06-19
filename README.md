@@ -14,7 +14,9 @@ npx skills add x1Rz47/Obsidian-Skill-Manager@obsidian-skill-manager
 
 | Workflow | What it does |
 |----------|-------------|
-| **Recording** | Installs a new tool, gathers info from GitHub/README, classifies it, assigns a number by popularity (stars), and generates an Obsidian doc from the template |
+| **Install** | Installs a tool, checks vault for existing docs first (skips doc if found), marks the device. Does not touch vault files |
+| **Document** | Creates or updates a vault doc for a tool. Does not install anything |
+| **Combined** | Install + auto-document if no existing doc found |
 | **Deployment** | Scans the vault for `必用: true` tools, infers install commands, and sets them up on a new machine |
 | **Sync** | Scans all vault files, fixes numbering gaps, re-sorts by stars, validates frontmatter, and updates device tracking |
 | **Template Sync** | When `00-工具功能介绍模板.md` changes, propagates the new field order, section structure, and defaults to every file |

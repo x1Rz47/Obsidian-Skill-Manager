@@ -11,7 +11,11 @@ template_checked: 2026-06-18
 
 Four workflows:
 
-**Recording:** When installing any tool, automatically gather information, execute installation, determine category, assign a number by popularity (GitHub stars), and record everything into the user's Obsidian vault following their template format. If the tool is already documented, update it instead of duplicating.
+**Install:** When installing a new tool, check vault for existing docs (skip if found), install it, and mark the device. Does not modify vault files.
+
+**Document:** When recording a tool, scan vault for existing docs (update if found, create if new), gather info, and generate an Obsidian document. Does not install anything.
+
+**Combined:** Install first, then document if no existing doc was found.
 
 **Deployment:** When setting up a new device, scan the vault for commonly-used tools (`必用: true`), infer the install commands from each document, execute them, and deploy corresponding opencode skills.
 
@@ -21,11 +25,13 @@ Four workflows:
 
 ## Triggering
 
-This skill activates in four modes:
+This skill activates in six modes:
 
 | Mode | Trigger phrases |
 |------|----------------|
-| **Recording** | "安装/下载/添加/设置/配置 [工具]"、"install/setup/add [tool]" |
+| **Install** | "安装/下载 [工具]"、"install/setup/add [tool]" |
+| **Document** | "记录 [工具]"、"给 [工具] 写个文档"、"doc [tool]" |
+| **Combined** | "安装并记录 [工具]"、"install and doc [tool]" |
 | **Deployment** | "部署到这台电脑/安装常用/同步技能"、"deploy/setup this machine" |
 | **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
 | **Template Sync** | "模板变了/更新模板/同步模板"、"template changed/sync template" |
@@ -190,7 +196,7 @@ All skill document filenames in the vault must follow:
 
 ## Common Pre-Check (Step 0: Template Hash Validation)
 
-Before ANY workflow (Recording, Deployment, Sync, Template Sync), check if the vault template has changed:
+Before ANY workflow (Install, Document, Combined, Deployment, Sync, Template Sync), check if the vault template has changed:
 
 ### Step 0.1: Compute Current Template Hash
 
@@ -212,9 +218,9 @@ Read `template_hash` from this SKILL.md's frontmatter:
 
 If `template_checked` is more than 7 days old, update it to today.
 
-## Recording Workflow
+## Install Workflow（安装，不动 vault）
 
-### Step 1: Identify the Tool
+### Step I1: Identify the Tool
 
 Determine:
 - **Name**: What is it called?
@@ -222,7 +228,7 @@ Determine:
 - **Source**: GitHub / npm / brew / pip / direct download
 - **Category**: Map source to target directory using the [Sync S2 table](#step-s2-scan-all-vault-directories).
 
-### Step 2: Gather Information
+### Step I2: Gather Information
 
 Collect:
 - Description from official docs/README
@@ -234,31 +240,53 @@ Collect:
 
 If GitHub fetch fails (network error, no GitHub repo), set `GitHub星标: N/A`. Do not block the workflow.
 
-### Step 3: Execute Installation
+### Step I3: Check for Existing Document
+
+Before installing, scan the target directory in vault:
+1. Read all files in the target category directory
+2. Parse frontmatter of each file for `工具名` and `aliases`
+3. If a match is found → tell the user: "该工具已记录过文档，不再重复记录"
+4. If no match → proceed (Document workflow will handle it if needed)
+
+Continue to install regardless of the result.
+
+### Step I4: Execute Installation
 
 Run the installation command. Wait for it to complete. Verify success.
 
 After installation, note the current device name from Device Configuration. Device detection follows the [使用设备 判定规则](#使用设备-判定规则) table.
 
-### Step 4: Check for Existing Document
+---
 
-Before creating a new file:
+## Document Workflow（记录，不安装）
+
+### Step W1: Check for Existing Document
+
 1. Read all files in the target category directory
 2. Parse frontmatter of each file for `工具名` and `aliases`
 3. If a match is found → this is an **UPDATE**:
-   - Update `更新日期` to today (every modification)
-   - Do NOT modify `创建日期` — it is set once on creation and never changed
+   - Update `更新日期` to today
+   - Do NOT modify `创建日期`
    - Add a new entry to `更新功能`: e.g. "更新于 2026-06-06: 更新了核心功能描述"
    - Merge new information into existing sections
    - Do NOT change the file's number
-   - Skip Steps 5-6, go directly to Step 7
-4. If no match → this is a **NEW** entry, proceed to Step 5
+   - Skip Steps W3-W4, go directly to save
+4. If no match → this is a **NEW** entry, proceed to Step W2
 
-### Step 5: Global Sort and Renumber (NEW entries only)
+### Step W2: Gather Information
+
+Collect:
+- Description from official docs/README
+- GitHub URL and star count (use web search)
+- Core features
+- Dependencies
+- Any warnings or notes
+
+### Step W3: Global Sort and Renumber (NEW entries only)
 
 Follow [Sync Step S5](#step-s5-global-re-sort) for the target directory only.
 
-### Step 6: Generate Obsidian Document
+### Step W4: Generate Obsidian Document
 
 Read the template file at `{TEMPLATE}`, then fill in each section:
 
@@ -313,14 +341,19 @@ GitHub星标: <star-count>
 - **注意事项** — Important caveats
 - **更新功能** — changelog entries at the bottom
 
-### Step 7: Save and Confirm
-
 Write to `{VAULT_BASE}/{category}/{filename}`.
-Confirm to the user that the tool is installed and documented.
+Confirm to the user that the tool is documented.
+
+---
+
+## Combined Workflow（安装并记录）
+
+1. Run [Install Workflow](#install-workflow安装不动-vault) Steps I1-I4
+2. After installation, if no existing document was found in Step I3, run [Document Workflow](#document-workflow记录不安装) Steps W2-W4 (skip W1, info was already gathered in I2)
 
 ## Deployment Workflow (New Device Setup)
 
-This workflow runs independently from the recording workflow above. Use it when setting up a new machine.
+This workflow runs independently. Use it when setting up a new machine.
 
 ### Step D1: Scan for Favorites
 
@@ -412,7 +445,7 @@ For every file across all directories:
 
 #### Known Repo Mapping
 
-Used by Recording Step 6 and Sync S3 — extend as new tools are installed.
+Used by Document Workflow Step W4 and Sync S3 — extend as new tools are installed.
 Kept in global copy at `~/.config/opencode/skills/obsidian-skill-manager/SKILL.md` so all sessions benefit.
 
 | 工具名 (`工具名`) | GitHub Repo |
