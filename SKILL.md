@@ -444,7 +444,6 @@ For every file across all directories:
 - **`GitHub连接` missing or `无`** → Auto-fill from Known Repo Mapping table (see below); if no match found, set to `⚠️ Unknown`
 - **`GitHub连接` is `⚠️ Unknown`** → Leave as-is (flagged for review, don't auto-fix without confirming)
 - **Naming mismatches** → Rename to `{NN}-{Pascal-Kebab-Name}.md`
-- **Malformed frontmatter** → Fix YAML formatting (e.g. comma-separated→list, empty values→N/A, wrong field names)
 
 #### Known Repo Mapping
 
@@ -583,7 +582,6 @@ For each file's frontmatter:
 | `使用设备:` has wrong format | Fix: YAML list (`  - Device`) or `使用设备: N/A` |
 | Missing `使用设备:` | Add based on install detection |
 | Boolean values not lowercase | Fix: `True` → `true`, `False` → `false`, `Yes` → `yes` |
-| YAML parse errors | Fix frontmatter formatting |
 
 **Device detection:** Follow [使用设备 判定规则](#使用设备-判定规则) for each file.
 
@@ -725,6 +723,7 @@ Walk ALL `.md` files under `{VAULT_BASE}` (excluding the template itself).
 | Check | Detection | Fix |
 |-------|-----------|-----|
 | `aliases` 含 `@` 前缀 | Parse frontmatter, aliases value starts with `@` | Remove `@` prefix, keep rest of text |
+| frontmatter YAML 解析错误 | Parse each file's YAML frontmatter; catch errors (delimiters, alignment, illegal chars) | Fix formatting and re-parse until clean |
 
 *(Add rows to this table as new format issues are identified.)*
 
