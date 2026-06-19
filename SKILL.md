@@ -579,6 +579,42 @@ If the template has added, removed, or reordered body sections:
 
 Do NOT overwrite or remove content within sections — only add/remove/reorder the section headers.
 
+### Step T4c: 模板节内容补全（网上搜索）
+
+**Scope:** ALL `.md` files under `辅助工具/` that have empty or missing template sections (触发条件, 前置依赖, 主要解决的问题, 主要使用场景, 注意事项, 更新功能, 常用命令/语法).
+
+**Goal:** No file should have empty sections. Every template section must contain meaningful content derived from internet research.
+
+**Execution:**
+
+1. **Scan for gaps:** For each file, check which of the 8 template sections are missing or contain only `> ` / whitespace.
+
+2. **Identify the tool/skill:** Extract `工具名` from frontmatter, or infer from filename and `Skills简介`.
+
+3. **Internet research (do one of):**
+   - If the tool has a `GitHub连接` → open the GitHub README, extract relevant section content
+   - If the tool is from a known collection (Anthropic/MattPocock/Superpowers/AddyOsmani/GStack) → search web for the skill's documentation
+   - If the tool is a CLI/package → search web for its official docs
+   - Use `websearch` tool with query: `"{tool-name} AI agent skill documentation"` or `"{tool-name} CLI tool features"`
+
+4. **Fill each section with real content:**
+   - `触发条件` → When should an agent/user invoke this tool? What problem triggers its use?
+   - `前置依赖` → What runtimes, packages, or prior setup are needed?
+   - `主要解决的问题` → ❌/✅ table with 3+ pain points and how this tool solves them
+   - `常用命令/语法` → Actual command examples, code blocks
+   - `主要使用场景` → Bullet list with **bold** scene names + descriptions
+   - `注意事项` → Caveats, known limitations, version-specific warnings
+   - `更新功能` → "无（首次记录）" for new entries, or research changelog
+
+5. **Content rules:**
+   - Content must be in Chinese (except code blocks, URLs, proper nouns)
+   - Do NOT copy placeholder text from the template
+   - Base content on actual research, not speculation
+   - If web research yields no results, derive content from the existing `Skills简介` section
+   - After filling, verify the file reads naturally as a complete document
+
+**Batching:** Process files in parallel by category (Skills/, Skills-Packs/*, 工具/, MCP/, 插件/). For large packs (GStack 45, AddyOsmani 24), split into sub-batches.
+
 ### Step T4b: 辅助工具/ 全库模板化 + 汉化
 
 **Scope:** ALL `.md` files under `辅助工具/` (Skills, Skills-Packs, MCP, 插件, 工具). Does NOT apply to files outside `辅助工具/`.
