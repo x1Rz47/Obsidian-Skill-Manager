@@ -221,6 +221,17 @@ Read `template_hash` from this SKILL.md's frontmatter:
 
 If `template_checked` is more than 7 days old, update it to today.
 
+## Frontmatter Normalization Rules
+
+Shared by Sync S3 and Template Sync T3. Apply these checks to every `.md` file before other workflow-specific logic.
+
+| Check | Fix |
+|-------|-----|
+| Wrong field order | Reorder to match template: `工具名` → `aliases` → `标签` → `GitHub连接` → `GitHub星标` → `创建日期` → `更新日期` → `必用` → `使用设备` → `使用平台` |
+| `使用设备:` wrong format | Fix to YAML list (`  - Device`) or `使用设备: N/A` |
+| Missing `使用设备:` | Add based on install detection |
+| Boolean values not lowercase | Fix: `True` → `true`, `False` → `false`, `Yes` → `yes` |
+
 ## Install Workflow（安装，不动 vault）
 
 ### Step I1: Identify the Tool
@@ -433,14 +444,10 @@ For each file, parse its frontmatter and build a manifest: `工具名`, `GitHub�
 
 ### Step S3: Detect and Fix Issues Per File
 
-For every file across all directories:
+Apply [Frontmatter Normalization Rules](#frontmatter-normalization-rules) to every file, plus Sync-specific checks:
 
-- **Missing `使用设备:`** → Add with current device name or `no`
-- **Wrong `使用设备:` format** → YAML list (`  - DeviceName`) or `使用设备: N/A`
 - **Missing `必用:`** → Add `必用: false`
 - **Wrong field name (`常用`)** → Rename to `必用`
-- **Wrong field order** → Reorder to match template: `工具名` → `aliases` → `标签` → `GitHub连接` → `GitHub星标` → `创建日期` → `更新日期` → `必用` → `使用设备` → `使用平台`
-- **Stale fields (`tags:`)** → Remove (template doesn't have it)
 - **`GitHub连接` missing or `无`** → Auto-fill from Known Repo Mapping table (see below); if no match found, set to `⚠️ Unknown`
 - **`GitHub连接` is `⚠️ Unknown`** → Leave as-is (flagged for review, don't auto-fix without confirming)
 - **Naming mismatches** → Rename to `{NN}-{Pascal-Kebab-Name}.md`
@@ -571,17 +578,13 @@ Walk ALL `.md` files under `{VAULT_BASE}` (excluding the template itself).
 
 ### Step T3: Normalize Frontmatter Per File
 
-For each file's frontmatter:
+Apply [Frontmatter Normalization Rules](#frontmatter-normalization-rules) to every file, plus template-specific checks:
 
 | Check | Action |
 |-------|--------|
-| Field order doesn't match template | Reorder fields to match template order exactly |
 | Field name doesn't match template | Rename to match template exactly |
 | Field removed from template (e.g., `tags:`) | Remove the field from all files |
 | Field added to template (e.g., `使用平台:`) | Add the field with default value |
-| `使用设备:` has wrong format | Fix: YAML list (`  - Device`) or `使用设备: N/A` |
-| Missing `使用设备:` | Add based on install detection |
-| Boolean values not lowercase | Fix: `True` → `true`, `False` → `false`, `Yes` → `yes` |
 
 **Device detection:** Follow [使用设备 判定规则](#使用设备-判定规则) for each file.
 
