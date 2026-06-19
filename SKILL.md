@@ -35,7 +35,7 @@ This skill activates in six modes:
 | **Document** | "记录 [工具]"、"给 [工具] 写个文档"、"doc [tool]" |
 | **Combined** | "安装并记录 [工具]"、"install and doc [tool]" |
 | **Deployment** | "部署/安装必用/安装常用/同步技能"、"deploy/setup this machine" |
-| **Fix** | "更新文档/修复文档/检查格式"、"fix docs/fix format" |
+| **Fix** | "修复文档/修复所有文档/修复格式/检查格式"、"fix docs/fix format" |
 | **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
 | **Template Sync** | "模板变了/更新模板/同步模板"、"template changed/sync template" |
 
@@ -710,7 +710,7 @@ No per-file confirmation needed — batch and report.
 
 ## Fix Workflow
 
-Triggered by `"更新文档"` / `"fix docs"`. Scans vault for known format issues and fixes them. Does NOT renumber, refresh data, or sync templates.
+Triggered by `"修复文档/修复格式/检查格式"` / `"fix docs"`. Scans vault for known format issues and fixes them. Does NOT renumber, refresh data, or sync templates.
 
 ### Step F1: Scan All Vault Files
 
