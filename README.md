@@ -2,41 +2,47 @@
 
 [![GitHub](https://img.shields.io/badge/GitHub-x1Rz47%2FObsidian--Skill--Manager-blue)](https://github.com/x1Rz47/Obsidian-Skill-Manager)
 
-OpenCode skill — 自动管理工具文档到 Obsidian 知识库，支持多设备追踪和模板同步。
+An OpenCode skill that manages tool documentation in an Obsidian vault — automatic classification, numbering, device tracking, and template synchronization.
 
-[→ SKILL.md](SKILL.md)
-
-## 安装
+## Installation
 
 ```bash
-npx skills add x1Rz47/Obsidian-Skill-Manager -g -y
+npx skills add x1Rz47/Obsidian-Skill-Manager@obsidian-skill-manager
 ```
 
-## 快速使用
+## Workflows
 
-| 命令 | 说明 |
-|------|------|
-| `安装 <tool>` | 安装工具并自动记录到 Obsidian |
-| `部署到这台电脑` | 在新设备安装 `必用: true` 的工具 |
-| `执行` / `sync` | 扫描并修复 vault 文档状态 |
-| `模板变了` | 同步所有文档到最新模板格式 |
+| Workflow | What it does |
+|----------|-------------|
+| **Recording** | Installs a new tool, gathers info from GitHub/README, classifies it, assigns a number by popularity (stars), and generates an Obsidian doc from the template |
+| **Deployment** | Scans the vault for `必用: true` tools, infers install commands, and sets them up on a new machine |
+| **Sync** | Scans all vault files, fixes numbering gaps, re-sorts by stars, validates frontmatter, and updates device tracking |
+| **Template Sync** | When `00-工具功能介绍模板.md` changes, propagates the new field order, section structure, and defaults to every file |
 
-## 四个工作流
-
-- **Recording** — 安装时自动归类、按 GitHub Star 排号、生成标准化文档
-- **Deployment** — 跨设备部署标记为 `必用` 的工具
-- **Sync** — 修复 frontmatter、编号、设备标记
-- **Template Sync** — 模板变更时级联更新所有 vault 文件
-
-## 目录结构
+## Vault Structure
 
 ```
-Obsidian-Skill-Manager/
-├── SKILL.md      主技能定义
-├── README.md     本文档
-└── .gitignore
+辅助工具/
+├── Skills/           # Agent SKILL.md instruction sets, grouped by domain
+│   ├── 浏览器自动化/
+│   ├── 媒体创作/
+│   ├── 搜索代理/
+│   ├── 效率工具/
+│   ├── 启动验证/
+│   └── 知识管理/
+├── Skills-Packs/     # Multi-skill repositories (Superpowers, Anthropic, etc.)
+├── 工具/             # Standalone CLIs, Obsidian plugins, libraries
+├── 插件/             # Agent runtime-injection plugins (supermemory, morph, etc.)
+└── MCP/              # MCP protocol tools (MarkItDown, CodeGraph, GBrain)
 ```
 
-## License
+## Classification Principle
 
-MIT
+Tools are classified by **execution context** — where does the tool actually run?
+
+- Agent **external** (standalone CLI, Obsidian plugin, VS Code extension) → `工具/`
+- Agent **internal** (SKILL.md instruction set) → `Skills/`
+- Agent **internal** (runtime injection) → `插件/`
+- Agent **internal** (MCP protocol) → `MCP/`
+
+See `SKILL.md` for the full classification guide, workflow steps, naming conventions, and anti-patterns.
