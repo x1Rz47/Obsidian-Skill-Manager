@@ -556,7 +556,7 @@ Present a summary:
 
 ## Template Sync Workflow
 
-This workflow runs when the user updates `{TEMPLATE}` and asks for all vault files to be synchronized to match. It normalizes frontmatter field order, field names, device tracking, and body section structure.
+This workflow runs when the user updates `{TEMPLATE}` and asks for all vault files to be synchronized to match. It normalizes frontmatter field order, field names, device tracking, body section structure, and refreshes live data (stars, dates, changelog).
 
 ### Step T1: Read the Template
 
@@ -576,7 +576,7 @@ For each file's frontmatter:
 | Check | Action |
 |-------|--------|
 | Field order doesn't match template | Reorder fields to match template order exactly |
-| Field name changed (e.g., `Github连接` → `GitHub连接`, `Github星标` → `GitHub星标`) | Rename to match template |
+| Field name doesn't match template | Rename to match template exactly |
 | Field removed from template (e.g., `tags:`) | Remove the field from all files |
 | Field added to template (e.g., `使用平台:`) | Add the field with default value |
 | `使用设备:` has wrong format | Fix: YAML list (`  - Device`) or `使用设备: N/A` |
@@ -637,6 +637,18 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
 
 **Batching:** Process files in parallel by category (Skills/, Skills-Packs/*, 工具/, MCP/, 插件/). For large packs (GStack 45, AddyOsmani 24), split into sub-batches.
 
+### Step T4b: 数据刷新
+
+For every `.md` file under `辅助工具/`:
+
+1. **GitHub星标** — fetch 对应 repo 页面, 解析星标数后写回
+2. **更新日期** — 设为当天 `YYYY-MM-DD`
+3. **更新功能** — 查 repo release 日志, 与上次 `更新日期` 对比:
+   - 有更新 → 写新条目
+   - 无变化 → 写 `"无（数据已同步）"`
+
+No per-file confirmation needed — batch and report.
+
 ### Step T5: Verify and Report
 
 1. Re-read every modified file and verify the YAML parses correctly
@@ -651,10 +663,12 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
 📋 模板同步完成
   - 总文件: <N>
   - 字段重排: <N>
-  - 字段重命名: <N>
-  - 使用设备更新: <N>
-  - 布尔值修复: <N>
-  - 错误: 0
+   - 字段重命名: <N>
+   - 使用设备更新: <N>
+   - 布尔值修复: <N>
+   - GitHub星标更新: <N>
+   - 更新日期写入: <N>
+   - 错误: 0
 ```
 
 4. If any files couldn't be parsed correctly, report them as errors and do not modify them.
