@@ -21,40 +21,28 @@ Four workflows:
 
 ## Triggering
 
-This skill activates in three modes:
+This skill activates in four modes:
 
-**Recording mode** — when the user acquires new software:
-- "安装 X" / "下载 X" / "添加 X"
-- "设置 X" / "配置 X"
-- "install X" / "setup X" / "add X"
-- Any request involving acquiring new software
-
-**Deployment mode** — when the user sets up a new device:
-- "部署到这台电脑" / "安装常用" / "同步技能"
-- "deploy my skills" / "setup this machine"
-
-**Sync mode** — when the user wants to clean up and re-sort:
-- "执行" / "同步" / "清理"
-- "sync" / "clean up" / "reindex"
-
-**Template Sync mode** — when the vault template changes and needs propagation:
-- "模板变了" / "模板更新" / "同步模板"
-- "template changed" / "sync template" / "更新模板"
-- "按这个模板来更新" / "按模板更新"
-- Any instruction to match all docs to a specific template format
+| Mode | Trigger phrases |
+|------|----------------|
+| **Recording** | "安装/下载/添加/设置/配置 [工具]"、"install/setup/add [tool]" |
+| **Deployment** | "部署到这台电脑/安装常用/同步技能"、"deploy/setup this machine" |
+| **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
+| **Template Sync** | "模板变了/更新模板/同步模板"、"template changed/sync template" |
 
 ## Vault Configuration
 
-**macOS (Mac Mini):**
-```
-VAULT_BASE = /Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖
-TEMPLATE   = {VAULT_BASE}/00-工具功能介绍模板.md
-```
+`hostname` determines the active config:
 
-**Windows (WPC):**
 ```
-VAULT_BASE = D:\SynologyDrive\5.个人资料\1.知识库\个人知识库\04.AI相关-🤖
-TEMPLATE   = {VAULT_BASE}\00-工具功能介绍模板.md
+if hostname == "x1Rz47-A1213":    # Mac Mini (macOS)
+  VAULT_BASE = /Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖
+  TEMPLATE   = {VAULT_BASE}/00-工具功能介绍模板.md
+elif hostname == "WPC-x1Rz47":    # WPC (Windows)
+  VAULT_BASE = D:\SynologyDrive\5.个人资料\1.知识库\个人知识库\04.AI相关-🤖
+  TEMPLATE   = {VAULT_BASE}\00-工具功能介绍模板.md
+else:
+  ask user to identify the device and add to [Device Configuration](#device-configuration)
 ```
 
 ## Category Directories
