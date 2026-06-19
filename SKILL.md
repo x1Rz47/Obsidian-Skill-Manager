@@ -150,28 +150,24 @@ Skills-Packs 按技能包来源划分，不受此限。
 | `x1Rz47-A1213` | Mac Mini |
 | `WPC-x1Rz47` | WPC |
 
-To determine the current device, check `hostname` and map it using this table. If the hostname is not yet mapped, ask the user to name the device.
-
 ## 使用设备 判定规则
 
-`使用设备` 字段记录该工具/技能**在当前设备上是否实际安装和可用**，不是"相关应用已安装"或"依赖已存在"。
+`使用设备` 记录工具**在当前设备上是否实际安装**，不是"依赖存在"或"相关应用已安装"。
 
-| 工具类型 | 判定方式 | 示例 |
+| 工具类型 | 判定命令 | 示例 |
 |---------|---------|------|
-| agent skill | `npx skills list -g` 可见，或在 `~/.config/opencode/skills/` (Mac) / `~\.agents\skills\` (Windows) 目录下 | `video-use` → `- Mac Mini` / `- WPC` |
-| MCP server | `opencode.jsonc` 的 `mcpServers` 中已配置 | `markitdown-mcp` → `- Mac Mini` |
-| CLI 工具 | `which <tool>` (Mac) / `where.exe <tool>` (Windows) 能找到 | `ffmpeg` → `- Mac Mini` / `- WPC` |
-| brew 包 | `brew list <pkg>` 成功 (仅 Mac) | `gh` → `- Mac Mini` |
-| npm 全局包 | `npm list -g <pkg>` 可见 | `bun` → `- Mac Mini` / `- WPC` |
-| pip 包 | `pip3 list \| grep <pkg>` (Mac) / `pip list \| findstr <pkg>` (Windows) 有结果 | `openai-whisper` → `- Mac Mini` |
-| 工作流/流程文档 / Skills-Packs | 不可安装，永远不写设备名 | GStack、Superpowers、Anthropic 等 → `N/A` |
+| agent skill | `npx skills list -g` 可见 或 目录存在 | `video-use` |
+| MCP server | `opencode.jsonc` 的 `mcpServers` 中已配置 | `markitdown-mcp` |
+| CLI 工具 | `which <tool>`（Mac）/ `where.exe <tool>`（Win） | `ffmpeg` |
+| brew 包 | `brew list <pkg>`（仅 Mac） | `gh` |
+| npm 全局包 | `npm list -g <pkg>` | `bun` |
+| pip 包 | `pip3 list \| grep <pkg>`（Mac）/ `pip list \| findstr <pkg>`（Win） | `openai-whisper` |
+| 工作流/Skills-Packs | 不可安装，永远写 `N/A` | GStack, Superpowers |
 
-**常见的错误模式（禁止）：**
-- Obsidian App 已安装 ≠ `kepano/obsidian-skills` 仓库的 agent skill 已安装
-- 电脑上有 ffmpeg ≠ `manim` 这个 Python 包已安装
+**禁止：**
+- Obsidian App 已安装 ≠ `kepano/obsidian-skills` 的 skill 已安装
+- 电脑有 ffmpeg ≠ `manim` Python 包已安装
 - 依赖存在 ≠ 工具本身存在
-
-**总结：只查工具本身是否安装，不查上下游依赖，不查相关生态工具。**
 
 ## Naming Conventions
 
