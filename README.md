@@ -12,7 +12,6 @@ An OpenCode skill that manages tool documentation in an Obsidian vault — autom
 - **Multi-device sync** — consistent documentation across Mac and Windows
 - **Global re-sort** — renumbers files by GitHub stars across all categories
 - **Automatic section filling** — web research populates empty template sections
-- **Known Repo Mapping** — auto-fills GitHub links from a maintained lookup table
 
 ## 📦 Installation
 
@@ -101,5 +100,5 @@ Skills-Packs are always `N/A` (not individually installable).
 
 ## 🔗 See Also
 
-- [`SKILL.md`](SKILL.md) — full workflow documentation, classification guide, naming conventions, edge cases, anti-patterns, and Known Repo Mapping table
+- [`SKILL.md`](SKILL.md) — full workflow documentation, classification guide, naming conventions, edge cases, anti-patterns
 - [`TEMPLATE.md`](TEMPLATE.md) — vault document template

@@ -2,35 +2,16 @@
 name: obsidian-skill-manager
 description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the vault's skill documentation needs organizing, renaming, standardizing, fixing, or format-checking. Also use when the vault documentation template changes and all files need syncing to match. Also use when the user says fix docs, fix format, 修复文档, 修复格式, or 检查格式.
 metadata:
-  template_hash: 4b42fd92dfb91f7afc088fce421356f8
-  template_checked: 2026-06-19
+  template_hash: b033a64a9115d1aecfc5d4e49dbeba1c
+  template_checked: 2026-06-20
+  # WARNING: All section lists must be read from TEMPLATE.md, never hardcoded.
 ---
 
 # Obsidian Skill Manager
 
-## Overview
-
-Eight workflows:
-
-**Install:** When installing a new tool, check vault for existing docs (skip if found), install it, and mark the device. Does not modify vault files.
-
-**Document:** When recording a tool, scan vault for existing docs (update if found, create if new), gather info, and generate an Obsidian document. Does not install anything.
-
-**Combined:** Install first, then document if no existing doc was found.
-
-**Deployment:** Scan vault for `必用: true` tools and install them on the current device.
-
-**Fix:** Scan vault for known format issues and fix them — no template sync, no data refresh, no renumbering.
-
-**Sync:** Full vault scan — fix numbering, validate frontmatter, update device tracking, re-sort by stars.
-
-**Template Sync:** When the vault template changes, propagate new field order, section structure, and defaults to every file.
-
-**Standardize:** Full vault standardization — fix format issues, normalize frontmatter, reorder sections, refresh data, update device tracking, re-sort by stars, and fill empty sections via web research.
-
 ## Triggering
 
-This skill activates in seven modes:
+This skill activates in eight modes:
 
 | Mode | Trigger phrases |
 |------|----------------|
@@ -45,24 +26,14 @@ This skill activates in seven modes:
 
 ## Vault Configuration
 
-`hostname -s` determines the active config:
+`{TEMPLATE}` = `{SKILL_DIR}/TEMPLATE.md`. Hostname → config:
 
-```
-if `hostname -s` == "x1Rz47-A1213":    # Mac Mini (macOS)
-  VAULT_BASE = /Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖
-  SKILL_DIR  = /Users/x1rz47/.agents/skills/obsidian-skill-manager
-  TEMPLATE   = {SKILL_DIR}/TEMPLATE.md
-elif `hostname` == "WPC-x1Rz47":    # WPC (Windows)
-  VAULT_BASE = D:\SynologyDrive\5.个人资料\1.知识库\个人知识库\04.AI相关-🤖
-  SKILL_DIR  = %USERPROFILE%\.agents\skills\obsidian-skill-manager
-  TEMPLATE   = {SKILL_DIR}\TEMPLATE.md
-else:
-  ask user to identify the device and add to [Device Configuration](#device-configuration)
-```
+| Hostname | Device | VAULT_BASE | SKILL_DIR |
+|----------|--------|------------|-----------|
+| `x1Rz47-A1213` | Mac Mini | `/Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖` | `/Users/x1rz47/.agents/skills/obsidian-skill-manager` |
+| `WPC-x1Rz47` | WPC | `D:\SynologyDrive\5.个人资料\1.知识库\个人知识库\04.AI相关-🤖` | `%USERPROFILE%\.agents\skills\obsidian-skill-manager` |
+| _Other_ | — | Ask user to identify device | — |
 
-## Category Directories
-
-See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical directory list and numbering rules.
 
 ## Classification Guide
 
@@ -80,34 +51,6 @@ See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical direc
 >
 > 安装后与之前判断冲突 → 标记 `⚠️ 分类存疑，需人工确认`，不自动纠正。
 
-### Directory Depth Rule
-
-**Skills/ 下避免 3 级目录**（最多 2 级）。只有当某个二级分类下有 **≥3 个文件** 且子类之间领域明显不同时，才保留 3 级：
-
-| 场景 | 做法 |
-|------|------|
-| 三级目录仅 1-2 个文件 | 拍平到二级 |
-| 三级目录 ≥3 个文件，且子类不同 | 保留三级，如 `媒体创作/视频制作/` + `内容创作/` |
-| 三级目录 3+ 文件但子类相近 | 考虑拍平 |
-
-Skills-Packs 按技能包来源划分，不受此限。
-
-### Known Misclassifications（反面教材）
-
-| 文件 | 错放在 | 原因 | 正确分类 |
-|------|--------|------|---------|
-| `Agent-Browser.md` | Skills/ | `vercel-labs/agent-browser` 是独立 npm CLI（36K），运行在 Agent 外部 | **工具/** |
-| `Repomix-Explorer.md` | Skills/ | `yamadashy/repomix` 是独立 npm CLI（2.4K），运行在 Agent 外部 | **工具/** |
-| `Deep-Agents.md` | Skills/ | `langchain-ai/deepagents` 是独立 Python 框架（24.6K），运行在 Agent 外部 | **工具/** |
-| `SkillOpt.md` | Skills/ | `microsoft/SkillOpt` 是独立 pip 工具（7.1K），运行在 Agent 外部 | **工具/** |
-| `Defuddle.md` | 插件/ 或 Skills/ | `kepano/defuddle` 是 Obsidian 插件（7K），运行在 Agent **外部** | **工具/** |
-
-## Device Configuration
-
-| Hostname | Device Name |
-|----------|-------------|
-| `x1Rz47-A1213` | Mac Mini |
-| `WPC-x1Rz47` | WPC |
 
 ## 使用设备 判定规则
 
@@ -122,11 +65,6 @@ Skills-Packs 按技能包来源划分，不受此限。
 | npm 全局包 | `npm list -g <pkg>` | `bun` |
 | pip 包 | `pip3 list \| grep <pkg>`（Mac）/ `pip list \| findstr <pkg>`（Win） | `openai-whisper` |
 | 工作流/Skills-Packs | 不可安装，永远写 `N/A` | GStack, Superpowers |
-
-**禁止：**
-- Obsidian App 已安装 ≠ `kepano/obsidian-skills` 的 skill 已安装
-- 电脑有 ffmpeg ≠ `manim` Python 包已安装
-- 依赖存在 ≠ 工具本身存在
 
 ## Naming Conventions
 
@@ -146,6 +84,14 @@ All skill document filenames in the vault must follow:
 - Template files (`00-*`) are excluded from the numbering convention
 
 **Independent numbering per directory (including 3rd-level subdirectories):** See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical directory list and numbering rules. When moving or renaming files, always derive the natural name from the filename (strip `NN-` prefix and convert Pascal-kebab-case to natural name).
+
+### Subdirectory Rule
+
+当一个目录下同一类型的文档超过 **3 个** 时，应创建子分类文件夹：
+- 子分类名用中文，不加编号（如 `语音合成/`、`浏览器自动化/`）
+- 将对应文件移入子目录，**独立编号**（01-N，按 GitHub stars 降序）
+- 文件 aliases 中文名同步改为新的子分类名
+- 在 Sync S2 表中添加新子目录的行
 
 ### Aliases 规范
 
@@ -196,10 +142,14 @@ Shared by Sync S3 and Template Sync T3. Apply these checks to every `.md` file b
 | Check | Fix |
 |-------|-----|
 | Wrong field order | Reorder to match `{TEMPLATE}` field order exactly |
-| `使用平台` value invalid | Must be one of: `全平台` / `OpenCode` / `Codex` / `Claude Code` / `Gemini` / `NO` |
+| `使用平台` value invalid | Must list specific platforms (OpenCode / Codex / Claude Code / Gemini), separated by ` / `. Never use `全平台` or `NO`. Example: `Claude Code / Codex / OpenCode` |
 | `使用设备:` wrong format | Fix to YAML list (`  - Device`) or `使用设备: N/A` |
 | Missing `使用设备:` | Add based on install detection |
 | Boolean values not lowercase | Fix: `True` → `true`, `False` → `false`, `Yes` → `yes` |
+
+## Body Section Conventions
+
+文档 body 严格按 `{TEMPLATE}` 的 `##` 节结构和格式生成。各节的写法和示例见模板本身，不再重复。
 
 ## Install Workflow（安装，不动 vault）
 
@@ -237,7 +187,7 @@ Continue to install regardless of the result.
 
 Run the installation command. Wait for it to complete. Verify success.
 
-After installation, note the current device name from Device Configuration. Device detection follows the [使用设备 判定规则](#使用设备-判定规则) table.
+After installation, note the current device name from Vault Configuration table. Device detection follows the [使用设备 判定规则](#使用设备-判定规则) table.
 
 ---
 
@@ -263,7 +213,7 @@ Collect:
 - GitHub URL and star count (use web search)
 - Core features
 - Dependencies
-- 使用平台 — 从 GitHub README / 官网文档判断，不确定则填 NO
+- 使用平台 — 从 GitHub README / 官网文档判断支持哪些 AI 编程平台（OpenCode / Codex / Claude Code / Gemini），多个用 / 分隔
 - Any warnings or notes
 
 ### Step W3: Global Sort and Renumber (NEW entries only)
@@ -279,13 +229,8 @@ Read `{TEMPLATE}` for field order, section structure, and writing rules. Apply p
 - When installing via `npm install owner/repo` → derive from `owner/repo`
 - When the install URL is known from the user or the skill source → write it directly
 - NEVER leave `GitHub 链接` as `无` or empty — if truly unknown, set to `⚠️ Unknown` (not `无`)
-- Cross-check against the [Known Repo Mapping](#known-repo-mapping) table below
 
 **Device detection:** Follow the [使用设备 判定规则](#使用设备-判定规则) table to determine install status per device.
-
-**When verifying a file's frontmatter:**
-- `必用:` controls deployment behavior (`必用: true` = deploy to new devices)
-- `使用设备:` tracks actual installation per device (not intent)
 
 Write to `{VAULT_BASE}/{category}/{filename}`.
 Confirm to the user that the tool is documented.
@@ -322,13 +267,7 @@ For each file with `必用: true`:
 
 ### Step D3: Report Results
 
-Present a summary table:
-
-| Tool | Status |
-|------|--------|
-| Find-Skills | ✅ 已完成 |
-| Data-Visualization | ✅ 已完成 |
-| Task-Management | ⏭️ 已存在 |
+Present a summary table of each tool and its status.
 
 ## Sync Workflow (Clean and Re-Sort)
 
@@ -337,7 +276,7 @@ This workflow runs independently. Use it when you've manually added, deleted, or
 ### Step S1: Determine Current Device
 
 1. Run `hostname -s` (macOS) or `hostname` (Windows) to get the current machine's hostname
-2. Look up the device name in the Device Configuration table
+2. Look up the device name in the Vault Configuration table
 3. If the hostname is not mapped, ask the user to identify the device
 
 ### Step S2: Scan All Vault Directories
@@ -372,6 +311,7 @@ Walk ALL `.md` files under `{VAULT_BASE}` grouped by directory:
 | `辅助工具/Skills-Packs/07-PM-Skills/{category}/` | Manual (01-N, ordered at creation) | Full template |
 | `辅助工具/MCP/` | By GitHub stars (desc) | Full template |
 | `辅助工具/工具/` | By GitHub stars (desc) | Full template |
+| `辅助工具/工具/语音合成/` | By GitHub stars (desc) | Full template |
 | `辅助工具/插件/` | By GitHub stars (desc) | Full template |
 
 For each file, parse its frontmatter and derive the tool name from the filename (strip `NN-` prefix, convert Pascal-kebab to natural name) or from the first `aliases` entry. Build a manifest: tool name, `GitHub Star`, `使用设备`, `必用`, and install commands.
@@ -382,63 +322,10 @@ Apply [Frontmatter Normalization Rules](#frontmatter-normalization-rules) to eve
 
 - **Missing `必用:`** → Add `必用: false`
 - **Wrong field name (`常用`)** → Rename to `必用`
-- **`GitHub 链接` missing or `无`** → Auto-fill from Known Repo Mapping table (see below); if no match found, set to `⚠️ Unknown`
+- **`GitHub 链接` missing or `无`** → Auto-fill via web research; if still not found, set to `⚠️ Unknown`
 - **`GitHub 链接` is `⚠️ Unknown`** → Leave as-is (flagged for review, don't auto-fix without confirming)
 - **Naming mismatches** → Rename to `{NN}-{Pascal-Kebab-Name}.md`
 
-#### Known Repo Mapping
-
-Used by Document Workflow Step W4 and Sync S3 — extend as new tools are installed.
-Kept in global copy at `~/.agents/skills/obsidian-skill-manager/SKILL.md` so all sessions benefit.
-
-| 工具名称 (aliases) | GitHub Repo |
-|---|---|---|
-| `Agent Browser` / `agent-browser` | `https://github.com/vercel-labs/agent-browser` |
-| `Agent Reach` / `agent-reach` | `https://github.com/Panniantong/Agent-Reach` |
-| `AISuite` / `aisuite` | `https://github.com/andrewyng/aisuite` |
-| `AiToEarn` / `ai-to-earn` | `https://github.com/yikart/AiToEarn` |
-| `BrowserAct` / `browser-act` | `https://github.com/browser-act/skills` |
-| `Cheat on Content` / `cheat-on-content` | `https://github.com/XBuilderLAB/cheat-on-content` |
-| `Chronos` / `chronos-forecasting` | `https://github.com/amazon-science/chronos-forecasting` |
-| `CodeGraph` / `codegraph` | `https://github.com/colbymchenry/codegraph` |
-| `Data Visualization` / `data-visualization` | `https://github.com/anthropics/knowledge-work-plugins` |
-| `Deep Agents` / `deep-agents` | `https://github.com/langchain-ai/deepagents` |
-| `Defuddle` / `defuddle` | `https://github.com/kepano/defuddle` |
-| `Douyin to Text` / `douyin-to-text` | `https://github.com/bibigod/douyin-to-text` |
-| `Find Skills` / `find-skills` | `https://github.com/vercel-labs/skills` |
-| `GBrain` / `gbrain` | `https://github.com/garrytan/gbrain` |
-| `Goal Prompt Builder` / `goal-prompt-builder` | `https://github.com/win4r/goal-prompt-builder` |
-| `Last30Days` / `last30days` | `https://github.com/mvanhorn/last30days-skill` |
-| `Last30Days CN` / `last30days-cn` | `https://github.com/Jesseovo/last30days-skill-cn` |
-| `Manim Video` / `manim-video` | `https://github.com/obra/superpowers` |
-| `MarkItDown` / `markitdown` | `https://github.com/microsoft/markitdown/tree/main/packages/markitdown-mcp` |
-| `Memory Management` / `memory-management` | `https://github.com/anthropics/knowledge-work-plugins` |
-| `Obsidian Bases` / `obsidian-bases` | `https://github.com/kepano/obsidian-skills` |
-| `Obsidian CLI` / `obsidian-cli` | `https://github.com/kepano/obsidian-skills` |
-| `Obsidian Markdown` / `obsidian-markdown` | `https://github.com/kepano/obsidian-skills` |
-| `Obsidian Skill Manager` / `obsidian-skill-manager` | `https://github.com/x1Rz47/Obsidian-Skill-Manager` |
-| `Oh My Openagent` / `oh-my-openagent` | `https://github.com/code-yeongyu/oh-my-openagent` |
-| `OpenCode Supermemory` / `opencode-supermemory` | `https://github.com/supermemoryai/opencode-supermemory` |
-| `OpenMontage` / `openmontage` | `https://github.com/calesthio/OpenMontage` |
-| `Playwright` / `playwright-skill` | `https://github.com/testdino-hq/playwright-skill` |
-| `Repomix Explorer` / `repomix-explorer` | `https://github.com/yamadashy/repomix` |
-| `SkillOpt` / `skillopt` | `https://github.com/microsoft/SkillOpt` |
-| `SkillSpector` / `skillspector` | `https://github.com/NVIDIA/SkillSpector` |
-| `Startup Pressure Test` / `startup-pressure-test` | `https://github.com/Kappaemme-git/codex-startup-pressure-test-skill` |
-| `Synapse` / `synapse` | `https://github.com/akillness/synapse-skill` |
-| `Task Management` / `task-management` | `https://github.com/anthropics/knowledge-work-plugins` |
-| `Technical Documentation` / `technical-documentation` | `https://github.com/anthropics/knowledge-work-plugins` |
-| `Video Use` / `video-use` | `https://github.com/obra/superpowers` |
-| `Yt-Dlp` / `yt-dlp` | `https://github.com/yt-dlp/yt-dlp` |
-| (All `mattpocock/skills` skills — 工程开发 12) | `https://github.com/mattpocock/skills` |
-| (All `mattpocock/skills` skills — 工作效率 5) | `https://github.com/mattpocock/skills` |
-| (All `mattpocock/skills` skills — 其他 4) | `https://github.com/mattpocock/skills` |
-| (All `anthropics/skills` skills) | `https://github.com/anthropics/skills` |
-| (All `addyosmani/agent-skills` skills) | `https://github.com/addyosmani/agent-skills` |
-| (All `vercel-labs/skills` skills) | `https://github.com/vercel-labs/skills` |
-| (All `kepano/obsidian-skills` skills) | `https://github.com/kepano/obsidian-skills` |
-| (All `obra/superpowers` skills) | `https://github.com/obra/superpowers` |
-| (Add rows as new tools are installed)
 
 ### Step S4: Device Tracking
 
@@ -465,32 +352,7 @@ For all directories sorted by GitHub stars, renumber files:
 
 ### Step S6: Report
 
-Present a summary:
-
-```
-🔍 同步完成 — 全 vault
-  - 当前设备: {从 S1 获取}
-  - 扫描目录: <N>
-  - 扫描文件: <N>
-  - 修复 frontmatter: <N>
-  - 设备标记更新: <N>
-  - Skills/浏览器自动化/ 新编号范围: 01-<N>
-  - Skills/搜索代理/ 新编号范围: 01-<N>
-  - Skills/效率工具/ 新编号范围: 01-<N>
-  - Skills/启动验证/ 新编号范围: 01-<N>
-  - Skills/媒体创作/ 新编号范围: 01-<N>
-  - Skills/知识管理/Obsidian生态/ 新编号范围: 01-<N>
-  - Skills/知识管理/个人效能/ 新编号范围: 01-<N>
-  - Skills-Packs/01-Superpowers/ 所有子目录: 01-<N>
-  - Skills-Packs/02-Anthropic/ 所有子目录: 01-<N>
-  - Skills-Packs/03-MattPocock/ 所有子目录: 01-<N>
-  - Skills-Packs/04-GStack/ 所有子目录: 01-<N>
-  - Skills-Packs/05-Awesome-Copilot/: 01-<N>
-  - Skills-Packs/06-AddyOsmani/ 所有子目录: 01-<N>
-  - Skills-Packs/07-PM-Skills/ 所有子目录: 01-<N>
-  - MCP/: 01-<N>
-  - 插件/: 01-<N>
-```
+Present a summary of scanned directories, files, fixes, and new numbering ranges per directory.
 
 ## Template Sync Workflow
 
@@ -535,8 +397,7 @@ If the template has added, removed, or reordered body sections:
 2. Remove sections that no longer exist in the template (e.g., `参考链接`)
 3. Add new empty sections from the template (e.g., `用法`)
 4. Reorder sections to match template order
-
-Do NOT overwrite or remove content within sections — only add/remove/reorder the section headers.
+5. Run `scripts/fix-format.sh "{VAULT_BASE}/辅助工具"` — reads each section's structural skeleton from `{TEMPLATE}` and wraps content in the correct callout blocks, `<details>` tags, or table headers; preserves text content
 
 ### Step T4a: 模板节内容 — 补空模式
 
@@ -567,7 +428,7 @@ Do NOT overwrite or remove content within sections — only add/remove/reorder t
    - If web research yields no results, derive content from the existing `简介` section
    - After filling, verify the file reads naturally as a complete document
 
-**Batching:** Process files in parallel by category (Skills/, Skills-Packs/*, 工具/, MCP/, 插件/). For large packs (GStack 45, AddyOsmani 24), split into sub-batches.
+**Batching:** Process files in parallel by category (Skills/, Skills-Packs/*, 工具/, MCP/, 插件/). For large packs, split into sub-batches.
 
 ### Step T4a2: 模板节内容 — 全量刷新模式
 
@@ -616,20 +477,7 @@ No per-file confirmation needed — batch and report.
    - No stale fields (renamed fields, removed fields)
    - `使用设备:` values are correct (no `False` from YAML boolean parsing)
    - `必用:` values are lowercase (`true`/`false`)
-3. Present a summary:
-
-```
-📋 模板同步完成
-  - 总文件: <N>
-  - 字段重排: <N>
-   - 字段重命名: <N>
-   - 使用设备更新: <N>
-   - 布尔值修复: <N>
-   - GitHub Star更新: <N>
-   - 更新日期写入: <N>
-   - 错误: 0
-```
-
+3. Present a summary with counts per operation
 4. If any files couldn't be parsed correctly, report them as errors and do not modify them.
 
 ### Step T6: Update Template Hash
@@ -643,101 +491,16 @@ No per-file confirmation needed — batch and report.
 
 **Trigger:** `"标准化所有文档"` / `"standardize all docs"` — runs every vault-wide fix in sequence, from formatting to data refresh to renumbering.
 
-**Routing:**
-- `"标准化所有文档"` / `"全面标准化"` / `"standardize all docs"` / `"full standardize"` → full run Z1→Z10
-- Does NOT prompt per-step — batch and report at the end
+Runs the following workflows in sequence, batching and reporting at the end:
 
-### Step Z1: Determine Current Device
-
-Follow [Sync Step S1](#step-s1-determine-current-device).
-
-### Step Z2: Fix Format Issues
-
-Run [Fix Workflow](#fix-workflow) Steps F1-F3 against ALL `.md` files under `{VAULT_BASE}`. Fix `aliases` prefix issues, YAML parse errors, and other known format problems.
-
-### Step Z3: Normalize Frontmatter
-
-Apply [Frontmatter Normalization Rules](#frontmatter-normalization-rules) to every file:
-- Reorder fields to match template order
-- Fix `使用设备:` format (YAML list or N/A)
-- Add missing `使用设备:` based on install detection
-- Fix boolean casing (`True` → `true`)
-
-Plus additional checks from [Sync S3](#step-s3-detect-and-fix-issues-per-file):
-- Add missing `必用: false`
-- Fix wrong field names (`常用` → `必用`)
-- Fix `GitHub 链接` missing/`无` via Known Repo Mapping
-- Fix naming mismatches
-
-### Step Z4: Normalize Body Section Structure
-
-Follow [Template Sync T4](#step-t4-normalize-body-section-structure):
-1. Map each file's sections to template order
-2. Remove sections no longer in template
-3. Add missing sections
-4. Reorder to match template
-
-### Step Z5: Fill Empty Sections — Internet Research
-
-Follow [Template Sync T4a](#step-t4a-模板节内容--补空模式):
-1. Read `{TEMPLATE}` for section list, then scan for gaps
-2. Research each tool's GitHub/README/docs
-3. Fill each empty/missing section with real content
-4. Content in Chinese, based on actual research
-
-**Before starting, ask the user:** "是否需要联网填充空白节？这将对 146 个文件产生大量网络请求。"
-- User confirms → run T4a in full
-- User declines → skip to Z6
-
-### Step Z6: Refresh Data
-
-Follow [Template Sync T4b](#step-t4b-数据刷新):
-1. Fetch GitHub star counts for every file with a `GitHub 链接`
-2. Update `更新日期` to today
-3. Research release changelogs; append entries to `更新功能`
-
-**Rate limiting:** Batch requests to avoid rate limits. For known skill packs (Anthropic/MattPocock/AddyOsmani etc.) that share a single repo, fetch once and reuse.
-
-### Step Z7: Update Device Tracking
-
-Follow [Sync S4](#step-s4-device-tracking):
-1. Detect each tool's install status on the current device
-2. Add/remove device name from `使用设备:` accordingly
-3. Skills-Packs → set `使用设备: N/A`
-
-### Step Z8: Global Re-Sort
-
-Follow [Sync S5](#step-s5-global-re-sort):
-1. Read `GitHub Star` from each file (directories sorted by stars)
-2. Sort descending; equal stars → alphabetical by filename-derived name (strip `NN-` prefix, convert Pascal-kebab to natural name)
-3. Renumber `01`, `02`, `03`...
-4. Rename files to `{NN}-{Pascal-Kebab-Name}.md`
-5. Manual-numbered directories (Skills-Packs) → skip renumbering, but verify no collisions
-
-### Step Z9: Verify and Report
-
-1. Re-read every modified file; verify YAML parses correctly
-2. Present combined report:
-
-```
-📋 标准化完成 — 全 vault
-  - 当前设备: <DeviceName>
-  - 扫描文件: <N>
-  - Fix 修复: <N>
-  - Frontmatter 修复: <N>
-  - 节结构重排: <N>
-  - 空白节填充: <N>
-  - GitHub Star更新: <N>
-  - 设备标记更新: <N>
-  - 重编号目录: <N>
-  - 错误: 0
-```
-
-3. If any files failed to parse, report them individually and do not modify.
-
-### Step Z10: Update Template Hash
-
-Follow [Template Sync T6](#step-t6-update-template-hash).
+1. **[Fix Workflow](#fix-workflow)** — fix format issues (F1-F3)
+2. **[Sync Workflow](#sync-workflow-clean-and-re-sort)** — normalize frontmatter, device tracking, re-sort (S1-S6)
+3. **[Template Sync T4a](#step-t4a-模板节内容--补空模式)** — fill empty sections via web research
+   - Before starting, ask the user: "是否需要联网填充所有文件的空白节？这会产生大量网络请求。"
+   - If declined, skip to step 4
+4. **[Template Sync T4b](#step-t4b-数据刷新)** — refresh star counts, dates, changelog
+5. **[Template Sync T5](#step-t5-verify-and-report)** — verify and report
+6. **[Template Sync T6](#step-t6-update-template-hash)** — update template hash
 
 ---
 
@@ -756,8 +519,9 @@ Walk ALL `.md` files under `{VAULT_BASE}`.
 | `aliases` 含 `@` 前缀 | Parse frontmatter, aliases value starts with `@` | Remove `@` prefix, keep rest of text |
 | `aliases` 少于 3 条或格式不规范 | 英文名含连词符、中文名非分类名、条目数 < 3 | 按 Aliases 规范修复：英文名去连词符、中文名改为分类名、补核心技术关键词 |
 | frontmatter YAML 解析错误 | Parse each file's YAML frontmatter; catch errors (delimiters, alignment, illegal chars) | Fix formatting and re-parse until clean |
-
-*(Add rows to this table as new format issues are identified.)*
+| `ℹ️ 基本介绍` callout 中含裸 `[abstract]`（无 `!`） | `section_has_skeleton` rejects if content has >1 `[!abstract]` line | Run `fix-format.sh` — strips and re-wraps cleanly |
+| `ℹ️ 基本介绍` 缺少 `**状态**` 行 | `validate_section_format` checks `**状态**` existence | Run `fix-format.sh` — appends `> **状态**：<span style="color:var(--color-green)">待评估</span>` |
+| *(Add rows as new format issues are discovered.)* | | |
 
 For each file:
 - Detect which checks trigger
@@ -766,101 +530,17 @@ For each file:
 
 ### Step F3: Report
 
-```
-✅ 文档修复完成
-  - 检查文件: <N>
-  - 发现问题: <N>
-  - 已修复: <N>
-    - <filepath> → <fix description>
-```
-
-If no issues found: "✅ 文档格式检查通过，未发现问题"
-
-## Quality Checks
-
-- Read back first few lines to verify content
-- Installation commands must be the actual commands used
-- Section structure must match the template
-- No placeholder text left in the document
-- After renumbering, verify no files are missing or misnumbered
-
-## Red Flags
-
-Stop and re-evaluate if you catch yourself thinking:
-
-| Thought | Reality |
-|---------|---------|
-| "这个工具我很熟，不用查资料了" | 必须查官方文档/README |
-| "star 数大概记得，不用查" | 必须现查，从不用记忆 |
-| "先安装了再说" | 必须先查信息 → 再安装 → 最后记录 |
-| "这个不需要模板" | 必须使用 `{TEMPLATE}` |
-| "记录到目录就行了，不用管编号" | 必须全局排序并重编号 |
-| "它就是一个小工具，不用查 GitHub" | 每个工具都要查，无 GitHub 的标 N/A |
-| "这跟已有的工具很像，直接跳过" | 必须检查确切匹配，不能猜 |
-| "手动删了几个文件，编号我手动改一下就好" | 用 sync 工作流自动处理 |
-| "这个工具就在这台电脑上用的，不用写设备名" | 必须写，sync 会自动检测补充 |
-| "模板只改了一点点，不用同步" | 模板变了必须运行 Template Sync |
-| "PowerShell 脚本改 YAML 没问题" | 必须用结构化 YAML 解析 |
-| "移动文件到另一个目录，改个数字就行" | 同时涉及源和目标目录的编号更新，重命名可能有冲突 |
-
-> 分类误放案例见 [Known Misclassifications](#known-misclassifications反面教材) 表。
+Present a summary with file counts per issue type. If no issues found, say so.
 
 ## Edge Cases
 
 | Case | Handling |
 |------|----------|
-| Template file not found | Stop with error: "模板文件不存在：{TEMPLATE}" |
-| GitHub fetch fails | Set `GitHub Star: N/A`, do not block |
 | No GitHub repository | Set `GitHub 链接: ⚠️ Unknown`, `GitHub Star: N/A` |
-| Tool already documented | Update existing file, do not duplicate |
 | Star count format varies | Parse: `12K` → 12000, `1.5K` → 1500, `N/A` → 0 |
 | Empty non-template files (e.g. OPENdesign.md) | Skip — no frontmatter, not a tool document |
 | Multiple files share the same star count | Sort alphabetically by tool name |
 | File rename fails during renumbering | Stop and report which file failed |
-| No existing files in directory | Number new file as `01` |
-| User manually deleted files | Sync workflow detects and renumbers around them |
-| Numbering has gaps | Sync workflow closes all gaps |
-| File was renamed but not numbered | Sanitize name to match convention |
-| Hostname not found in Device Configuration | Ask user to identify the current device |
+| Hostname not found in Vault Configuration | Ask user to identify the current device |
 | Tool install detection is ambiguous | Check multiple methods (`which`, `brew list`, etc.) |
-| Device already in `使用设备` | Skip, do not duplicate |
-| Tool not installed on current device | Set `使用设备: N/A` if no devices are listed |
-| Template hash mismatch detected | Ask user whether to run Template Sync |
-| Template hash not set in SKILL.md | Compute and set during first Template Sync run |
-| User declines template sync | Update `metadata.template_hash` to current, skip syncing |
-| Superpowers core skills (核心技能) | Detectable via npm cache. NOT found via `npx skills list -g`. |
-| Skill is domain-specific (Obsidian/MCP/GStack/Codex) | Place in the correct domain directory per the S2 table. |
-| Skill exists in both `Skills/` and `Skills-Packs/` | **Pack version wins.** Delete from `Skills/` (individual). |
-| `工具名` field removed from template | Derive tool name from filename instead (strip `NN-` prefix, convert Pascal-kebab to natural name). Keep existing `工具名` field in docs until next Template Sync. |
-| `GitHub 链接` format | 必须使用 HTTPS 格式 `https://github.com/owner/repo` |
-| `创建日期` / `更新日期` format | 固定 `YYYY-MM-DD` |
-| `使用平台` values | 取值：`全平台` / `OpenCode` / `Codex` / `Claude Code` / `Gemini` |
-| `npx skills add` 安装失败 | 检查网络/权限/npm 缓存，记录错误后继续 |
 | Cross-device sync conflict | 设备 A 修改后推送 → 设备 B 需重新运行 Sync |
-
-## Anti-Patterns
-
-**安装前后：**
-- Don't write the doc before confirming installation succeeded
-- Don't install tools the user didn't mark as `必用`
-- Don't reinstall already-present tools without asking
-- Don't guess about tool existence — read frontmatter to check
-
-**目录与编号：**
-- Don't skip creating category directories if they don't exist
-- Don't move files between directories without handling both source and target numbering — use intermediate temp names to resolve rename collisions
-- Don't create 3-level directories for 1-2 files
-
-**模板与字段：**
-- Don't skip frontmatter validation during sync
-- Don't leave `使用设备: False` (YAML boolean corruption) — fix to `no` or proper list format
-- Don't leave `GitHub 链接: 无` — use `⚠️ Unknown` or the actual URL
-
-**YAML：**
-- Don't use PowerShell/batch string manipulation (regex, -replace, string concatenation) on YAML frontmatter — use proper YAML parsing or read/write the whole block
-
-**分类：**
-- Don't guess classification — use the [Classification Guide](#classification-guide) table.
-
-**去重：**
-- Don't keep duplicate skills across `Skills/` and `Skills-Packs/` — pack version wins, delete from Skills/
