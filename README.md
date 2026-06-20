@@ -4,6 +4,27 @@
 
 An OpenCode skill that manages tool documentation in an Obsidian vault — automatic classification, numbering, device tracking, template synchronization, and standardization.
 
+## Quick Reference
+
+| Command | Description |
+|---------|-------------|
+| `安装 <tool>` | Record tool into vault |
+| `部署到这台电脑` | Install tools marked `必用: true` |
+| `修复文档/检查格式` | Fix common format issues |
+| `同步` | Full vault re-index, re-sort, device tracking |
+| `模板变了` | Propagate template changes to all files |
+| `标准化所有文档` | Run everything: fix, sync, refresh, research |
+
+## Structure
+
+```
+My-Skills/Obsidian-Skill-Manager/
+├── SKILL.md       ← Main skill (8 workflows, template sync)
+├── TEMPLATE.md    ← Canonical doc template
+├── scripts/       ← Format validators & fixers
+└── README.md      ← Detailed docs
+```
+
 ## ✨ Features
 
 - **8 workflows** covering install, document, sync, fix, and standardize
@@ -102,3 +123,7 @@ Skills-Packs are always `N/A` (not individually installable).
 
 - [`SKILL.md`](SKILL.md) — full workflow documentation, classification guide, naming conventions, edge cases, anti-patterns
 - [`TEMPLATE.md`](TEMPLATE.md) — vault document template
+
+## License
+
+MIT
