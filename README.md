@@ -37,7 +37,7 @@ The skill detects the current device via `hostname -s` and maps it to vault path
 | `x1Rz47-A1213` | Mac Mini | `/Users/x1rz47/Library/CloudStorage/.../04.AI相关-🤖` |
 | `WPC-x1Rz47` | WPC | `D:\SynologyDrive\...\04.AI相关-🤖` |
 
-Template file location: `{SKILL_DIR}/template.md`
+Template file location: `{SKILL_DIR}/TEMPLATE.md`
 
 Add new devices to the **Device Configuration** table in `SKILL.md`.
 
@@ -102,4 +102,4 @@ Skills-Packs are always `N/A` (not individually installable).
 ## 🔗 See Also
 
 - [`SKILL.md`](SKILL.md) — full workflow documentation, classification guide, naming conventions, edge cases, anti-patterns, and Known Repo Mapping table
-- [`template.md`](template.md) — vault document template
+- [`TEMPLATE.md`](TEMPLATE.md) — vault document template

@@ -51,11 +51,11 @@ This skill activates in seven modes:
 if `hostname -s` == "x1Rz47-A1213":    # Mac Mini (macOS)
   VAULT_BASE = /Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖
   SKILL_DIR  = /Users/x1rz47/.agents/skills/obsidian-skill-manager
-  TEMPLATE   = {SKILL_DIR}/template.md
+  TEMPLATE   = {SKILL_DIR}/TEMPLATE.md
 elif `hostname` == "WPC-x1Rz47":    # WPC (Windows)
   VAULT_BASE = D:\SynologyDrive\5.个人资料\1.知识库\个人知识库\04.AI相关-🤖
   SKILL_DIR  = %USERPROFILE%\.agents\skills\obsidian-skill-manager
-  TEMPLATE   = {SKILL_DIR}\template.md
+  TEMPLATE   = {SKILL_DIR}\TEMPLATE.md
 else:
   ask user to identify the device and add to [Device Configuration](#device-configuration)
 ```
@@ -149,14 +149,20 @@ All skill document filenames in the vault must follow:
 
 ### Aliases 规范
 
-`aliases` 所有条目首字母大写（Pascal Case）。中文条目无需大写。
-仅大小写差异的第二别名（如 `Ai-Suite` ≈ `AISuite`）应当过滤，避免冗余。
+每个文件的 `aliases` 至少包含 **3 个条目**，遵循以下规则：
+
+| # | 条目 | 规则 | 示例 |
+|---|------|------|------|
+| 1 | 英文名 | Pascal Case 无连词符，只写一个 | `BrowserAct` |
+| 2 | 中文名 | 当前分类名，只写一个（来自目录结构） | `浏览器自动化` |
+| 3+ | 核心技术关键词 | 至少 1 个，从文档简介/核心功能提取，可有多个 | `浏览器控制`、`Web自动化` |
 
 ```yaml
 aliases:
-  - BrowserAct           # Pascal Case: 首字母大写
-  - Browser-Act          # 连词符后也大写
-  - 浏览器自动化          # 中文条目无需大写
+  - BrowserAct           # 英文名（Pascal Case 无连词符）
+  - 浏览器自动化          # 中文名（当前分类名）
+  - 浏览器控制            # 核心技术关键词（至少 1 个）
+  - Web自动化            # 核心技术关键词（可选）
 ```
 
 ## Common Pre-Check (Step 0: Template Hash Validation)
@@ -748,6 +754,7 @@ Walk ALL `.md` files under `{VAULT_BASE}`.
 | Check | Detection | Fix |
 |-------|-----------|-----|
 | `aliases` 含 `@` 前缀 | Parse frontmatter, aliases value starts with `@` | Remove `@` prefix, keep rest of text |
+| `aliases` 少于 3 条或格式不规范 | 英文名含连词符、中文名非分类名、条目数 < 3 | 按 Aliases 规范修复：英文名去连词符、中文名改为分类名、补核心技术关键词 |
 | frontmatter YAML 解析错误 | Parse each file's YAML frontmatter; catch errors (delimiters, alignment, illegal chars) | Fix formatting and re-parse until clean |
 
 *(Add rows to this table as new format issues are identified.)*

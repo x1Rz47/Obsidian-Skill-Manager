@@ -1,6 +1,9 @@
 ---
 必用: false                # true = 部署到新设备时自动安装
-aliases:                   # 功能/技术关键词，首字母大写
+aliases:                   # 至少 3 条：英文名（Pascal Case 无连词符）、中文分类名、核心技术关键词
+  - ToolName               # 英文名（Pascal Case 无连词符，只写一个）
+  - 分类名                  # 中文名（当前分类名，只写一个）
+  - 核心技术关键词           # 核心技术关键词（至少 1 个）
 GitHub 链接:               # 必填，格式 https://github.com/owner/repo
 GitHub Star:               # 格式：数字+K，无则填 N/A
 使用设备:                  # 已安装此工具的电脑名
