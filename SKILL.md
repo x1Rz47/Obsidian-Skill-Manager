@@ -1,8 +1,9 @@
 ---
 name: obsidian-skill-manager
 description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the vault's skill documentation needs organizing, renaming, standardizing, fixing, or format-checking. Also use when the vault documentation template changes and all files need syncing to match. Also use when the user says fix docs, fix format, 修复文档, 修复格式, or 检查格式.
-template_hash: 4b42fd92dfb91f7afc088fce421356f8
-template_checked: 2026-06-19
+metadata:
+  template_hash: 4b42fd92dfb91f7afc088fce421356f8
+  template_checked: 2026-06-19
 ---
 
 # Obsidian Skill Manager
@@ -170,17 +171,17 @@ Run the appropriate command for the current OS to get the MD5 hash of `{TEMPLATE
 
 ### Step 0.2: Compare with Stored Hash
 
-Read `template_hash` from this SKILL.md's frontmatter:
+Read `metadata.template_hash` from this SKILL.md's frontmatter:
 - If hashes **match** → template unchanged, proceed to the requested workflow
 - If hashes **differ** → template has been modified since last sync:
   1. Report the hash difference to the user
   2. Ask: "模板已更新，是否同步所有文档到新模板格式？"
-  3. **User confirms** → abort current workflow, switch to **Template Sync Workflow** (Step T1-T5). After Template Sync completes, `template_hash` is automatically updated.
-  4. **User declines** → update `template_hash` in SKILL.md frontmatter to the current hash without syncing. Continue with the requested workflow.
+  3. **User confirms** → abort current workflow, switch to **Template Sync Workflow** (Step T1-T5). After Template Sync completes, `metadata.template_hash` is automatically updated.
+  4. **User declines** → update `metadata.template_hash` in SKILL.md frontmatter to the current hash without syncing. Continue with the requested workflow.
 
 ### Step 0.3: Update Timestamp
 
-If `template_checked` is more than 7 days old, update it to today.
+If `metadata.template_checked` is more than 7 days old, update it to today.
 
 ## Frontmatter Normalization Rules
 
@@ -628,8 +629,8 @@ No per-file confirmation needed — batch and report.
 ### Step T6: Update Template Hash
 
 1. Run `md5 -q "{TEMPLATE}"` to compute the new template hash
-2. Update `template_hash` in this SKILL.md's frontmatter to the new hash
-3. Update `template_checked` to today's date
+2. Update `metadata.template_hash` in this SKILL.md's frontmatter to the new hash
+3. Update `metadata.template_checked` to today's date
 4. Confirm to the user: "模板哈希已更新，后续将自动检测变更"
 
 ## Standardize Workflow（全面标准化）
@@ -819,7 +820,7 @@ Stop and re-evaluate if you catch yourself thinking:
 | Tool not installed on current device | Set `使用设备: N/A` if no devices are listed |
 | Template hash mismatch detected | Ask user whether to run Template Sync |
 | Template hash not set in SKILL.md | Compute and set during first Template Sync run |
-| User declines template sync | Update `template_hash` to current, skip syncing |
+| User declines template sync | Update `metadata.template_hash` to current, skip syncing |
 | Superpowers core skills (核心技能) | Detectable via npm cache. NOT found via `npx skills list -g`. |
 | Skill is domain-specific (Obsidian/MCP/GStack/Codex) | Place in the correct domain directory per the S2 table. |
 | Skill exists in both `Skills/` and `Skills-Packs/` | **Pack version wins.** Delete from `Skills/` (individual). |
