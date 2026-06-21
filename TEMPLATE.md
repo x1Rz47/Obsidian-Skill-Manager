@@ -32,6 +32,13 @@ GitHub Star:               # 格式：数字+K，无则填 N/A
 - <span style="color:green">**可选**</span> ： 依赖项名称
 - <span style="color:gray">**无**</span> ： （无需额外依赖）
 
+## 💿 安装
+
+> [!info]
+> ```bash
+> # 安装命令（brew / npm / pip / curl 等）
+> ```
+
 ---
 
 ## 💊 痛点解决
