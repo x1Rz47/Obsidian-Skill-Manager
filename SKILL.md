@@ -1,13 +1,6 @@
 ---
 name: obsidian-skill-manager
-description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the 知识库 agent skill documentation needs organizing, renaming, standardizing, fixing, or format-checking. Also use when the 知识库 documentation template changes and all files need syncing to match. Also use when the user says fix docs, fix format, 修复文档, 修复格式, or 检查格式. Works in OpenCode, Claude Code, and Codex CLI.
-compatibility:
-  - opencode
-  - codex
-  - claude-code
-metadata:
-  template_hash: b033a64a9115d1aecfc5d4e49dbeba1c
-  template_checked: 2026-06-20
+description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the 知识库 agent skill documentation needs organizing, renaming, standardizing, fixing, or format-checking. Also use when the 知识库 documentation template changes and all files need syncing to match. Also use when the user says fix docs, fix format, 修复文档, 修复格式, or 检查格式. Compatible with any SKILL.md-based AI coding assistant.
 ---
 <!-- WARNING: All section lists must be read from TEMPLATE.md, never hardcoded. -->
 
@@ -15,18 +8,16 @@ metadata:
 
 ## Triggering
 
-This skill activates in eight modes:
+This skill activates in six modes:
 
 | Mode | Trigger phrases |
 |------|----------------|
 | **Install** | "安装/下载 [工具]"、"install/setup/add [tool]" |
 | **Document** | "记录 [工具]"、"给 [工具] 写个文档"、"doc [tool]" |
-| **Combined** | "安装并记录 [工具]"、"install and doc [tool]" |
-| **Deployment** | "部署/安装必用/安装常用/同步技能"、"deploy/setup this machine" |
-| **Fix** | "修复文档/修复所有文档/修复格式/检查格式"、"fix docs/fix format" |
-| **Sync** | "执行/同步/清理"、"sync/clean up/reindex" |
-| **Template Sync** | "模板变了/更新模板/同步模板/更新所有文档/刷新所有文档"、"template changed/sync template/refresh all docs" |
-| **Standardize** | "标准化所有文档/标准化文档/全面标准化"、"standardize all docs/full standardize" |
+| **Deployment** | "部署/安装必用/安装常用/部署技能"、"deploy/setup this machine" |
+| **Fix** | "修复文档/修复格式/检查格式/清理"、"fix docs" |
+| **Sync** | "同步/重新编号/重新索引"、"sync/reindex" |
+| **Template Sync** | "模板变了/更新模板/同步模板"、"template changed" |
 
 ## 知识库配置
 
@@ -48,536 +39,462 @@ Resolution order:
 2. Match `{HOSTNAME}` against the table → determines `{VAULT_BASE}`
 3. If no match or no local config → ask user for their hostname and vault path
 
-### Quick Start for New Users
 
-```markdown
-# {SKILL_DIR}/SKILL.local.md
-## Device Configuration
+## 规则
 
-| Hostname | Device | VAULT_BASE |
-|----------|--------|------------|
-| my-macbook | MacBook | /path/to/vault/04.AI相关-🤖 |
+### 分类规则
+
+所有层级统一按**能力域**分类。核心问题：**"AI Agent 通过这个工具获得了什么能力？"**
+
+### 类型规则
+
+`类型` 字段标注工具的技术形态，与目录位置无关。
+
+**格式：** YAML 列表，一个工具可标注多个类型。
+
+```yaml
+类型:
+  - CLI
+  - MCP
 ```
 
-Run `hostname -s` to find your hostname.
+| 取值 | 含义 | 示例 |
+|------|------|------|
+| `Agent` | 自主 AI Agent 或 Agent 编排框架 | Deep-Agents, Remote-OpenCode |
+| `Skill` | Agent 可执行的 SKILL.md 指令集 | BrowserAct, Playwright, Agent-Reach |
+| `Agent-Plugin` | 注入 Agent 运行时的扩展 | Supermemory, Morph, Vibeguard |
+| `Guide` | 参考文档 / 方法论 / 工作流指南 | Cheat-On-Content, Obsidian-Markdown |
+| `MCP` | Model Context Protocol 服务器 | MarkItDown, CodeGraph, GBrain |
+| `CLI` | 命令行独立工具 | yt-dlp, Repomix, DesktopCtl |
+| `Library` | 编程库 / SDK / Python 包 | PyAutoGUI, AISuite, GPT-SoVITS |
+| `API` | 云服务 / API 接口 | （暂无） |
+| `GUI` | 桌面图形应用 | OmniVoice-Studio, AISuite |
+| `Web` | Web 应用 | Ian-Xiaohei-Illustrations, SkillOpt |
+| `Plugin` | 外部软件插件（如 Obsidian 插件） | Claudian, Obsidian-Agent-Client |
+| `Model` | AI 模型 / 数据集 | （暂无） |
+| `Collection` | 资源集合仓库（仅管理文档） | Superpowers, Anthropic, GStack |
+
+**规则：**
+- 取值必须来自上方表格，不可自创
+- 至少标注 1 个，建议不超过 3 个
+- 多个类型按优先级排列：Agent → Skill → MCP → CLI → Library → API → Agent-Plugin → Plugin → Guide → GUI → Web → Model → Collection
+- `类型` 独立于目录位置，同目录文件可以有不同 `类型`
+
+### 目录层级规则
+
+**格式：** `{VAULT_BASE}/辅助工具/{L1}/{L2}/{L3}/{L4}/{NN}-{名称}.md`
+
+| 层级 | 建目录条件 | 说明 |
+|------|-----------|------|
+| **L1** | 不因文件数量合并/拆分 | 1 个文件也独立成目录 |
+| **L2-L4** | 子能力域内文件 **>2** 个时创建子目录 | 递归适用；13 种类型混装视为同类 |
+
+**规则：**
+- L1 名称：`{NN}-{中文能力域名}`（`NN` 为两位数字 `01`-`99`），按拼音排序连续分配，用于固定显示顺序
+- L2/L3/L4 名称：`{NN}-{中文子能力域名}`，NN 为两位数字，所属父目录内独立编号
+- L1 的 `NN-` 数字前缀用于目录排序，文件名的 `NN-` 是各目录内独立编号，两者互不冲突
+- 不限技术类型，13 种类型混装在同一个目录均视为同类
+
+**新建前检查：** 当目录中有 >2 个文件属于同一子能力域时，创建子目录：
+1. 确保每个文件的 `aliases` 中包含中文子能力域名（不含 NN 前缀），缺失则追加
+2. 从文件所属子能力域提取中文域名（可能有多个，如 `视频制作`、`语音合成`）
+3. 每个子能力域分别创建 `{NN}-{中文子能力域名}` 子目录，NN 按拼音首字母排序连续分配
+4. 旧文档：移入对应子目录后按 GitHub stars 降序重新分配编号
+5. 新文档：按 `{NN}-{英文名}` 格式命名，NN 接续当前目录最大编号
+
+**递归：** 每次操作后，扫描所有已有目录（L2→L4），检查是否有剩余 >2 的聚类需要拆分。
+
+### 命名规则
+
+**格式：** `{NN}-{英文名}.md`
+- `NN`：两位数编号（`01`、`02`...`99`）
+- `英文名`：每个单词首字母大写，连词符连接，仅英文
+- 示例：`12-Playwright.md`、`04-Data-Visualization.md`
+
+**规则：**
+- 只允许字母、数字、连词符和官方名中文
+- 每个单词首字母大写，连词符连接（如 `Data-Visualization`）
+- 官方名例外：保留工具官方名称原样（如 `PyAutoGUI`、`BrowserAct`、`ian-xiaohei-illustrations`），不强行拆连词符或翻译
+- 无空格、无下划线、无其他特殊字符
+- 不追加类型后缀：文件名不出现 `-mcp`、`-plugin`、`-skill`——目录路径已表达类型
+- 去厂商前缀：`opencode-X` → `X`、`vscode-X` → `X`，除非前缀是工具官方标识的一部分
+- 模板文件（`00-*`）不参与编号
+- 每个目录独立编号（含 L3 子目录）
 
 
-## Classification Guide
+### 别名规则
 
-按 **执行上下文** 分类：工具运行在 Agent **外部**（独立可执行）还是 **内部**（注入 Agent 运行时）？
+每个文件的 `aliases` 按以下规则填写，最多不超过 **5** 个条目：
 
-| 类型 | 运行位置 | 识别方式 | 例子 |
-|------|---------|---------|------|
-| **MCP Server** | Agent 内部（协议） | 描述含 "MCP server" / "Model Context Protocol"；包名含 `-mcp` | MarkItDown-MCP, CodeGraph, GBrain |
-| **Agent Skill** | Agent 内部（指令集） | 描述含 "skill"；仓库有 SKILL.md + 触发条件；安装：npx skills add（Codex CLI 也支持 $skill-installer） | Playwright-skill, BrowserAct-skill, Find-Skills, Agent-Reach |
-| **Skill Pack** | Agent 内部（指令集） | 多 skill 仓库；安装同上 | Superpowers, Anthropic, MattPocock, GStack |
-| **插件** | Agent 内部（运行时注入） | 描述含 "plugin" / "inject into agent"；安装后修改 Agent 能力，不论平台 | supermemory, morph, type-inject, vibeguard |
-| **工具** | Agent **外部** | 以上都不符合的可安装软件，不论具体形态 | yt-dlp, repomix, deepagents, agent-browser, Defuddle |
+| # | 条目 | 规则 | 示例 |
+|---|------|------|------|
+| 1 | 英文名 | 有则写，无则跳过。Pascal Case 无连词符，只写一个 | `BrowserAct` |
+| 2 | 中文名 | 有则写，无则跳过。所属目录的中文能力域名（不含 NN 编号），位置不限 | `视频制作` |
+| 3+ | 核心技术关键词 | 至少 1 个，从文档简介/核心功能提取，可有多个 | `浏览器控制`、`Web自动化` |
 
-> **工具/ 是兜底分类。** 只要不是 MCP server、不是 agent skill、也不是注入 Agent 运行时的插件，全部归入 工具/。 Obsidian 插件、VS Code 扩展、OpenCode 插件中不注入运行时的部分，都是 工具/。
->
-> 安装后与之前判断冲突 → 标记 `⚠️ 分类存疑，需人工确认`，不自动纠正。
+### 前置元数据规则
 
+被同步和模板同步工作流共享。在其他工作流逻辑前对每个 `.md` 文件执行以下检查：
 
-## 使用设备 判定规则
+| 检查项 | 修复方式 |
+|-------|---------|
+| `字段顺序` 错误 | 按 `{TEMPLATE}` 的 frontmatter 键顺序重新排列 |
+| `类型:` 缺失 | 添加为 YAML 列表，取值见[类型规则](#类型规则) |
+| `类型:` 非列表 | 转为 YAML 列表：`类型: X` → `类型:\n  - X`；多类型追加全部取值 |
+| `使用平台:` 无效 | 通用工具填 `ALL`，Agent 专用工具从 `OpenCode / Codex / Claude Code / Gemini` 中用 ` / ` 分隔选择。禁止 `NO`、`N/A` 等模糊值 |
+| `使用设备:` 格式错误 | 修正为 YAML 列表（`  - Device`）或 `N/A` |
+| `使用设备:` 缺失 | 检测当前设备安装状态：已安装追加设备名，未安装设 `N/A` |
+| 布尔值未小写 | 修复：`True` → `true`，`False` → `false`，`Yes` → `yes` |
 
-`使用设备` 记录工具**在当前设备上是否实际安装**，不是"依赖存在"或"相关应用已安装"。
+### 文档规则
 
-| 工具类型 | 判定命令 | 示例 |
+文档 body 严格按 `{TEMPLATE}` 的 `##` 节结构和格式生成。各节的写法和示例见模板本身，不再重复。
+
+#### `📝 更新功能` 书写规范
+
+- 文档仅有 1 条更新记录时，描述统一写 `首次创建`
+- 文档有 2+ 条记录时，第一条写 `首次创建`，第二条起内容不限
+- 模板变更（增删字段、重排结构、格式化）**不记入** `更新功能`，仅联网查到的新内容更新才记录
+- 更新记录描述尽量简短，一句话概括做了什么即可，不必展开细节
+
+#### 更新操作
+
+当任一工作流更新已有文档时，始终执行以下操作：
+
+| 字段 | 操作 |
+|------|------|
+| `GitHub Star` | 重新查网页，更新最新 star 数；查不到则保留原值 |
+| `更新日期` | 设为当天 `YYYY-MM-DD` |
+| `更新功能` | 仅联网查到的新内容更新才追记；模板变更不记录 |
+| `已有内容` | 合并新信息到对应章节，新旧重复或矛盾时以新资料为准覆盖 |
+| `创建日期` | **不变** |
+| `文件编号` | 按 GitHub stars 排序重新分配 |
+| `使用设备` | 检测当前设备安装状态：已安装追加设备名，未安装设 `N/A` |
+
+### 安装检测规则
+
+| 安装类型 | 判定命令 | 示例 |
 |---------|---------|------|
-| agent skill | skill 列表可见 或 目录存在（OpenCode: `npx skills list -g`, Claude Code: `claude skills list`, Codex: 自动检测） | `video-use` |
-| MCP server | agent 配置文件的 mcpServers 中已配置（opencode.json / claude.json / codex config.toml ） | `markitdown-mcp` |
 | CLI 工具 | `which <tool>`（Mac）/ `where.exe <tool>`（Win） | `ffmpeg` |
 | brew 包 | `brew list <pkg>`（仅 Mac） | `gh` |
 | npm 全局包 | `npm list -g <pkg>` | `bun` |
 | pip 包 | `pip3 list \| grep <pkg>`（Mac）/ `pip list \| findstr <pkg>`（Win） | `openai-whisper` |
-| 工作流/Skills-Packs | 不可安装，永远写 `N/A` | GStack, Superpowers |
+| 工作流/Collection | 不可安装，永远写 `N/A` | GStack, Superpowers |
 
-## Naming Conventions
 
-All skill document filenames in the 知识库 must follow:
+## 工作流
 
-**Format:** `{NN}-{English-Name}.md`
-- `NN`: 2-digit number (`01`, `02`...`99`)
-- `English-Name`: Pascal-kebab-case, English only
-- Example: `12-Playwright.md`, `04-Data-Visualization.md`
+### 通用步骤
 
-**Rules:**
-- Only letters, numbers, and hyphens allowed
-- First letter of each word capitalized (Pascal case), joined by hyphens
-- No Chinese characters, no spaces, no underscores, no special characters
-- No category suffix: Do not append category type (e.g., `-mcp`, `-plugin`, `-skill`) to filename — the directory path already indicates the type
-- Strip vendor prefix: Remove redundant vendor/framework prefixes (e.g., `opencode-X` → `X`, `vscode-X` → `X`) unless the prefix is part of the tool's official identity
-- Template files (`00-*`) are excluded from the numbering convention
+#### 查知识库
 
-**Independent numbering per directory (including 3rd-level subdirectories):** See [Sync S2 table](#step-s2-scan-all-知识库-directories) for the canonical directory list and numbering rules. When moving or renaming files, always derive the natural name from the filename (strip `NN-` prefix and convert Pascal-kebab-case to natural name).
+在目标目录中搜索已有文档：
+1. 读取目标目录下所有 `.md` 文件
+2. 按文件名（去掉 `NN-` 前缀）或第一个 `aliases` 条目匹配
+3. **找到** → 继续后续步骤
+4. **未找到** → 跳至[完整搜资](#完整搜资)
 
-### Subdirectory Rule
+#### 查最新star
 
-当一个目录下同一类型的文档超过 **3 个** 时，应创建子分类文件夹：
-- 子分类名用中文，不加编号（如 `语音合成/`、`浏览器自动化/`）
-- 将对应文件移入子目录，**独立编号**（01-N，按 GitHub stars 降序）
-- 文件 aliases 中文名同步改为新的子分类名
-- 在 Sync S2 表中添加新子目录的行
+获取当前 GitHub star 数：
+- 工具有 GitHub 链接 → 抓取页面解析 star 数
+- 抓取失败或没有 GitHub 仓库 → 保留原有 `GitHub Star`
 
-### Aliases 规范
+#### 完整搜资
 
-每个文件的 `aliases` 至少包含 **3 个条目**，遵循以下规则：
+收集以下信息：
+- 官方 README / 文档中的简介
+- GitHub 链接和 star 数（用搜索引擎或 GitHub API）
+- 安装命令（如 I1 已确定则跳过）
+- 核心功能、依赖项、`使用平台`
+- 注意事项或已知限制
 
-| # | 条目 | 规则 | 示例 |
-|---|------|------|------|
-| 1 | 英文名 | Pascal Case 无连词符，只写一个 | `BrowserAct` |
-| 2 | 中文名 | 当前分类名，只写一个（来自目录结构） | `浏览器自动化` |
-| 3+ | 核心技术关键词 | 至少 1 个，从文档简介/核心功能提取，可有多个 | `浏览器控制`、`Web自动化` |
+GitHub 抓取失败时设 `GitHub Star: N/A`。
 
-```yaml
-aliases:
-  - BrowserAct           # 英文名（Pascal Case 无连词符）
-  - 浏览器自动化          # 中文名（当前分类名）
-  - 浏览器控制            # 核心技术关键词（至少 1 个）
-  - Web自动化            # 核心技术关键词（可选）
-```
+#### 安装
 
-## Common Pre-Check (Step 0: Template Hash Validation)
+执行安装命令。等待完成。验证成功或失败。
 
-Before ANY 工作流 (Install, Document, Combined, Deployment, Sync, Template Sync), check if the 知识库 template has changed:
+安装后从知识库配置表记录当前设备名。设备检测参照[前置元数据规则](#前置元数据规则)。
 
-### Step 0.1: Compute Current Template Hash
+告知用户结果："安装成功"或"安装失败：[原因]"。
 
-Run the appropriate command for the current OS to get the MD5 hash of `{TEMPLATE}`:
-- **Mac:** `md5 -q "{TEMPLATE}"`
-- **Windows:** `certutil -hashfile "{TEMPLATE}" MD5 | findstr /v "MD5"`
+#### 生成文档
 
-### Step 0.2: Compare with Stored Hash
+写入前检查[目录层级规则](#目录层级规则)：
+- 目标目录存在 >2 个同子能力域文件 → 创建子分类文件夹、移入、重编号
+- 否则直接使用当前目录
 
-Read `metadata.template_hash` from this SKILL.md's frontmatter:
-- If hashes **match** → template unchanged, proceed to the requested 工作流
-- If hashes **differ** → template has been modified since last sync:
-  1. Report the hash difference to the user
-  2. Ask: "模板已更新，是否同步所有文档到新模板格式？"
-  3. **User confirms** → abort current 工作流, switch to **模板同步工作流** (Step T1-T5). After Template Sync completes, `metadata.template_hash` is automatically updated.
-  4. **User declines** → update `metadata.template_hash` in SKILL.md frontmatter to the current hash without syncing. Continue with the requested 工作流.
+用完整搜资的数据创建文档：
+- 读取 `{TEMPLATE}` 获取字段顺序、章节结构和书写规则
+- 填充 `GitHub 链接`、`GitHub Star`、简介、核心功能、`使用平台`
+- `创建日期` 和 `更新日期` 设为当天
+- `使用设备` 设为当前设备
+- 取目标目录中下一个可用编号（最大 `NN` + 1，空目录从 `01` 开始）
+- 写入 `{VAULT_BASE}/{category}/{NN}-{英文名}.md`
+- 告知用户："已生成文档：{filename}"
 
-### Step 0.3: Update Timestamp
+### 安装工作流
 
-If `metadata.template_checked` is more than 7 days old, update it to today.
+#### I1: 识别工具
 
-## Frontmatter Normalization Rules
+确定以下信息：
+- **名称**：工具叫什么？
+- **来源**：GitHub / npm / brew / pip / direct download
+- **分类**：根据来源映射到知识库目录（参照[同步工作流 S2](#s2-扫描全部知识库目录)）
 
-Shared by Sync S3 and Template Sync T3. Apply these checks to every `.md` file before other 工作流-specific logic.
+→ 跳至[查知识库](#查知识库)
 
-| Check | Fix |
-|-------|-----|
-| Wrong field order | Reorder to match `{TEMPLATE}` field order exactly |
-| `使用平台` value invalid | Must list specific platforms (OpenCode / Codex / Claude Code / Gemini), separated by ` / `. Never use `全平台` or `NO`. Example: `Claude Code / Codex / OpenCode` |
-| `使用设备:` wrong format | Fix to YAML list (`  - Device`) or `使用设备: N/A` |
-| Missing `使用设备:` | Add based on install detection |
-| Boolean values not lowercase | Fix: `True` → `true`, `False` → `false`, `Yes` → `yes` |
+#### ═══ 已有文档 ═══
 
-## Body Section Conventions
+#### 查最新star
 
-文档 body 严格按 `{TEMPLATE}` 的 `##` 节结构和格式生成。各节的写法和示例见模板本身，不再重复。
+参照[通用步骤 - 查最新star](#查最新star)。
 
-### `📝 更新功能` 书写规范
+#### 安装
 
-- 文档仅有 1 条更新记录时，描述统一写 `首次创建`
-- 文档有 2+ 条记录时，第一条写 `首次创建`，第二条起内容不限
+参照[通用步骤 - 安装](#安装)。
 
-## 安装工作流
+#### I5: 更新文档
 
-### Step I1: Identify the Tool
-
-Determine:
-- **Name**: What is it called?
-- **Type**: skill / 插件 / MCP / npm package / config / other
-- **Source**: GitHub / npm / brew / pip / direct download
-- **Category**: Map source to target directory using the [Sync S2 table](#step-s2-scan-all-知识库-directories).
-
-### Step I2: Gather Information
-
-Collect:
-- Description from official docs/README
-- GitHub URL and star count (use web search)
-- Installation command
-- Core features
-- Dependencies
-- Any warnings or notes
-
-If GitHub fetch fails (network error, no GitHub repo), set `GitHub Star: N/A`. Do not block the 工作流.
-
-### Step I3: Check for Existing Document
-
-Before installing, scan the target directory in 知识库:
-1. Read all files in the target category directory
-2. Parse frontmatter of each file for `aliases` — the tool name is derived from the filename (strip `NN-` prefix, convert Pascal-kebab to natural name) or from the first `aliases` entry
-3. If a match is found → tell the user: "该工具已记录过文档，不再重复记录"
-4. If no match → proceed (记录工作流 will handle it if needed)
-
-Continue to install regardless of the result.
-
-### Step I4: Execute Installation
-
-Run the installation command. Wait for it to complete. Verify success.
-
-After installation, note the current device name from 知识库配置表. Device detection follows the [使用设备 判定规则](#使用设备-判定规则) table.
+应用[文档规则](#文档规则)：
+- 安装成功 → 全部规则（star/日期/更新功能/内容/设备）
+- 安装失败 → 只更新 `更新日期` + `更新功能`（追加 "YYYY-MM-DD: 安装失败：[原因]"），其余不变
 
 ---
 
-## 记录工作流
+#### ═══ 无文档 ═══
 
-### Step W1: Check for Existing Document
+#### 完整搜资
 
-1. Read all files in the target category directory
-2. Parse frontmatter of each file for `aliases` — the tool name is derived from the filename (strip `NN-` prefix, convert Pascal-kebab to natural name) or from the first `aliases` entry
-3. If a match is found → this is an **UPDATE**:
-   - Update `更新日期` to today
-   - Do NOT modify `创建日期`
-   - Add a new entry to `更新功能`: e.g. "更新于 2026-06-06: 更新了核心功能描述"
-   - Merge new information into existing sections
-   - Do NOT change the file's number
-   - Skip Steps W3-W4, go directly to save
-4. If no match → this is a **NEW** entry, proceed to Step W2
+参照[通用步骤 - 完整搜资](#完整搜资)。
 
-### Step W2: Gather Information
+#### 安装
 
-Collect:
-- Description from official docs/README
-- GitHub URL and star count (use web search)
-- Core features
-- Dependencies
-- 使用平台 — 从 GitHub README / 官网文档判断支持哪些 AI 编程平台（OpenCode / Codex / Claude Code / Gemini），多个用 / 分隔
-- Any warnings or notes
+参照[通用步骤 - 安装](#安装)。
 
-### Step W3: Global Sort and Renumber (NEW entries only)
+#### I7: 生成文档
 
-Follow [Sync Step S5](#step-s5-global-re-sort) for the target directory only.
-
-### Step W4: Generate Obsidian Document
-
-Read `{TEMPLATE}` for field order, section structure, and writing rules. Apply per-field overrides below:
-
-**`GitHub 链接` must always be populated:**
-- When installing via a skill installer (OpenCode: `npx skills add owner/repo@skill`, Codex: `$skill-installer`, Claude Code: `claude` with config) → derive from `owner/repo` → `https://github.com/owner/repo`
-- When installing via `npm install owner/repo` → derive from `owner/repo`
-- When the install URL is known from the user or the skill source → write it directly
-- NEVER leave `GitHub 链接` as `无` or empty — if truly unknown, set to `⚠️ Unknown` (not `无`)
-
-**Device detection:** Follow the [使用设备 判定规则](#使用设备-判定规则) table to determine install status per device.
-
-Write to `{VAULT_BASE}/{category}/{filename}`.
-Confirm to the user that the tool is documented.
+参照[通用步骤 - 生成文档](#生成文档)。
 
 ---
 
-## 综合工作流
+### 记录工作流
 
-1. Run [安装工作流](#安装工作流) Steps I1-I4
-2. After installation, if no existing document was found in Step I3, run [记录工作流](#记录工作流) Steps W2-W4 (skip W1, info was already gathered in I2)
+#### W1: 查知识库
 
-## 部署工作流
+识别工具（名称、类型、分类），参照[通用步骤 - 查知识库](#查知识库)：
+- 找到 → 跳至 W2: 更新文档
+- 未找到 → 跳至 W3: 完整搜资
 
-Scan the 知识库 for `必用: true` tools and install them on the current device.
+#### W2: 更新文档
 
-### Step D1: Scan for Favorites
-
-1. Read all .md files under `{VAULT_BASE}/辅助工具/` (all subdirectories — Skills/, Skills-Packs/, MCP/, 工具/, 插件/)
-2. Parse frontmatter of each file, filter for `必用: true`
-3. If none found, report "没有标记必用的工具" and stop
-
-### Step D2: Install Each Favorite
-
-For each file with `必用: true`:
-
-1. Read the document body, focusing on the **用法** and **核心功能** sections
-2. Infer the installation command(s) from the content
-3. Determine what to install:
-   - **System tool** (brew/pip/npm) → run the install command directly
-   - **Agent skill** → symlink/copy to the current platform's skill directory（OpenCode: `~/.config/opencode/skills/`, Claude Code: `~/.claude/skills/`, Codex: `~/.codex/skills/` or `$REPO_ROOT/.agents/skills/`）
-4. Check if already installed — skip if present
-5. Execute the install command. Verify success.
-6. Record success or failure
-
-### Step D3: Report Results
-
-Present a summary table of each tool and its status.
-
-## 同步工作流
-
-This 工作流 runs independently. Use it when you've manually added, deleted, or renamed files in the 知识库, and need the numbering restored to a consistent state across all directories.
-
-### Step S1: Determine Current Device
-
-1. Run `hostname -s` (macOS) or `hostname` (Windows) to get the current machine's hostname
-2. Look up the device name in the 知识库配置表
-3. If the hostname is not mapped, ask the user to identify the device
-
-### Step S2: Scan All 知识库 Directories
-
-Walk ALL `.md` files under `{VAULT_BASE}` grouped by directory:
-
-| Directory | Numbering Rule | Frontmatter Required |
-|-----------|---------------|---------------------|
-| `辅助工具/Skills/浏览器自动化/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/媒体创作/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/搜索代理/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/效率工具/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/启动验证/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/知识管理/Obsidian生态/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills/知识管理/个人效能/` | By GitHub stars (desc) | Full template |
-| `辅助工具/Skills-Packs/01-Superpowers/规划/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/01-Superpowers/执行/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/01-Superpowers/协作/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/01-Superpowers/工作流/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/01-Superpowers/质量/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/01-Superpowers/元技能/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/02-Anthropic/API与开发/` | Manual (01-N, ordered by stars) | Full template |
-| `辅助工具/Skills-Packs/02-Anthropic/文档处理/` | Manual (01-N, ordered by stars) | Full template |
-| `辅助工具/Skills-Packs/02-Anthropic/创意设计/` | Manual (01-N, ordered by stars) | Full template |
-| `辅助工具/Skills-Packs/02-Anthropic/沟通协作/` | Manual (01-N, ordered by stars) | Full template |
-| `辅助工具/Skills-Packs/03-MattPocock/工程开发/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/03-MattPocock/工作效率/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/03-MattPocock/其他/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/04-GStack/{category}/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/05-Awesome-Copilot/` | Manual (01-N, ordered by stars) | Full template |
-| `辅助工具/Skills-Packs/06-AddyOsmani/{category}/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/Skills-Packs/07-PM-Skills/{category}/` | Manual (01-N, ordered at creation) | Full template |
-| `辅助工具/MCP/` | By GitHub stars (desc) | Full template |
-| `辅助工具/工具/` | By GitHub stars (desc) | Full template |
-| `辅助工具/工具/语音合成/` | By GitHub stars (desc) | Full template |
-| `辅助工具/插件/` | By GitHub stars (desc) | Full template |
-
-For each file, parse its frontmatter and derive the tool name from the filename (strip `NN-` prefix, convert Pascal-kebab to natural name) or from the first `aliases` entry. Build a manifest: tool name, `GitHub Star`, `使用设备`, `必用`, and install commands.
-
-### Step S3: Detect and Fix Issues Per File
-
-Apply [Frontmatter Normalization Rules](#frontmatter-normalization-rules) to every file, plus Sync-specific checks:
-
-- **Missing `必用:`** → Add `必用: false`
-- **Wrong field name (`常用`)** → Rename to `必用`
-- **`GitHub 链接` missing or `无`** → Auto-fill via web research; if still not found, set to `⚠️ Unknown`
-- **`GitHub 链接` is `⚠️ Unknown`** → Leave as-is (flagged for review, don't auto-fix without confirming)
-- **Naming mismatches** → Rename to `{NN}-{Pascal-Kebab-Name}.md`
-
-
-### Step S4: Device Tracking
-
-Follow [使用设备 判定规则](#使用设备-判定规则) to detect each tool's install status on the current device.
-
-Update `使用设备:` per file:
-
-| Install Status | Action |
-|---------------|--------|
-| Tool IS installed | Add `  - <DeviceName>` under `使用设备:` |
-| Tool NOT installed and `使用设备:` is empty or has no entries | Set `使用设备: N/A` |
-| Tool NOT installed but `使用设备:` has entries from other devices | Leave existing entries unchanged |
-| 工作流/process doc / Skills-Packs | Set `使用设备: N/A` (not installable software)
-
-### Step S5: Global Re-Sort
-
-For all directories sorted by GitHub stars, renumber files:
-
-1. Read `GitHub Star` from each file; parse counts: `12K` → 12000, `1.5K` → 1500, `N/A` → 0
-2. Sort by star count descending (N/A → end); equal stars → alphabetically by filename-derived name (strip `NN-` prefix, convert Pascal-kebab to natural name)
-3. Assign new numbers `01`, `02`, `03`...
-4. Rename files to `{NN}-{Pascal-Kebab-Name}.md`
-5. Fix any files with missing frontmatter fields
-
-### Step S6: Report
-
-Present a summary of scanned directories, files, fixes, and new numbering ranges per directory.
-
-## 模板同步工作流
-
-**Routing:**
-- `"模板变了"` / `"更新模板"` / `"同步模板"` / `"template changed"` → full run T1→T6
-- `"更新所有文档"` / `"刷新所有文档"` / `"refresh all docs"` → skip T1/T3/T4, run T4a2 + T4b + T5, skip T6
-
-This 工作流 normalizes frontmatter field order, field names, device tracking, body section structure, and refreshes live data (stars, dates, changelog).
-
-### Step T1: Read the Template
-
-1. Read `{TEMPLATE}`
-2. Parse the frontmatter: capture field names and their exact order
-3. Parse the body: identify all `##` section headers and their order
-4. Note any changes from the previous template state (e.g., field added/removed/renamed, section added/removed/renamed)
-
-### Step T2: Scan All 知识库 Files
-
-Walk ALL `.md` files under `{VAULT_BASE}`.
-
-### Step T3: Normalize Frontmatter Per File
-
-Apply [Frontmatter Normalization Rules](#frontmatter-normalization-rules) to every file, plus template-specific checks:
-
-| Check | Action |
-|-------|--------|
-| Field name doesn't match template | Rename to match template exactly |
-| Field removed from template (e.g., `tags:`) | Remove the field from all files |
-| Field added to template (e.g., `使用平台:`) | Add the field with default value |
-
-**Device detection:** Follow [使用设备 判定规则](#使用设备-判定规则) for each file.
-
-Update `使用设备:` based on detection result:
-- Installed → `使用设备:\n  - Mac Mini`
-- Not installed → `使用设备: N/A`
-
-### Step T4: Normalize Body Section Structure
-
-If the template has added, removed, or reordered body sections:
-
-1. Map each file's existing sections to the template's section order
-2. Remove sections that no longer exist in the template (e.g., `参考链接`)
-3. Add new empty sections from the template (e.g., `用法`)
-4. Reorder sections to match template order
-5. Run `scripts/fix-format.sh "{VAULT_BASE}/辅助工具"` — reads each section's structural skeleton from `{TEMPLATE}` and wraps content in the correct callout blocks, `<details>` tags, or table headers; preserves text content
-
-### Step T4a: 模板节内容 — 补空模式
-
-**Scope:** ALL `.md` files under `辅助工具/` that have empty or missing `{TEMPLATE}` sections.
-
-**Goal:** No file should have empty sections. Every section must contain meaningful content derived from internet research.
-
-**Execution:**
-
-1. **Read `{TEMPLATE}`** to determine section list and writing rules for each section.
-
-2. **Scan for gaps:** For each file, check which sections from `{TEMPLATE}` are missing or contain only `> ` / whitespace.
-
-3. **Identify the tool/skill:** Derive the tool name from the filename (strip `NN-` prefix, convert Pascal-kebab to natural name) or from `简介`.
-
-4. **Internet research (do one of):**
-   - If the tool has a `GitHub 链接` → open the GitHub README, extract relevant section content
-   - If the tool is from a known collection (Anthropic/MattPocock/Superpowers/AddyOsmani/GStack) → search web for the skill's documentation
-   - If the tool is a CLI/package → search web for its official docs
-   - Use `websearch` tool with query: `"{tool-name} AI agent skill documentation"` or `"{tool-name} CLI tool features"`
-
-5. **Fill each section per `{TEMPLATE}` writing rules.**
-
-6. **Content rules:**
-   - Content must be in Chinese (except code blocks, URLs, proper nouns)
-   - Do NOT copy placeholder text from the template
-   - Base content on actual research, not speculation
-   - If web research yields no results, derive content from the existing `简介` section
-   - After filling, verify the file reads naturally as a complete document
-
-**Batching:** Process files in parallel by category (Skills/, Skills-Packs/*, 工具/, MCP/, 插件/). For large packs, split into sub-batches.
-
-### Step T4a2: 模板节内容 — 全量刷新模式
-
-**Triggers:** `"更新所有文档"` / `"refresh all docs"` — skips T1/T3/T4, runs T4a2 + T4b only.
-
-**Scope:** ALL `.md` files under `辅助工具/`.
-
-**Goal:** Every section in every file is re-checked against current source material. Existing content is kept unless new information is found.
-
-**Execution:**
-
-1. For each file, derive the tool name from the filename (strip `NN-` prefix, convert Pascal-kebab to natural name) and get `GitHub 链接`.
-
-2. **Research current source:**
-   - Has `GitHub 链接` → fetch README, compare against current 知识库 content section by section
-   - From a known collection → search web for updated documentation
-   - CLI/package → check official docs for changes
-
-3. **Update sections where new info found:**
-   - Refer to `{TEMPLATE}` for the canonical section list
-   - Only write if there is new information — otherwise leave unchanged
-
-4. **Append to `更新功能`:**
-   - If any section was updated → add entry: `"YYYY-MM-DD: 更新 [section]"`.
-   - If no changes → no new entry (T4b handles the `"无"` case).
-
-**No per-file confirmation — batch and report.
-
-### Step T4b: 数据刷新
-
-For every `.md` file under `辅助工具/`:
-
-1. **GitHub Star** — fetch 对应 repo 页面, 解析星标数后写回
-2. **更新日期** — 设为当天 `YYYY-MM-DD`
-3. **更新功能** — 查 repo release 日志, 与上次 `更新日期` 对比:
-   - 有更新 → 写新条目
-   - 无变化 → 写 `"无（数据已同步）"`
-
-No per-file confirmation needed — batch and report.
-
-### Step T5: Verify and Report
-
-1. Re-read every modified file and verify the YAML parses correctly
-2. Run a validation pass:
-   - All frontmatter fields match template order
-   - No stale fields (renamed fields, removed fields)
-   - `使用设备:` values are correct (no `False` from YAML boolean parsing)
-   - `必用:` values are lowercase (`true`/`false`)
-3. Present a summary with counts per operation
-4. If any files couldn't be parsed correctly, report them as errors and do not modify them.
-
-### Step T6: Update Template Hash
-
-1. Run `md5 -q "{TEMPLATE}"` to compute the new template hash
-2. Update `metadata.template_hash` in this SKILL.md's frontmatter to the new hash
-3. Update `metadata.template_checked` to today's date
-4. Confirm to the user: "模板哈希已更新，后续将自动检测变更"
-
-## 标准化工作流
-
-**Trigger:** `"标准化所有文档"` / `"standardize all docs"` — runs every 全知识库 fix in sequence, from formatting to data refresh to renumbering.
-
-Runs the following workflows in sequence, batching and reporting at the end:
-
-1. **[修复工作流](#修复工作流)** — fix format issues (F1-F3)
-2. **[同步工作流](#同步工作流)** — normalize frontmatter, device tracking, re-sort (S1-S6)
-3. **[Template Sync T4a](#step-t4a-模板节内容--补空模式)** — fill empty sections via web research
-   - Before starting, ask the user: "是否需要联网填充所有文件的空白节？这会产生大量网络请求。"
-   - If declined, skip to step 4
-4. **[Template Sync T4b](#step-t4b-数据刷新)** — refresh star counts, dates, changelog
-5. **[Template Sync T5](#step-t5-verify-and-report)** — verify and report
-6. **[Template Sync T6](#step-t6-update-template-hash)** — update template hash
+应用[文档规则](#文档规则)：
+- 自动搜最新 GitHub star、更新日期、追记更新功能、合并新信息
+- 如果用户提供了新信息，优先用用户提供的内容合并
 
 ---
 
-## 修复工作流
+#### W3: 完整搜资
 
-Triggered by `"修复文档/修复格式/检查格式"` / `"fix docs"`. Scans 知识库 for known format issues and fixes them. Does NOT renumber, refresh data, or sync templates.
+参照[通用步骤 - 完整搜资](#完整搜资)。
 
-### Step F1: Scan All 知识库 Files
+#### W4: 生成文档
 
-Walk ALL `.md` files under `{VAULT_BASE}`.
+参照[通用步骤 - 生成文档](#生成文档)。
 
-### Step F2: Check and Fix Known Issues
+---
 
-| Check | Detection | Fix |
-|-------|-----------|-----|
-| `aliases` 含 `@` 前缀 | Parse frontmatter, aliases value starts with `@` | Remove `@` prefix, keep rest of text |
-| `aliases` 少于 3 条或格式不规范 | 英文名含连词符、中文名非分类名、条目数 < 3 | 按 Aliases 规范修复：英文名去连词符、中文名改为分类名、补核心技术关键词 |
-| frontmatter YAML 解析错误 | Parse each file's YAML frontmatter; catch errors (delimiters, alignment, illegal chars) | Fix formatting and re-parse until clean |
-| `ℹ️ 基本介绍` callout 中含裸 `[abstract]`（无 `!`） | `section_has_skeleton` rejects if content has >1 `[!abstract]` line | Run `fix-format.sh` — strips and re-wraps cleanly |
-| `ℹ️ 基本介绍` 缺少 `**状态**` 行 | `validate_section_format` checks `**状态**` existence | Run `fix-format.sh` — appends `> **状态**：<span style="color:var(--color-green)">待评估</span>` |
-| `📝 更新功能` 条目描述不规范 | Parse `更新功能` section; file has exactly 1 entry whose description is not `首次创建` | Change description to `首次创建` |
-| Callout 续行存在前导空格 | Lines after `> [!abstract]`/`> [!info]`/`> [!warning]` start with ` > ` instead of `> ` | Remove leading space before `>` on continuation lines |
-| 表格后缺少空行再接标题 | `##` heading immediately follows pipe row (`|\n##`) | Insert blank line between table end and next `##` heading |
-| 末尾缺少 `---` 分隔符 | File does not end with `---` on its own line | Append `\n---` to file |
-| `💊 痛点解决` 前缺少 `---` 分隔符 | Section `💊 痛点解决` is not preceded by `---` on its own line | Insert `\n---\n` between preceding content and `## 💊 痛点解决` |
-| *(Add rows as new format issues are discovered.)* | | |
+### 部署工作流
 
-For each file:
-- Detect which checks trigger
-- Apply fixes
-- Track what was changed
+扫描知识库中标记 `必用: true` 的工具，在当前设备上安装。
 
-### Step F3: Report
+#### D1: 扫描必用工具
 
-Present a summary with file counts per issue type. If no issues found, say so.
+1. 读取 `{VAULT_BASE}/辅助工具/` 下所有 `.md` 文件（递归所有子目录）
+2. 解析每个文件的 frontmatter，筛选 `必用: true`
+3. 无结果则报告"没有标记必用的工具"并停止
 
-## Edge Cases
+#### D2: 逐个安装
 
-| Case | Handling |
-|------|----------|
-| No GitHub repository | Set `GitHub 链接: ⚠️ Unknown`, `GitHub Star: N/A` |
-| Star count format varies | Parse: `12K` → 12000, `1.5K` → 1500, `N/A` → 0 |
-| Empty non-template files (e.g. OPENdesign.md) | Skip — no frontmatter, not a tool document |
-| Multiple files share the same star count | Sort alphabetically by tool name |
-| File rename fails during renumbering | Stop and report which file failed |
-| Hostname not found in 知识库配置 | Ask user to identify the current device |
-| Tool install detection is ambiguous | Check multiple methods (`which`, `brew list`, etc.) |
-| Cross-device sync conflict | 设备 A 修改后推送 → 设备 B 需重新运行 Sync |
+对每个 `必用: true` 的文件：
+
+1. 读取文档正文，重点关注**用法**和**核心功能**章节
+2. 从内容推断安装命令
+3. 判断安装类型：
+   - **系统工具**（brew/pip/npm）→ 直接执行安装命令
+   - **Agent 技能** → 链接/复制到当前平台的 skill 目录（OpenCode: `~/.config/opencode/skills/`，Claude Code: `~/.claude/skills/`，Codex: `~/.codex/skills/` 或 `$REPO_ROOT/.agents/skills/`）
+4. 检查是否已安装 — 已安装则跳过
+5. 执行安装命令。验证成功。
+6. 记录成功或失败
+
+#### D3: 报告结果
+
+展示每个工具的安装状态汇总表。
+
+### 同步工作流
+
+此工作流独立运行。在手动增删或重命名知识库文件后，用于恢复所有目录的编号一致性。
+
+#### S1: 确定当前设备
+
+按[设备到知识库映射](#device--vault-mapping)的解析顺序确定 `{HOSTNAME}` 和 `{VAULT_BASE}`。
+
+#### S2: 扫描全部知识库目录
+
+递归扫描 `{VAULT_BASE}/辅助工具/` 下所有含 `.md` 文件的目录。对每个文件解析 frontmatter 并构建清单：工具名、`GitHub Star`、`使用设备`、`必用`、安装命令。
+
+扫描前递归应用[目录层级规则](#目录层级规则)，确保没有 >2 个同子能力域未拆分。
+
+#### S3: 检测并修复文件问题
+
+对每个文件应用[前置元数据规则](#前置元数据规则)，外加同步专属检查：
+
+| 检查项 | 修复方式 |
+|-------|---------|
+| 缺少 `必用:` | 添加 `必用: false` |
+| 错误字段名（`常用`） | 改名为 `必用` |
+| `GitHub 链接` 缺失或为 `无` | 联网搜索自动填充；仍找不到则设 `⚠️ Unknown` |
+| `GitHub 链接` 为 `⚠️ Unknown` | 保持不动（标记待审，不自动修复） |
+| 命名不匹配 | 重命名为 `{NN}-{英文名}.md` |
+
+#### S4: 设备追踪
+
+参照[前置元数据规则](#前置元数据规则)检测当前设备安装状态。
+
+更新 `使用设备:`：
+
+| 安装状态 | 操作 |
+|---------|------|
+| 已安装 | 在 `使用设备:` 下追加 `- <设备名>` |
+| 未安装且 `使用设备:` 为空或无条目 | 设 `使用设备: N/A` |
+| 未安装但 `使用设备:` 有来自其他设备的条目 | 保留现有条目不变 |
+| 工作流/流程文档/Collection | 设 `使用设备: N/A`（不可安装的软件） |
+
+#### S5: 全局重新排序
+
+对所有目录按 GitHub stars 降序重编号文件：
+
+1. 读取每个文件的 `GitHub Star`；解析：`12K` → 12000，`1.5K` → 1500，`N/A` → 0
+2. 按 star 数降序排列（N/A 排末尾）；star 相同则按文件名（去掉 `NN-` 前缀后）字母序
+3. 分配新编号 `01`、`02`、`03`……
+4. 重命名文件为 `{NN}-{英文名}.md`
+5. 修复缺少 frontmatter 字段的文件
+
+#### S6: 报告
+
+展示扫描的目录数、文件数、修复项以及各目录的新编号范围。
+
+#### S7: 数据刷新
+
+对 `辅助工具/` 下每个 `.md` 文件，应用[文档规则](#文档规则)：
+- `GitHub Star` — 抓取并更新
+- `更新日期` — 设为当天
+- `更新功能` — 检查仓库发布日志：有更新 → 追记新条目；无变化 → `"无（数据已同步）"`
+- `使用设备` — 重新检测当前设备安装状态
+
+同时询问用户："是否需要联网刷新所有文档的内容？" 确认后对每个文件：
+- 抓取 GitHub README 或搜索该工具
+- 合并新信息到已有章节
+- 如有章节更新则追加到 `更新功能`
+
+无需逐文件确认，批量执行并报告。
+
+### 模板同步工作流
+
+**触发：** `"模板变了"` / `"更新模板"` / `"同步模板"` / `"template changed"` → 执行 T1→T5
+
+模板变更后标准化 frontmatter 字段顺序、字段名称和正文结构。不重编号、不刷新数据、不填充内容——此后运行**同步工作流**处理这些。始终由用户手动触发。
+
+#### T1: 读取模板
+
+1. 读取 `{TEMPLATE}`
+2. 解析 frontmatter：记录字段名及其精确顺序
+3. 解析正文：识别所有 `##` 章节标题及其顺序
+4. 记录与上一个模板版本的差异（新增/删除/重命名字段，新增/删除/重命名章节）
+
+#### T2: 扫描全部知识库文件
+
+遍历 `{VAULT_BASE}` 下所有 `.md` 文件。
+
+#### T3: 逐文件标准化前置元数据
+
+对每个文件应用[前置元数据规则](#前置元数据规则)，外加模板同步专属检查：
+
+| 检查项 | 修复方式 |
+|-------|---------|
+| 字段名与模板不匹配 | 按模板精确重命名 |
+| 字段已从模板移除（如 `tags:`） | 从所有文件删除该字段 |
+| 字段已加入模板（如 `使用平台:`） | 以默认值添加该字段 |
+
+**设备检测：** 参照[前置元数据规则](#前置元数据规则)处理每个文件，规则与[同步工作流 S4](#s4-设备追踪)相同。
+
+#### T4: 标准化正文结构
+
+如果模板新增、删除或重排了正文章节：
+
+1. 将每个文件现有章节映射到模板章节顺序
+2. 删除模板中已不存在的章节（如 `参考链接`）
+3. 从模板新增空白章节（如 `用法`）
+4. 按模板顺序重排章节
+5. 运行 `scripts/fix-format.sh "{VAULT_BASE}/辅助工具"` — 从 `{TEMPLATE}` 读取各章节结构骨架，将内容包裹到正确的 callout 块、`<details>` 标签或表头中；保留文本内容
+
+#### T5: 确认
+
+告知用户："模板同步完成，共更新 {count} 个文件。"
+
+### 标准化
+
+**触发：** `"标准化所有文档"` / `"全面标准化"` / `"standardize all docs"` — 按顺序执行 修复 → 同步。此为路由别名，非独立工作流。
+
+1. **[修复工作流](#修复工作流)** — 修复格式问题（F1-F3）
+2. **[同步工作流](#同步工作流)** — 完整重索引、重编号、设备追踪、数据刷新（S1-S7）
+
+---
+
+### 修复工作流
+
+触发：`"修复文档/修复格式/检查格式/清理"` / `"fix docs"`。扫描知识库发现已知格式问题并修复。不重编号、不刷新数据、不同步模板。
+
+#### F1: 扫描全部知识库文件
+
+遍历 `{VAULT_BASE}` 下所有 `.md` 文件。
+
+#### F2: 检查并修复已知问题
+
+| 检查项 | 检测方式 | 修复方式 |
+|-------|---------|---------|
+| `aliases` 含 `@` 前缀 | 解析 frontmatter，aliases 值以 `@` 开头 | 移除 `@` 前缀，保留其余文本 |
+| `aliases` 少于 3 条或格式不规范 | 英文名含连词符、中文名非分类名、条目数 < 3 | 按[别名规则](#别名规则)修复：英文名去连词符、中文名改为分类名、补核心技术关键词 |
+| frontmatter YAML 解析错误 | 解析每个文件的 YAML frontmatter；捕获分隔符/对齐/非法字符等错误 | 修复格式并重新解析直到通过 |
+| `ℹ️ 基本介绍` callout 中含裸 `[abstract]`（无 `!`） | `section_has_skeleton` 检测到 >1 行 `[!abstract]` | 运行 `fix-format.sh` — 清理并重新包裹 |
+| `ℹ️ 基本介绍` 缺少 `**状态**` 行 | `validate_section_format` 检查 `**状态**` 是否存在 | 运行 `fix-format.sh` — 追加 `> **状态**：<span style="color:var(--color-green)">待评估</span>` |
+| `📝 更新功能` 条目描述不规范 | 对照[文档规则](#文档规则)的 `📝 更新功能` 书写规范校验 | 按规则修正 |
+| Callout 续行存在前导空格 | `> [!abstract]`/`> [!info]`/`> [!warning]` 后的行以 ` > ` 而非 `> ` 开头 | 移除 `>` 前的空格 |
+| 表格后缺少空行再接标题 | `##` 标题紧跟管道行（`|\n##`） | 在表格结尾和下一个 `##` 间插入空行 |
+| 末尾缺少 `---` 分隔符 | 文件不以 `---` 结尾 | 追加 `\n---` |
+| `💊 痛点解决` 前缺少 `---` 分隔符 | `💊 痛点解决` 前无 `---` 独占一行 | 在 `## 💊 痛点解决` 前插入 `\n---\n` |
+| 类型字段不规范 | 缺少、非列表、值无效 | 参照[前置元数据规则](#前置元数据规则)的 `类型:` 检查项修复 |
+
+对每个文件：
+- 检测哪些检查项触发
+- 应用修复
+- 追踪变更内容
+
+#### F3: 报告
+
+按问题类型展示文件数汇总。无问题时如实告知。
+
+### 边界情况
+
+| 情况 | 处理方式 |
+|------|---------|
+| 无 GitHub 仓库 | 设 `GitHub 链接: ⚠️ Unknown`，`GitHub Star: N/A` |
+| Star 数格式不一 | 解析：`12K` → 12000，`1.5K` → 1500，`N/A` → 0 |
+| 空白的非模板文件（如 OPENdesign.md） | 跳过——无 frontmatter，非工具文档 |
+| 多个文件 star 数相同 | 按工具名字母序排列 |
+| 重编号时文件重命名失败 | 停止并报告哪个文件失败 |
+| 知识库配置中找不到主机名 | 询问用户当前设备名 |
+| 工具安装检测不明确 | 多种方法检测（`which`、`brew list` 等） |
+| 跨设备同步 | 知识库同步后（SynologyDrive/其他云盘），设备 B 需重新运行同步工作流更新 `使用设备` 和编号 |
+

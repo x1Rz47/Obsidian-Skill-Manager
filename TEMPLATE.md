@@ -1,15 +1,16 @@
 ---
-必用: false                # true = 部署到新设备时自动安装
 aliases:                   # 至少 3 条：英文名（Pascal Case 无连词符）、中文分类名、核心技术关键词
   - ToolName               # 英文名（Pascal Case 无连词符，只写一个）
-  - 分类名                  # 中文名（当前分类名，只写一个）
+  - 分类名                  # 中文名（所属目录的中文能力域名，不含 NN 前缀）
   - 核心技术关键词           # 核心技术关键词（至少 1 个）
+类型:                      # YAML 列表，取值见规则-类型字段
 GitHub 链接:               # 必填，格式 https://github.com/owner/repo
 GitHub Star:               # 格式：数字+K，无则填 N/A
 使用设备:                  # 已安装此工具的电脑名
-使用平台:                  # 取值：OpenCode / Codex / Claude Code / Gemini，多个用 / 分隔，如 "Claude Code / Codex / OpenCode"
+使用平台:                  # 取值：ALL（通用工具）或 OpenCode / Codex / Claude Code / Gemini，多个用 / 分隔
 创建日期: 2026-05-13       # 首次创建日 YYYY-MM-DD，永不更改
 更新日期: 2026-05-13       # 最后修改日 YYYY-MM-DD
+必用: false                # true = 部署到新设备时自动安装
 ---
 
 ---
