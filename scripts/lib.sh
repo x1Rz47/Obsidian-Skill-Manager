@@ -1,5 +1,5 @@
 #!/bin/bash
-# lib.sh — Common functions for vault template format operations
+# lib.sh — Common functions for 知识库 template format operations
 # Usage: source "$(dirname "$0")/lib.sh"
 
 SKILL_DIR="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}")")" && pwd)"
@@ -397,7 +397,7 @@ TEMPLATE_TABLE
   fi
 }
 
-# Validate one section in a vault file
+# Validate one section in a 知识库 file
 validate_section_format() {
   local file="$1" section="$2"
   local skeleton_type

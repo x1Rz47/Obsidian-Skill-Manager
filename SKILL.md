@@ -1,11 +1,15 @@
 ---
 name: obsidian-skill-manager
-description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the vault's skill documentation needs organizing, renaming, standardizing, fixing, or format-checking. Also use when the vault documentation template changes and all files need syncing to match. Also use when the user says fix docs, fix format, 修复文档, 修复格式, or 检查格式.
+description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when the 知识库 agent skill documentation needs organizing, renaming, standardizing, fixing, or format-checking. Also use when the 知识库 documentation template changes and all files need syncing to match. Also use when the user says fix docs, fix format, 修复文档, 修复格式, or 检查格式. Works in OpenCode, Claude Code, and Codex CLI.
+compatibility:
+  - opencode
+  - codex
+  - claude-code
 metadata:
   template_hash: b033a64a9115d1aecfc5d4e49dbeba1c
   template_checked: 2026-06-20
-  # WARNING: All section lists must be read from TEMPLATE.md, never hardcoded.
 ---
+<!-- WARNING: All section lists must be read from TEMPLATE.md, never hardcoded. -->
 
 # Obsidian Skill Manager
 
@@ -24,13 +28,13 @@ This skill activates in eight modes:
 | **Template Sync** | "模板变了/更新模板/同步模板/更新所有文档/刷新所有文档"、"template changed/sync template/refresh all docs" |
 | **Standardize** | "标准化所有文档/标准化文档/全面标准化"、"standardize all docs/full standardize" |
 
-## Vault Configuration
+## 知识库配置
 
 `{TEMPLATE}` = `{SKILL_DIR}/TEMPLATE.md`. Hostname → config:
 
 | Hostname | Device | VAULT_BASE | SKILL_DIR |
 |----------|--------|------------|-----------|
-| `x1Rz47-A1213` | Mac Mini | `/Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖` | `/Users/x1rz47/.agents/skills/obsidian-skill-manager` |
+| `x1Rz47-A1213` | Mac Mini | `/Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖` | `~/.agents/skills/obsidian-skill-manager` (agent) / `~/.config/opencode/skills/obsidian-skill-manager` (opencode) / `~/.claude/skills/obsidian-skill-manager` (claude) / `~/.codex/skills/obsidian-skill-manager` (codex) |
 | `WPC-x1Rz47` | WPC | `D:\SynologyDrive\5.个人资料\1.知识库\个人知识库\04.AI相关-🤖` | `%USERPROFILE%\.agents\skills\obsidian-skill-manager` |
 | _Other_ | — | Ask user to identify device | — |
 
@@ -42,8 +46,8 @@ This skill activates in eight modes:
 | 类型 | 运行位置 | 识别方式 | 例子 |
 |------|---------|---------|------|
 | **MCP Server** | Agent 内部（协议） | 描述含 "MCP server" / "Model Context Protocol"；包名含 `-mcp` | MarkItDown-MCP, CodeGraph, GBrain |
-| **Agent Skill** | Agent 内部（指令集） | 描述含 "skill"；仓库有 SKILL.md + 触发条件；安装：npx skills add | Playwright-skill, BrowserAct-skill, Find-Skills, Agent-Reach |
-| **Skill Pack** | Agent 内部（指令集） | 多 skill 仓库；安装：npx skills add owner/repo | Superpowers, Anthropic, MattPocock, GStack |
+| **Agent Skill** | Agent 内部（指令集） | 描述含 "skill"；仓库有 SKILL.md + 触发条件；安装：npx skills add（Codex CLI 也支持 $skill-installer） | Playwright-skill, BrowserAct-skill, Find-Skills, Agent-Reach |
+| **Skill Pack** | Agent 内部（指令集） | 多 skill 仓库；安装同上 | Superpowers, Anthropic, MattPocock, GStack |
 | **插件** | Agent 内部（运行时注入） | 描述含 "plugin" / "inject into agent"；安装后修改 Agent 能力，不论平台 | supermemory, morph, type-inject, vibeguard |
 | **工具** | Agent **外部** | 以上都不符合的可安装软件，不论具体形态 | yt-dlp, repomix, deepagents, agent-browser, Defuddle |
 
@@ -58,8 +62,8 @@ This skill activates in eight modes:
 
 | 工具类型 | 判定命令 | 示例 |
 |---------|---------|------|
-| agent skill | `npx skills list -g` 可见 或 目录存在 | `video-use` |
-| MCP server | `opencode.jsonc` 的 `mcpServers` 中已配置 | `markitdown-mcp` |
+| agent skill | skill 列表可见 或 目录存在（OpenCode: `npx skills list -g`, Claude Code: `claude skills list`, Codex: 自动检测） | `video-use` |
+| MCP server | agent 配置文件的 mcpServers 中已配置（opencode.json / claude.json / codex config.toml ） | `markitdown-mcp` |
 | CLI 工具 | `which <tool>`（Mac）/ `where.exe <tool>`（Win） | `ffmpeg` |
 | brew 包 | `brew list <pkg>`（仅 Mac） | `gh` |
 | npm 全局包 | `npm list -g <pkg>` | `bun` |
@@ -68,7 +72,7 @@ This skill activates in eight modes:
 
 ## Naming Conventions
 
-All skill document filenames in the vault must follow:
+All skill document filenames in the 知识库 must follow:
 
 **Format:** `{NN}-{English-Name}.md`
 - `NN`: 2-digit number (`01`, `02`...`99`)
@@ -83,7 +87,7 @@ All skill document filenames in the vault must follow:
 - Strip vendor prefix: Remove redundant vendor/framework prefixes (e.g., `opencode-X` → `X`, `vscode-X` → `X`) unless the prefix is part of the tool's official identity
 - Template files (`00-*`) are excluded from the numbering convention
 
-**Independent numbering per directory (including 3rd-level subdirectories):** See [Sync S2 table](#step-s2-scan-all-vault-directories) for the canonical directory list and numbering rules. When moving or renaming files, always derive the natural name from the filename (strip `NN-` prefix and convert Pascal-kebab-case to natural name).
+**Independent numbering per directory (including 3rd-level subdirectories):** See [Sync S2 table](#step-s2-scan-all-知识库-directories) for the canonical directory list and numbering rules. When moving or renaming files, always derive the natural name from the filename (strip `NN-` prefix and convert Pascal-kebab-case to natural name).
 
 ### Subdirectory Rule
 
@@ -113,7 +117,7 @@ aliases:
 
 ## Common Pre-Check (Step 0: Template Hash Validation)
 
-Before ANY workflow (Install, Document, Combined, Deployment, Sync, Template Sync), check if the vault template has changed:
+Before ANY 工作流 (Install, Document, Combined, Deployment, Sync, Template Sync), check if the 知识库 template has changed:
 
 ### Step 0.1: Compute Current Template Hash
 
@@ -124,12 +128,12 @@ Run the appropriate command for the current OS to get the MD5 hash of `{TEMPLATE
 ### Step 0.2: Compare with Stored Hash
 
 Read `metadata.template_hash` from this SKILL.md's frontmatter:
-- If hashes **match** → template unchanged, proceed to the requested workflow
+- If hashes **match** → template unchanged, proceed to the requested 工作流
 - If hashes **differ** → template has been modified since last sync:
   1. Report the hash difference to the user
   2. Ask: "模板已更新，是否同步所有文档到新模板格式？"
-  3. **User confirms** → abort current workflow, switch to **Template Sync Workflow** (Step T1-T5). After Template Sync completes, `metadata.template_hash` is automatically updated.
-  4. **User declines** → update `metadata.template_hash` in SKILL.md frontmatter to the current hash without syncing. Continue with the requested workflow.
+  3. **User confirms** → abort current 工作流, switch to **模板同步工作流** (Step T1-T5). After Template Sync completes, `metadata.template_hash` is automatically updated.
+  4. **User declines** → update `metadata.template_hash` in SKILL.md frontmatter to the current hash without syncing. Continue with the requested 工作流.
 
 ### Step 0.3: Update Timestamp
 
@@ -137,7 +141,7 @@ If `metadata.template_checked` is more than 7 days old, update it to today.
 
 ## Frontmatter Normalization Rules
 
-Shared by Sync S3 and Template Sync T3. Apply these checks to every `.md` file before other workflow-specific logic.
+Shared by Sync S3 and Template Sync T3. Apply these checks to every `.md` file before other 工作流-specific logic.
 
 | Check | Fix |
 |-------|-----|
@@ -151,7 +155,12 @@ Shared by Sync S3 and Template Sync T3. Apply these checks to every `.md` file b
 
 文档 body 严格按 `{TEMPLATE}` 的 `##` 节结构和格式生成。各节的写法和示例见模板本身，不再重复。
 
-## Install Workflow（安装，不动 vault）
+### `📝 更新功能` 书写规范
+
+- 文档仅有 1 条更新记录时，描述统一写 `首次创建`
+- 文档有 2+ 条记录时，第一条写 `首次创建`，第二条起内容不限
+
+## 安装工作流
 
 ### Step I1: Identify the Tool
 
@@ -159,7 +168,7 @@ Determine:
 - **Name**: What is it called?
 - **Type**: skill / 插件 / MCP / npm package / config / other
 - **Source**: GitHub / npm / brew / pip / direct download
-- **Category**: Map source to target directory using the [Sync S2 table](#step-s2-scan-all-vault-directories).
+- **Category**: Map source to target directory using the [Sync S2 table](#step-s2-scan-all-知识库-directories).
 
 ### Step I2: Gather Information
 
@@ -171,15 +180,15 @@ Collect:
 - Dependencies
 - Any warnings or notes
 
-If GitHub fetch fails (network error, no GitHub repo), set `GitHub Star: N/A`. Do not block the workflow.
+If GitHub fetch fails (network error, no GitHub repo), set `GitHub Star: N/A`. Do not block the 工作流.
 
 ### Step I3: Check for Existing Document
 
-Before installing, scan the target directory in vault:
+Before installing, scan the target directory in 知识库:
 1. Read all files in the target category directory
 2. Parse frontmatter of each file for `aliases` — the tool name is derived from the filename (strip `NN-` prefix, convert Pascal-kebab to natural name) or from the first `aliases` entry
 3. If a match is found → tell the user: "该工具已记录过文档，不再重复记录"
-4. If no match → proceed (Document workflow will handle it if needed)
+4. If no match → proceed (记录工作流 will handle it if needed)
 
 Continue to install regardless of the result.
 
@@ -187,11 +196,11 @@ Continue to install regardless of the result.
 
 Run the installation command. Wait for it to complete. Verify success.
 
-After installation, note the current device name from Vault Configuration table. Device detection follows the [使用设备 判定规则](#使用设备-判定规则) table.
+After installation, note the current device name from 知识库配置表. Device detection follows the [使用设备 判定规则](#使用设备-判定规则) table.
 
 ---
 
-## Document Workflow（记录，不安装）
+## 记录工作流
 
 ### Step W1: Check for Existing Document
 
@@ -225,7 +234,7 @@ Follow [Sync Step S5](#step-s5-global-re-sort) for the target directory only.
 Read `{TEMPLATE}` for field order, section structure, and writing rules. Apply per-field overrides below:
 
 **`GitHub 链接` must always be populated:**
-- When installing via `npx skills add owner/repo@skill` → derive from `owner/repo` → `https://github.com/owner/repo`
+- When installing via a skill installer (OpenCode: `npx skills add owner/repo@skill`, Codex: `$skill-installer`, Claude Code: `claude` with config) → derive from `owner/repo` → `https://github.com/owner/repo`
 - When installing via `npm install owner/repo` → derive from `owner/repo`
 - When the install URL is known from the user or the skill source → write it directly
 - NEVER leave `GitHub 链接` as `无` or empty — if truly unknown, set to `⚠️ Unknown` (not `无`)
@@ -237,14 +246,14 @@ Confirm to the user that the tool is documented.
 
 ---
 
-## Combined Workflow（安装并记录）
+## 综合工作流
 
-1. Run [Install Workflow](#install-workflow安装不动-vault) Steps I1-I4
-2. After installation, if no existing document was found in Step I3, run [Document Workflow](#document-workflow记录不安装) Steps W2-W4 (skip W1, info was already gathered in I2)
+1. Run [安装工作流](#安装工作流) Steps I1-I4
+2. After installation, if no existing document was found in Step I3, run [记录工作流](#记录工作流) Steps W2-W4 (skip W1, info was already gathered in I2)
 
-## Deployment Workflow（部署必用工具）
+## 部署工作流
 
-Scan the vault for `必用: true` tools and install them on the current device.
+Scan the 知识库 for `必用: true` tools and install them on the current device.
 
 ### Step D1: Scan for Favorites
 
@@ -260,7 +269,7 @@ For each file with `必用: true`:
 2. Infer the installation command(s) from the content
 3. Determine what to install:
    - **System tool** (brew/pip/npm) → run the install command directly
-   - **OpenCode skill** → create `~/.config/opencode/skills/{tool-name}/SKILL.md`
+   - **Agent skill** → symlink/copy to the current platform's skill directory（OpenCode: `~/.config/opencode/skills/`, Claude Code: `~/.claude/skills/`, Codex: `~/.codex/skills/` or `$REPO_ROOT/.agents/skills/`）
 4. Check if already installed — skip if present
 5. Execute the install command. Verify success.
 6. Record success or failure
@@ -269,17 +278,17 @@ For each file with `必用: true`:
 
 Present a summary table of each tool and its status.
 
-## Sync Workflow (Clean and Re-Sort)
+## 同步工作流
 
-This workflow runs independently. Use it when you've manually added, deleted, or renamed files in the vault, and need the numbering restored to a consistent state across all directories.
+This 工作流 runs independently. Use it when you've manually added, deleted, or renamed files in the 知识库, and need the numbering restored to a consistent state across all directories.
 
 ### Step S1: Determine Current Device
 
 1. Run `hostname -s` (macOS) or `hostname` (Windows) to get the current machine's hostname
-2. Look up the device name in the Vault Configuration table
+2. Look up the device name in the 知识库配置表
 3. If the hostname is not mapped, ask the user to identify the device
 
-### Step S2: Scan All Vault Directories
+### Step S2: Scan All 知识库 Directories
 
 Walk ALL `.md` files under `{VAULT_BASE}` grouped by directory:
 
@@ -338,7 +347,7 @@ Update `使用设备:` per file:
 | Tool IS installed | Add `  - <DeviceName>` under `使用设备:` |
 | Tool NOT installed and `使用设备:` is empty or has no entries | Set `使用设备: N/A` |
 | Tool NOT installed but `使用设备:` has entries from other devices | Leave existing entries unchanged |
-| Workflow/process doc / Skills-Packs | Set `使用设备: N/A` (not installable software)
+| 工作流/process doc / Skills-Packs | Set `使用设备: N/A` (not installable software)
 
 ### Step S5: Global Re-Sort
 
@@ -354,13 +363,13 @@ For all directories sorted by GitHub stars, renumber files:
 
 Present a summary of scanned directories, files, fixes, and new numbering ranges per directory.
 
-## Template Sync Workflow
+## 模板同步工作流
 
 **Routing:**
 - `"模板变了"` / `"更新模板"` / `"同步模板"` / `"template changed"` → full run T1→T6
 - `"更新所有文档"` / `"刷新所有文档"` / `"refresh all docs"` → skip T1/T3/T4, run T4a2 + T4b + T5, skip T6
 
-This workflow normalizes frontmatter field order, field names, device tracking, body section structure, and refreshes live data (stars, dates, changelog).
+This 工作流 normalizes frontmatter field order, field names, device tracking, body section structure, and refreshes live data (stars, dates, changelog).
 
 ### Step T1: Read the Template
 
@@ -369,7 +378,7 @@ This workflow normalizes frontmatter field order, field names, device tracking, 
 3. Parse the body: identify all `##` section headers and their order
 4. Note any changes from the previous template state (e.g., field added/removed/renamed, section added/removed/renamed)
 
-### Step T2: Scan All Vault Files
+### Step T2: Scan All 知识库 Files
 
 Walk ALL `.md` files under `{VAULT_BASE}`.
 
@@ -443,7 +452,7 @@ If the template has added, removed, or reordered body sections:
 1. For each file, derive the tool name from the filename (strip `NN-` prefix, convert Pascal-kebab to natural name) and get `GitHub 链接`.
 
 2. **Research current source:**
-   - Has `GitHub 链接` → fetch README, compare against current vault content section by section
+   - Has `GitHub 链接` → fetch README, compare against current 知识库 content section by section
    - From a known collection → search web for updated documentation
    - CLI/package → check official docs for changes
 
@@ -487,14 +496,14 @@ No per-file confirmation needed — batch and report.
 3. Update `metadata.template_checked` to today's date
 4. Confirm to the user: "模板哈希已更新，后续将自动检测变更"
 
-## Standardize Workflow（全面标准化）
+## 标准化工作流
 
-**Trigger:** `"标准化所有文档"` / `"standardize all docs"` — runs every vault-wide fix in sequence, from formatting to data refresh to renumbering.
+**Trigger:** `"标准化所有文档"` / `"standardize all docs"` — runs every 全知识库 fix in sequence, from formatting to data refresh to renumbering.
 
 Runs the following workflows in sequence, batching and reporting at the end:
 
-1. **[Fix Workflow](#fix-workflow)** — fix format issues (F1-F3)
-2. **[Sync Workflow](#sync-workflow-clean-and-re-sort)** — normalize frontmatter, device tracking, re-sort (S1-S6)
+1. **[修复工作流](#修复工作流)** — fix format issues (F1-F3)
+2. **[同步工作流](#同步工作流)** — normalize frontmatter, device tracking, re-sort (S1-S6)
 3. **[Template Sync T4a](#step-t4a-模板节内容--补空模式)** — fill empty sections via web research
    - Before starting, ask the user: "是否需要联网填充所有文件的空白节？这会产生大量网络请求。"
    - If declined, skip to step 4
@@ -504,11 +513,11 @@ Runs the following workflows in sequence, batching and reporting at the end:
 
 ---
 
-## Fix Workflow
+## 修复工作流
 
-Triggered by `"修复文档/修复格式/检查格式"` / `"fix docs"`. Scans vault for known format issues and fixes them. Does NOT renumber, refresh data, or sync templates.
+Triggered by `"修复文档/修复格式/检查格式"` / `"fix docs"`. Scans 知识库 for known format issues and fixes them. Does NOT renumber, refresh data, or sync templates.
 
-### Step F1: Scan All Vault Files
+### Step F1: Scan All 知识库 Files
 
 Walk ALL `.md` files under `{VAULT_BASE}`.
 
@@ -521,6 +530,11 @@ Walk ALL `.md` files under `{VAULT_BASE}`.
 | frontmatter YAML 解析错误 | Parse each file's YAML frontmatter; catch errors (delimiters, alignment, illegal chars) | Fix formatting and re-parse until clean |
 | `ℹ️ 基本介绍` callout 中含裸 `[abstract]`（无 `!`） | `section_has_skeleton` rejects if content has >1 `[!abstract]` line | Run `fix-format.sh` — strips and re-wraps cleanly |
 | `ℹ️ 基本介绍` 缺少 `**状态**` 行 | `validate_section_format` checks `**状态**` existence | Run `fix-format.sh` — appends `> **状态**：<span style="color:var(--color-green)">待评估</span>` |
+| `📝 更新功能` 条目描述不规范 | Parse `更新功能` section; file has exactly 1 entry whose description is not `首次创建` | Change description to `首次创建` |
+| Callout 续行存在前导空格 | Lines after `> [!abstract]`/`> [!info]`/`> [!warning]` start with ` > ` instead of `> ` | Remove leading space before `>` on continuation lines |
+| 表格后缺少空行再接标题 | `##` heading immediately follows pipe row (`|\n##`) | Insert blank line between table end and next `##` heading |
+| 末尾缺少 `---` 分隔符 | File does not end with `---` on its own line | Append `\n---` to file |
+| `💊 痛点解决` 前缺少 `---` 分隔符 | Section `💊 痛点解决` is not preceded by `---` on its own line | Insert `\n---\n` between preceding content and `## 💊 痛点解决` |
 | *(Add rows as new format issues are discovered.)* | | |
 
 For each file:
@@ -541,6 +555,6 @@ Present a summary with file counts per issue type. If no issues found, say so.
 | Empty non-template files (e.g. OPENdesign.md) | Skip — no frontmatter, not a tool document |
 | Multiple files share the same star count | Sort alphabetically by tool name |
 | File rename fails during renumbering | Stop and report which file failed |
-| Hostname not found in Vault Configuration | Ask user to identify the current device |
+| Hostname not found in 知识库配置 | Ask user to identify the current device |
 | Tool install detection is ambiguous | Check multiple methods (`which`, `brew list`, etc.) |
 | Cross-device sync conflict | 设备 A 修改后推送 → 设备 B 需重新运行 Sync |

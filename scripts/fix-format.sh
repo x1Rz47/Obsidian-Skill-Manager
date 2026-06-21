@@ -1,5 +1,5 @@
 #!/bin/bash
-# fix-format.sh — Auto-fix every vault file's section format to match TEMPLATE.md
+# fix-format.sh — Auto-fix every 知识库 file's section format to match TEMPLATE.md
 # Usage: ./fix-format.sh <vault_dir>
 
 set -euo pipefail

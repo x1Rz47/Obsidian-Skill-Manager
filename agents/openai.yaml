@@ -1,0 +1,5 @@
+interface:
+  display_name: "Obsidian Skill Manager"
+  short_description: "Install, document, sync, and standardize AI agent tool documentation in an Obsidian knowledge base"
+policy:
+  allow_implicit_invocation: true

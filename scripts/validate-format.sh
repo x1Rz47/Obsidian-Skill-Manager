@@ -1,5 +1,5 @@
 #!/bin/bash
-# validate-format.sh — Check every vault file's section format against TEMPLATE.md
+# validate-format.sh — Check every 知识库 file's section format against TEMPLATE.md
 # Usage: ./validate-format.sh <vault_dir>
 
 set -euo pipefail
