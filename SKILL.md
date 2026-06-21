@@ -30,13 +30,36 @@ This skill activates in eight modes:
 
 ## 知识库配置
 
-`{TEMPLATE}` = `{SKILL_DIR}/TEMPLATE.md`. Hostname → config:
+`{TEMPLATE}` = `{SKILL_DIR}/TEMPLATE.md`.
 
-| Hostname | Device | VAULT_BASE | SKILL_DIR |
-|----------|--------|------------|-----------|
-| `x1Rz47-A1213` | Mac Mini | `/Users/x1rz47/Library/CloudStorage/SynologyDrive-x1Rz47/5.个人资料/1.知识库/个人知识库/04.AI相关-🤖` | `~/.agents/skills/obsidian-skill-manager` (agent) / `~/.config/opencode/skills/obsidian-skill-manager` (opencode) / `~/.claude/skills/obsidian-skill-manager` (claude) / `~/.codex/skills/obsidian-skill-manager` (codex) |
-| `WPC-x1Rz47` | WPC | `D:\SynologyDrive\5.个人资料\1.知识库\个人知识库\04.AI相关-🤖` | `%USERPROFILE%\.agents\skills\obsidian-skill-manager` |
-| _Other_ | — | Ask user to identify device | — |
+### Device → Vault Mapping
+
+Variables are resolved at runtime:
+
+| Variable | Source |
+|----------|--------|
+| `{HOSTNAME}` | `hostname -s` (macOS) / `hostname` (Windows) |
+| `{SKILL_DIR}` | Auto-detected from skill install location |
+| `{VAULT_BASE}` | Looked up from `{SKILL_DIR}/SKILL.local.md` by hostname |
+| `{TEMPLATE}` | `{SKILL_DIR}/TEMPLATE.md` |
+
+Resolution order:
+1. If `{SKILL_DIR}/SKILL.local.md` exists, read its **Device Configuration** table
+2. Match `{HOSTNAME}` against the table → determines `{VAULT_BASE}`
+3. If no match or no local config → ask user for their hostname and vault path
+
+### Quick Start for New Users
+
+```markdown
+# {SKILL_DIR}/SKILL.local.md
+## Device Configuration
+
+| Hostname | Device | VAULT_BASE |
+|----------|--------|------------|
+| my-macbook | MacBook | /path/to/vault/04.AI相关-🤖 |
+```
+
+Run `hostname -s` to find your hostname.
 
 
 ## Classification Guide

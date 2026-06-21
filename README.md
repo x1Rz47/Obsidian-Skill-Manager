@@ -19,10 +19,12 @@ An AI agent skill (OpenCode / Claude Code / Codex CLI) that manages tool documen
 
 ```
 My-Skills/Obsidian-Skill-Manager/
-├── SKILL.md       ← Main skill (8 workflows, template sync)
-├── TEMPLATE.md    ← Canonical doc template
-├── scripts/       ← Format validators & fixers
-└── README.md      ← Detailed docs
+├── SKILL.md          ← Main skill (8 workflows, template sync)
+├── SKILL.local.md    ← Your local device config (gitignored)
+├── TEMPLATE.md       ← Canonical doc template
+├── agents/           ← Platform metadata (openai.yaml)
+├── scripts/          ← Format validators & fixers
+└── README.md         ← Detailed docs
 ```
 
 ## ✨ Features
@@ -61,16 +63,26 @@ ln -s /path/to/obsidian-skill-manager ~/.codex/skills/obsidian-skill-manager
 
 ## ⚙️ Configuration
 
-The skill detects the current device via `hostname -s` and maps it to 知识库 paths:
+The skill resolves runtime variables to locate your Obsidian vault:
 
-| Hostname | Device Name | 知识库 Path |
-|----------|-------------|------------|
-| `x1Rz47-A1213` | Mac Mini | `/Users/x1rz47/Library/CloudStorage/.../04.AI相关-🤖` |
-| `WPC-x1Rz47` | WPC | `D:\SynologyDrive\...\04.AI相关-🤖` |
+| Variable | Source |
+|----------|--------|
+| `{HOSTNAME}` | `hostname -s` (macOS) / `hostname` (Windows) |
+| `{SKILL_DIR}` | Skill install location (auto-detected) |
+| `{VAULT_BASE}` | Matched from `{SKILL_DIR}/SKILL.local.md` by hostname |
+| `{TEMPLATE}` | `{SKILL_DIR}/TEMPLATE.md` |
 
-Template file location: `{SKILL_DIR}/TEMPLATE.md`
+Create `SKILL.local.md` in the skill directory to set your vault path:
 
-Add new devices to the **Device Configuration** table in `SKILL.md`.
+```markdown
+## Device Configuration
+
+| Hostname | Device | VAULT_BASE |
+|----------|--------|------------|
+| my-hostname | My Device | /path/to/vault/04.AI相关-🤖 |
+```
+
+`SKILL.local.md` is gitignored and stays local to your machine.
 
 ## 🔧 工作流
 

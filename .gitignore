@@ -2,3 +2,4 @@
 .opencode/
 *.log
 node_modules/
+SKILL.local.md
