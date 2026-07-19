@@ -7,6 +7,7 @@ TEMPLATE="$SKILL_DIR/TEMPLATE.md"
 
 # Section → skeleton mapping (no emoji keys: use name suffix for lookup)
 # Skeleton types: info_callout, warning_callout, abstract_callout, details_blocks, table_header
+# details_blocks 只接受 <details> 折叠块（TEMPLATE 标准），不接受 > [!quote] callout
 get_section_skeleton() {
   local section="$1"
   case "$section" in
@@ -88,7 +89,7 @@ ensure_template_sections() {
   last_line=$(tail -1 "$file")
   if [ "$last_line" = "---" ]; then
     # Insert before trailing ---
-    head -n -1 "$file" > "${file}.tmp"
+    sed '$d' "$file" > "${file}.tmp"
     echo "$order" >> "${file}.tmp"
     echo "---" >> "${file}.tmp"
     mv "${file}.tmp" "$file"
@@ -124,8 +125,22 @@ section_has_skeleton() {
       return 0
       ;;
     prereq_list)      echo "$effective" | grep -q '^- '                    ;;
-    plain_list)       echo "$effective" | grep -q '^- '                    ;;
-    details_blocks)   echo "$content" | grep -qE '<details|> \[!quote\]'   ;;
+    plain_list)
+      # 第一行必须是 list 项
+      echo "$effective" | grep -q '^- ' || return 1
+      # 检测"HTML 被错误包成 list"模式（每行带 - 前缀的 HTML 块标签）
+      # 这种内容格式上像 list，语义上完全错误，validate 必须抓住
+      if echo "$content" | grep -qE '^[[:space:]]*- <(table|thead|tbody|tr|td|th|div|p|span|ul|ol|li|details|summary|section|article|header|footer|main|figure|figcaption)\b'; then
+        return 1
+      fi
+      return 0
+      ;;
+    details_blocks)
+      # 🧩 核心功能 段必须用 <details> 折叠块（TEMPLATE 标准）
+      # 不再接受 > [!quote] callout 形式——容易和 ℹ️/⚠️ 等抽象 callout 混淆
+      echo "$content" | grep -q '<details' || return 1
+      return 0
+      ;;
     table_header)
       echo "$effective" | grep -q '🔢' || return 1
       # Check column alignment: data rows must have numbers in first column
@@ -271,11 +286,9 @@ TEMPLATE
       ;;
 
     details_blocks)
-      # Accept <details> or > [!quote] as valid format for 🧩
-      if echo "$content" | grep -q '> \[!quote\]'; then
-        # Already in quote format — fine, treat as valid
-        true
-      fi
+      # 🧩 段要求 <details> 折叠块（TEMPLATE 标准）
+      # 不自动转换 > [!quote] → <details>（结构解析复杂，交给手工修）
+      # section_has_skeleton 已经会报错，这里不做自动转换
       ;;
 
     table_header)
@@ -422,12 +435,311 @@ validate_section_format() {
     return 1
   fi
 
+  # Check for unfilled TEMPLATE placeholders（内容还在用模板占位符）
+  if has_placeholder_content "$content"; then
+    echo "  ❌ $(basename "$file") — $section (unfilled placeholder)"
+    return 1
+  fi
+
   # Additional check: ℹ️ section must have **状态** line
   if [ "$section" = "ℹ️ 基本介绍" ]; then
     if ! echo "$content" | grep -q '\*\*状态\*\*'; then
       echo "  ❌ $(basename "$file") — $section (missing **状态**)"
       return 1
     fi
+  fi
+  return 0
+}
+
+# Validate frontmatter aliases: detect duplicate entries
+# Obsidian UI renders duplicate aliases with strikethrough; raw markdown just has them duplicated.
+# This catches the "soft-deleted but not removed" failure mode.
+validate_aliases_unique() {
+  local file="$1"
+  # Extract aliases block from frontmatter
+  local aliases_block
+  aliases_block=$(awk '/^---$/{c++; next} c==1 && /^aliases:/{p=1; next} c==1 && p && /^[^[:space:]-]/{p=0} p' "$file")
+  [ -z "$aliases_block" ] && return 0
+
+  # Strip "- " prefix, strip ~~ strikethrough markers, trim whitespace
+  local items
+  items=$(echo "$aliases_block" | sed 's/^[[:space:]]*-[[:space:]]*//' | sed 's/~~//g' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+  # Find duplicates (case-sensitive, exact match)
+  local dups
+  dups=$(echo "$items" | grep -v '^$' | sort | uniq -d)
+  if [ -n "$dups" ]; then
+    while IFS= read -r dup; do
+      [ -z "$dup" ] && continue
+      echo "  ❌ $(basename "$file") — aliases 重复项: $dup"
+    done <<< "$dups"
+    return 1
+  fi
+  return 0
+}
+
+# Validate frontmatter: aliases uniqueness + (future) other frontmatter checks
+# Call this from validate-format.sh after section validation
+validate_frontmatter() {
+  local file="$1"
+  validate_aliases_unique "$file"
+}
+
+# Parse GitHub Star value to numeric for sorting
+# Examples: 100K → 100000, 8.4K → 8400, 233.7K → 233700, ~2K → 2000, 70K+ → 70000, 183 → 183, N/A → -1
+parse_star_numeric() {
+  local s="${1:-}"
+  [ -z "$s" ] && { echo "-1"; return; }
+  # 去掉前缀 ~ > < ≈ 和后缀 +（POSIX 写法，兼容 BSD sed）
+  s=$(echo "$s" | sed 's/^[~><≈ 	]*//' | sed 's/[ 	]*$//' | sed 's/\+$//')
+  # NK 格式
+  if echo "$s" | grep -qE '^[0-9.]+K$'; then
+    local num
+    num=$(echo "$s" | sed 's/K$//')
+    awk "BEGIN { printf \"%.0f\", $num * 1000 }"
+    return
+  fi
+  # 纯数字
+  if echo "$s" | grep -qE '^[0-9.]+$'; then
+    echo "$s" | awk '{ printf "%.0f", $1 }'
+    return
+  fi
+  # 无法解析（N/A、无（内部管理工具）等）→ -1 排最后
+  echo "-1"
+}
+
+# Validate directory sorting: files must be NN-numbered in GitHub Star descending order
+# N/A sorts last; ties broken by filename ascending
+validate_directory_sorting() {
+  local dir="$1"
+  [ ! -d "$dir" ] && return 0
+
+  local files
+  files=$(find "$dir" -maxdepth 1 -name '[0-9][0-9]-*.md' -type f 2>/dev/null | sort)
+  local count
+  count=$(echo "$files" | grep -c .)
+  [ "$count" -lt 2 ] && return 0
+
+  # Build (nn, filename, star_numeric) tuples
+  local entries=""
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    local fn star_raw star_num
+    fn=$(basename "$f")
+    star_raw=$(grep -m1 '^GitHub Star:' "$f" | sed 's/^GitHub Star:[[:space:]]*//')
+    star_num=$(parse_star_numeric "$star_raw")
+    entries="${entries}${star_num}|${fn}
+"
+  done <<< "$files"
+
+  # Compute expected order: star desc, filename asc
+  local expected current
+  expected=$(printf '%s' "$entries" | grep -v '^$' | sort -t'|' -k1,1nr -k2,2 | cut -d'|' -f2)
+  current=$(printf '%s' "$entries" | grep -v '^$' | sort -t'|' -k2,2 | cut -d'|' -f2)
+
+  if [ "$expected" != "$current" ]; then
+    echo "  ❌ 目录 $(basename "$dir")/ — 文件未按 GitHub Star 降序排列"
+    return 1
+  fi
+  return 0
+}
+
+# Detect if section content is still using TEMPLATE placeholder text
+# TEMPLATE.md 里的占位符标记文本只该出现在模板里，出现在实际文档说明段还是模板状态
+# 命中即返回 0（true = 是 placeholder），不命中返回 1（false = 已填真实内容）
+has_placeholder_content() {
+  local content="$1"
+  # 常见占位符：依赖项名称 / 具体描述 / 对应的解决方案 / 详细描述第N行 / 功能名+简短说明 / 安装命令（brew
+  if echo "$content" | grep -qE '依赖项名称|具体描述|对应的解决方案|详细描述(第一|第二)行|安装命令（brew'; then
+    return 0
+  fi
+  # 🧩 核心功能 的 details 标题里含"功能名：简短说明"
+  if echo "$content" | grep -qE '<b>功能名</b>.*简短说明|简短说明</summary>'; then
+    return 0
+  fi
+  return 1
+}
+
+# Normalize section name: strip emoji prefix, keep only the Chinese part after space
+# 例如 "ℹ️ 基本介绍" → "基本介绍"（避免 NFC/NFD 规范化差异）
+_normalize_sec() {
+  echo "$1" | sed 's/^[^[:space:]]*[[:space:]]*//' | sed 's/^[[:space:]]*//'
+}
+
+# Validate section order + presence + non-standard sections
+# 文件实际段必须严格匹配 TEMPLATE 的 9 段（顺序 + 内容），不能多、不能少、不能换序
+# 使用"去 emoji 前缀后的中文名"比对，规避 emoji 规范化问题
+validate_section_structure() {
+  local file="$1"
+  local expected expected_names
+  expected=$(get_template_sections)
+  # 期望的规范段名列表（去 emoji）；用 here-doc 避免管道子 shell 变量丢失
+  expected_names=""
+  while IFS= read -r s; do
+    [ -z "$s" ] && continue
+    expected_names="${expected_names}$(_normalize_sec "$s")
+"
+  done <<< "$expected"
+
+  local actual actual_names
+  actual=$(grep "^## " "$file" 2>/dev/null | sed 's/^## //')
+  # 实际的规范段名列表
+  actual_names=""
+  while IFS= read -r s; do
+    [ -z "$s" ] && continue
+    actual_names="${actual_names}$(_normalize_sec "$s")
+"
+  done <<< "$actual"
+
+  local has_error=0
+  # 非标准段：actual 中有但 expected_names 中没有的（按规范名比对）
+  while IFS= read -r sec; do
+    [ -z "$sec" ] && continue
+    local sec_name
+    sec_name=$(_normalize_sec "$sec")
+    if ! echo "$expected_names" | grep -qxF "$sec_name"; then
+      echo "  ❌ $(basename "$file") — 非标准段: $sec"
+      has_error=1
+    fi
+  done <<< "$actual"
+
+  # 缺失段：expected 中有但 actual 中没有的
+  while IFS= read -r sec; do
+    [ -z "$sec" ] && continue
+    local sec_name
+    sec_name=$(_normalize_sec "$sec")
+    if ! echo "$actual_names" | grep -qxF "$sec_name"; then
+      echo "  ❌ $(basename "$file") — 缺失段: $sec"
+      has_error=1
+    fi
+  done <<< "$expected"
+
+  # 顺序：actual 里属于标准的段按出现顺序排列，和 expected 比对
+  local actual_filtered=""
+  while IFS= read -r sec; do
+    [ -z "$sec" ] && continue
+    local sec_name
+    sec_name=$(_normalize_sec "$sec")
+    if echo "$expected_names" | grep -qxF "$sec_name"; then
+      actual_filtered="${actual_filtered}${sec_name}
+"
+    fi
+  done <<< "$actual"
+
+  if [ "$actual_filtered" != "$expected_names" ]; then
+    echo "  ❌ $(basename "$file") — 段顺序错误（应按 TEMPLATE: ℹ️→🎯→📦→💿→💊→🧩→⌨️→⚠️→📝）"
+    has_error=1
+  fi
+  return $has_error
+}
+
+# Detect commented-out URLs in callout code blocks
+# 形如 "> # https://..." / "> # GitHub: https://..." / "> # 3. 粘贴 https://..." 都算
+# 任何 "> #" 开头且行内含 URL 的行都算把 URL 藏在注释里
+# URL 应该可直接选中（去掉 # 前缀，或移到 callout 外做 markdown 链接）
+validate_no_commented_urls() {
+  local file="$1"
+  local hits
+  # 匹配 > # 开头且行内含 http:// 或 https:// 的（URL 不必紧跟 #）
+  hits=$(grep -nE '^>[[:space:]]*#.*https?://' "$file" 2>/dev/null)
+  if [ -n "$hits" ]; then
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      local ln content
+      ln=$(echo "$line" | cut -d: -f1)
+      content=$(echo "$line" | cut -d: -f2- | sed 's/^[[:space:]]*//')
+      echo "  ❌ $(basename "$file"):${ln} — URL 被注释隐藏: ${content:0:70}"
+    done <<< "$hits"
+    return 1
+  fi
+  return 0
+}
+
+# Detect duplicate adjacent --- horizontal rules
+# TEMPLATE 规定 frontmatter 后可以有一对相邻 ---（frontmatter 结束 + 文档主体分隔），合法
+# 其他位置的相邻 ---（中间最多 1 空行）都是冗余分隔符
+# 文件尾部双 ---（段尾分隔 + 文件结束符）也算
+validate_no_duplicate_hr() {
+  local file="$1"
+  # 提取所有 --- 行的行号
+  local hr_lines
+  hr_lines=$(grep -nE '^---[[:space:]]*$' "$file" 2>/dev/null | cut -d: -f1)
+  [ -z "$hr_lines" ] && return 0
+
+  # 跳过前两个 ---（frontmatter 开始 + 结束）
+  local fm_end=""
+  local count=0
+  local filtered=""
+  while IFS= read -r ln; do
+    [ -z "$ln" ] && continue
+    count=$((count + 1))
+    if [ "$count" -le 2 ]; then
+      fm_end="$ln"
+      continue
+    fi
+    filtered="${filtered}${ln}
+"
+  done <<< "$hr_lines"
+
+  [ -z "$filtered" ] && return 0
+
+  # 检查 frontmatter 结束 --- 后是否紧跟另一个 ---（TEMPLATE 标准：合法）
+  # 这种情况第一个 --- 是 fm_end，第二个是 filtered 第一行
+  local first_after_fm
+  first_after_fm=$(echo "$filtered" | head -1)
+  if [ -n "$fm_end" ] && [ -n "$first_after_fm" ]; then
+    # 如果 first_after_fm 与 fm_end 之间只有空行，视为合法的 frontmatter 后分隔
+    local between
+    between=$(sed -n "$((fm_end+1)),$((first_after_fm-1))p" "$file" | grep -c '^$')
+    local total_lines
+    total_lines=$((first_after_fm - fm_end - 1))
+    if [ "$between" = "$total_lines" ]; then
+      # 整段都是空行 → TEMPLATE 标准的 frontmatter 后分隔，跳过 first_after_fm
+      filtered=$(echo "$filtered" | tail -n +2)
+    fi
+  fi
+
+  [ -z "$filtered" ] && return 0
+
+  # 剩下的 --- 检查相邻性（中间最多 1 空行）
+  local prev=""
+  local has_error=0
+  while IFS= read -r ln; do
+    [ -z "$ln" ] && continue
+    if [ -n "$prev" ]; then
+      local between
+      between=$(sed -n "$((prev+1)),$((ln-1))p" "$file" | grep -c '^$')
+      local total_lines
+      total_lines=$((ln - prev - 1))
+      # 全是空行且距离 ≤ 2 → 相邻双 ---
+      if [ "$between" = "$total_lines" ] && [ "$total_lines" -le 2 ]; then
+        echo "  ❌ $(basename "$file"):${prev}-${ln} — 冗余双 ---（中间无内容）"
+        has_error=1
+      fi
+    fi
+    prev="$ln"
+  done <<< "$filtered"
+  return $has_error
+}
+
+# Detect commented-out commands in callout code blocks
+# 形如 "> # /skill xxx" / "> # $ xxx" / "> # npm xxx" — 命令被注释隐藏
+# 区别于说明性注释（"# npm 安装"、"# 方式 1"、"# 参考"）——这些末尾无参数
+# 判别规则：# 后是斜杠命令（/xxx）或可执行命令 + 参数
+validate_no_commented_commands() {
+  local file="$1"
+  # 匹配 > # 后紧跟斜杠（/command 形式，如 /skill /chat /help）
+  local hits
+  hits=$(grep -nE '^>[[:space:]]*#[[:space:]]*/[a-zA-Z]' "$file" 2>/dev/null)
+  if [ -n "$hits" ]; then
+    while IFS= read -r line; do
+      [ -z "$line" ] && continue
+      local ln content
+      ln=$(echo "$line" | cut -d: -f1)
+      content=$(echo "$line" | cut -d: -f2- | sed 's/^[[:space:]]*//')
+      echo "  ❌ $(basename "$file"):${ln} — 命令被注释隐藏: ${content:0:70}"
+    done <<< "$hits"
+    return 1
   fi
   return 0
 }

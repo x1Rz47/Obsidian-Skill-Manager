@@ -386,17 +386,27 @@ For each file in scope, check and fix in the following module order:
 | Empty field content | `GitHub 链接` is empty/placeholder, `GitHub Star` empty | Mark as `⚠️ pending`, F4 will fix via web search |
 | `aliases` has `@` prefix | YAML parse, value starts with `@` | Remove `@` |
 | `aliases` < 3 entries or bad format | Entry count < 3, English name has hyphens, Chinese name not category name | Fix per [Alias Rule](#alias-rule) |
+| `aliases` has duplicates | Parse aliases list, find duplicate values (case-sensitive, ignore ~~ strikethrough marks during comparison) | Remove duplicate entries, keep first occurrence |
+| frontmatter `aliases` strikethrough not deleted | Raw markdown has `~~value~~` in aliases (Obsidian UI shows red strikethrough but content remains) | Remove the entry or clean the `~~` marks |
 | `类型` invalid | Missing, not a list, invalid value | Fix per [Type Rule](#type-rule) |
 | `使用平台` invalid | Generic tool not `ALL`, Agent tool not platform list | Fix per [Frontmatter Rule](#frontmatter-rule) |
 | `使用设备` missing/format error | Not YAML list nor `N/A` | Fix per [Frontmatter Rule](#frontmatter-rule) |
 | Booleans not lowercase | `True`/`False`/`Yes`/`No` | Fix to lowercase |
 | YAML parse error | Frontmatter parse fails | Fix format until it passes |
+| Directory sorting violation | Files not NN-numbered in GitHub Star descending order (N/A last, ties by filename asc) | Reorder NN prefixes per [Naming Rule](#naming-rule) |
 
 **Module B — Body Structure**
 
 | Check | Detection | Fix |
 |-------|-----------|-----|
 | Section callout/skeleton anomaly | Expected skeleton per template (`[!abstract]`, `[!info]`, `[!warning]`, `<details>`, table, list) | Run `fix-format.sh` |
+| Non-standard section present | File has `## ` section not in TEMPLATE (e.g. `📖 使用技巧`, `❓ 常见问题`, `📌 备注`) | Merge content into standard sections, delete the non-standard section |
+| Section order wrong | File sections not in TEMPLATE's 9-section order (ℹ️→🎯→📦→💿→💊→🧩→⌨️→⚠️→📝) | Reorder sections to match TEMPLATE |
+| Missing section | TEMPLATE defines section but file lacks it | Add section with placeholder content per template |
+| Section content still TEMPLATE placeholder | Content contains template placeholder text (`依赖项名称` / `具体描述` / `对应的解决方案` / `详细描述第N行` / `功能名+简短说明` / `# 安装命令（brew`) | Fill with real content via web research (F4) |
+| URL hidden in code comment | Callout code block contains `> # https://...` (URL commented out instead of being visible) | Remove `#` prefix so URL is selectable, or move to callout exterior as markdown link |
+| Slash command hidden in code comment | Callout code block contains `> # /skill xxx` or similar `/command` commented out | Remove `#` prefix so command is selectable; keep real explanatory comments like `# npm 安装` |
+| Duplicate adjacent `---` horizontal rules | Two `---` lines with ≤1 blank line between them, except the legitimate pair right after frontmatter (TEMPLATE standard) | Remove the extra `---`, keep only one separator |
 | `📝 更新功能` format wrong | Not `- YYYY-MM-DD：（full-width colon）` format | Fix per [Document Rule](#document-rule) |
 | `使用设备` install state outdated | Last run recorded a different device; cross-device sync detected | Update per [Frontmatter Rule](#frontmatter-rule) — detect current device, append/set `N/A` |
 
