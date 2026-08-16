@@ -29,12 +29,17 @@ Variables are resolved at runtime:
 | `{HOSTNAME}` | `hostname -s` (macOS) / `hostname` (Windows) |
 | `{SKILL_DIR}` | Auto-detected from skill install location |
 | `{VAULT_BASE}` | Looked up from `{SKILL_DIR}/SKILL.local.md` by hostname |
+| `{SCOPE}` | `{VAULT_BASE}/01.辅助工具/` (computed from `{VAULT_BASE}`) |
 | `{TEMPLATE}` | `{SKILL_DIR}/TEMPLATE.md` |
 
 Resolution order:
 1. If `{SKILL_DIR}/SKILL.local.md` exists, read its **Device Configuration** table
 2. Match `{HOSTNAME}` against the table → determines `{VAULT_BASE}`
 3. If no match or no local config → ask user for their hostname and vault path
+
+### Operational Scope
+
+This skill manages **only** documents under `{SCOPE}` (`{VAULT_BASE}/01.辅助工具/`). Any `.md` files elsewhere in the vault (e.g. `{VAULT_BASE}/02.工具使用/`) are **out of scope**: they are never scanned, searched, updated, restructured, installed, or format-repaired by any workflow in this skill. All workflows below operate on `{SCOPE}` only, unless a user explicitly passes a path inside it.
 
 
 ## Rules
@@ -207,7 +212,7 @@ Core: Document management. Handles links, tool names, batch updates, and full va
 | GitHub link (`https://github.com/owner/repo`) | Extract tool name, GitHub URL, infer tool type |
 | Tool name (`ffmpeg` / `Playwright`) | Search vault by name |
 | Multiple tools (`ffmpeg, git, vscode`) | Parse list, process each |
-| "所有" / "全部" / not specified | Traverse full vault, process each |
+| "所有" / "全部" / not specified | Traverse all docs under `{SCOPE}`, process each |
 | "更新目录" / "重新分类" / "重新编号" / "重整" (without a tool name) | Full vault directory restructure → skip to I3DirRestructure |
 
 #### I2: Search & Match
@@ -215,10 +220,10 @@ Core: Document management. Handles links, tool names, batch updates, and full va
 Determine `{VAULT_BASE}` via [Device → Vault Mapping](#device--vault-mapping).
 
 Search targets:
-- **GitHub link** → extract `owner/repo`, search globally by `GitHub 链接` field across `{VAULT_BASE}`
-- **Tool name** → recursively search `{VAULT_BASE}/01.辅助工具/` all `.md` files, match by filename (without `NN-` prefix) or `aliases`
+- **GitHub link** → extract `owner/repo`, search globally by `GitHub 链接` field across `{SCOPE}`
+- **Tool name** → recursively search `{SCOPE}` all `.md` files, match by filename (without `NN-` prefix) or `aliases`
 - **Multiple tools** → search each tool separately
-- **"所有"** → target is full vault
+- **"所有"** → target is all docs under `{SCOPE}`
 
 Results:
 - **Specific doc found** → I3 (update content)
@@ -253,7 +258,7 @@ For "所有" / "全部".
 For "更新目录", "重新分类", "重新编号", "重整".
 
 1. Determine `{VAULT_BASE}` via [Device → Vault Mapping](#device--vault-mapping)
-2. Scan all `.md` files in `{VAULT_BASE}/01.辅助工具/`, parse frontmatter
+2. Scan all `.md` files in `{SCOPE}`, parse frontmatter
 3. Reclassify by [Directory Hierarchy Rule](#directory-hierarchy-rule):
    - Identify each file's sub-ability domain
    - Create/merge L2-L4 subdirectories
@@ -286,7 +291,7 @@ Check [Directory Hierarchy Rule](#directory-hierarchy-rule) before writing:
   1. Read `GitHub Star` from all existing `.md` files in the target directory (`N/A` sorts last, `0` as number 0)
   2. Sort existing files by stars **descending**, determine where the new file's star count would be inserted
   3. **Renumber all affected files**: target gets `{insertion-NN}`, every subsequent file gets `NN+1` (rename the file)
-  4. Write to `{VAULT_BASE}/{category}/{NN}-{English-name}.md`
+  4. Write to `{SCOPE}/{category}/{NN}-{English-name}.md`
 
 Tell user: "Document generated: {filename}"
 
@@ -320,7 +325,7 @@ Summary:
    - Read `SKILL.local.md`, get current hostname (`hostname -s`)
    - Look up `{VAULT_BASE}` from device config table
    - If not found, ask user for hostname and path
-2. Recursively traverse all `.md` files in `{VAULT_BASE}/01.辅助工具/`, parse frontmatter
+2. Recursively traverse all `.md` files in `{SCOPE}`, parse frontmatter
 3. During scan, detect frontmatter issues: missing fields, wrong order, format errors. Report immediately and suggest "Run format repair workflow", **do not auto-fix**
 4. Filter by D1 conditions:
    - **"安装所有"** → `必用: true`
@@ -368,15 +373,15 @@ Trigger: "文档有问题", "修复文档", "修复格式", "检查格式", "fix
 
 Executed when doc formatting is broken. Covers template sync, format repair, and content completion.
 
-- Trigger contains "模板" → full vault mode, skip F4 (structure sync only, no content fill)
+- Trigger contains "模板" → full `{SCOPE}` mode, skip F4 (structure sync only, no content fill)
 - Other triggers → determine scope via F1
 
 #### F1: Determine Scope
 
 - **User specified a path** → determine if file or directory:
-  - Relative paths are resolved against `{VAULT_BASE}`
+  - Relative paths are resolved against `{SCOPE}`
   - Directory = recursively process all `.md` files in it
-- **Not specified** (e.g. "修复格式" / "文档有问题") → traverse all `.md` files under `{VAULT_BASE}`
+- **Not specified** (e.g. "修复格式" / "文档有问题") → traverse all `.md` files under `{SCOPE}`
 
 #### F2: Template Sync
 
