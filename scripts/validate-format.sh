@@ -10,7 +10,7 @@ source "$SCRIPT_DIR/lib.sh"
 VAULT="${1:-}"
 if [ -z "$VAULT" ]; then
   echo "Usage: $0 <vault_path>"
-  echo "Example: $0 ~/path/to/04.AI相关-🤖/辅助工具"
+  echo "Example: $0 ~/path/to/04.AI相关-🤖/01.辅助工具"
   exit 1
 fi
 
@@ -99,6 +99,11 @@ echo "Directories with sorting errors: $sort_errors"
 
 if [ "$total_errors" -eq 0 ] && [ "$sort_errors" -eq 0 ]; then
   echo "All files match TEMPLATE.md format ✅"
+  echo ""
+  echo "=== Schema Validate（更严格的单一入口）==="
+  PY=$(command -v python3 || command -v python3.12 || echo python3)
+  "$PY" "$SCRIPT_DIR/validate_schema.py" "$VAULT"
+  exit $?
   exit 0
 else
   echo ""

@@ -10,7 +10,7 @@ source "$SCRIPT_DIR/lib.sh"
 VAULT="${1:-}"
 if [ -z "$VAULT" ]; then
   echo "Usage: $0 <vault_path>"
-  echo "Example: $0 ~/path/to/04.AI相关-🤖/辅助工具"
+  echo "Example: $0 ~/path/to/04.AI相关-🤖/01.辅助工具"
   exit 1
 fi
 

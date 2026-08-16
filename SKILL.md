@@ -79,12 +79,12 @@ The `类型` field marks the tool's technical form, independent of directory loc
 
 ### Directory Hierarchy Rule
 
-**Format:** `{VAULT_BASE}/辅助工具/{L1}/{L2}/{L3}/{L4}/{NN}-{name}.md`
+**Format:** `{VAULT_BASE}/01.辅助工具/{L1}/{L2}/{L3}/{L4}/{NN}-{name}.md`
 
 | Level | Creation condition | Description |
 |-------|-------------------|-------------|
 | **L1** | Never merged/split due to file count | A single file gets its own directory |
-| **L2-L4** | Create subdirectory when sub-ability has **>2** files | Recursive; all 13 types in same directory count as same category |
+| **L2-L4** | Create subdirectory when sub-ability has **≥2** files | Recursive; all 13 types in same directory count as same category |
 
 **Rules:**
 - L1 name: `{NN}-{Chinese ability domain name}` (NN = `01`-`99`), assigned consecutively by pinyin sort, for display ordering
@@ -92,7 +92,7 @@ The `类型` field marks the tool's technical form, independent of directory loc
 - L1's `NN-` prefix is for directory ordering; file `NN-` is independent per directory — they don't conflict
 - No technical type restriction; all 13 types in the same directory count as same category
 
-**Pre-creation check:** When a directory has >2 files belonging to the same sub-ability domain, create a subdirectory:
+**Pre-creation check:** When a directory has ≥2 files belonging to the same sub-ability domain, create a subdirectory:
 1. Ensure each file's `aliases` contains the Chinese sub-ability domain name (without NN prefix); append if missing
 2. Extract Chinese domain names from files (may have multiple, e.g. `视频制作`, `语音合成`)
 3. Create `{NN}-{Chinese sub-ability domain name}` subdirectory for each domain; NN assigned consecutively by pinyin
@@ -176,13 +176,25 @@ When any workflow updates an existing doc, always do the following:
 | npm package | `npm list -g <pkg>` | `bun` |
 | pip package | `pip3 list \| grep <pkg>` (Mac) / `pip list \| findstr <pkg>` (Win) | `openai-whisper` |
 | MCP | Same as CLI, detect via package manager (`which` / `brew list` / `npm list -g` / `pip3 list`) | `MarkItDown` |
-| Agent / Skill / Agent-Plugin | Try `which <tool>` first; then check agent skill directories (`~/.config/opencode/skills/` / `~/.claude/skills/` / `~/.codex/skills/`) | `BrowserAct` |
+| Agent / Skill / Agent-Plugin | Try `which <tool>` first; then check **all** agent skill directories: `~/.cc-switch/skills/` (super-source, 167+ skills) / `~/.config/opencode/skills/` / `~/.codex/skills/` / `~/.agents/skills/` / `~/.claude/skills/` / `~/.gemini/skills/`. A tool counts as installed if it exists in **any** of these dirs. Note: cc-switch is the master repo and often the only place a skill exists (e.g. SkillOpt, GBrain) — skipping it will miss real installs | `BrowserAct`, `SkillOpt` (only in opencode), `GBrain` (only in cc-switch + opencode) |
 | GUI | `ls /Applications/*.app` (Mac) / `which <tool>` | `OmniVoice-Studio` |
 | Web | Cannot detect install state, always `N/A` (web apps have no local installation) | `Ian-Xiaohei-Illustrations` |
 | Collection / Guide / Model | Not installable, always `N/A` | `GStack`, `Superpowers` |
 
 
 ## Workflows
+
+## Schema Architecture
+
+Document validation is **schema-driven**, not pattern-matching. The single source of truth is `scripts/schema.py` (Python dict). `scripts/validate_schema.py` reads the schema and strictly checks every file:
+
+- Frontmatter field completeness + order
+- Section structure completeness + order (non-standard sections rejected)
+- Per-section skeleton (abstract/info/warning callout, plain_list, prereq_list, table_header, details_blocks)
+- Global forbidden patterns (URL/command hidden in comments, HTML-in-list, TEMPLATE placeholders, `> [!quote]` in 🧩)
+- Cross-section structures (duplicate `---`, aliases uniqueness)
+
+`validate-format.sh` (bash, legacy) calls `validate_schema.py` after its own checks pass. To change validation rules, edit `schema.py` — not the bash functions. The old bash checks in `lib.sh` are retained for backward compat but the Python schema is authoritative.
 
 ### Doc Management Workflow
 
@@ -204,7 +216,7 @@ Determine `{VAULT_BASE}` via [Device → Vault Mapping](#device--vault-mapping).
 
 Search targets:
 - **GitHub link** → extract `owner/repo`, search globally by `GitHub 链接` field across `{VAULT_BASE}`
-- **Tool name** → recursively search `{VAULT_BASE}/辅助工具/` all `.md` files, match by filename (without `NN-` prefix) or `aliases`
+- **Tool name** → recursively search `{VAULT_BASE}/01.辅助工具/` all `.md` files, match by filename (without `NN-` prefix) or `aliases`
 - **Multiple tools** → search each tool separately
 - **"所有"** → target is full vault
 
@@ -241,7 +253,7 @@ For "所有" / "全部".
 For "更新目录", "重新分类", "重新编号", "重整".
 
 1. Determine `{VAULT_BASE}` via [Device → Vault Mapping](#device--vault-mapping)
-2. Scan all `.md` files in `{VAULT_BASE}/辅助工具/`, parse frontmatter
+2. Scan all `.md` files in `{VAULT_BASE}/01.辅助工具/`, parse frontmatter
 3. Reclassify by [Directory Hierarchy Rule](#directory-hierarchy-rule):
    - Identify each file's sub-ability domain
    - Create/merge L2-L4 subdirectories
@@ -269,7 +281,7 @@ Generate doc with researched data:
 - Set `使用设备` to current device
 
 Check [Directory Hierarchy Rule](#directory-hierarchy-rule) before writing:
-- If directory has >2 files in same sub-ability domain → create subdirectory, move files, renumber, then write
+- If directory has ≥2 files in same sub-ability domain → create subdirectory, move files, renumber, then write
 - Otherwise:
   1. Read `GitHub Star` from all existing `.md` files in the target directory (`N/A` sorts last, `0` as number 0)
   2. Sort existing files by stars **descending**, determine where the new file's star count would be inserted
@@ -308,7 +320,7 @@ Summary:
    - Read `SKILL.local.md`, get current hostname (`hostname -s`)
    - Look up `{VAULT_BASE}` from device config table
    - If not found, ask user for hostname and path
-2. Recursively traverse all `.md` files in `{VAULT_BASE}/辅助工具/`, parse frontmatter
+2. Recursively traverse all `.md` files in `{VAULT_BASE}/01.辅助工具/`, parse frontmatter
 3. During scan, detect frontmatter issues: missing fields, wrong order, format errors. Report immediately and suggest "Run format repair workflow", **do not auto-fix**
 4. Filter by D1 conditions:
    - **"安装所有"** → `必用: true`
