@@ -104,7 +104,7 @@ The `类型` field marks the tool's technical form, independent of directory loc
 4. Existing docs: move into subdirectory, reassign numbers by GitHub stars descending
 5. New docs: name as `{NN}-{English-name}.md`, NN continues from current directory's max number
 
-**Recursive:** After each operation, scan all directories (L2→L4) for remaining >2 clusters that need splitting.
+**Hard threshold — no discretion:** the ≥2 condition is mechanical, not advisory. When 2+ files in the same directory share a sub-ability domain, split — even if the resulting subdirectory holds only 2 files, and even if you judge the directory "small enough". Do not balance "avoid fragmentation" against the rule; a 2-file subdirectory is correct output. After each operation, re-scan all directories (L2→L4) for remaining clusters.
 
 ### Naming Rule
 
@@ -236,6 +236,13 @@ Search targets:
 - **Tool name** → recursively search `{SCOPE}` all `.md` files, match by filename (without `NN-` prefix) or `aliases`
 - **Multiple tools** → search each tool separately
 - **"所有"** → target is all docs under `{SCOPE}`
+
+**Classification sanity check** (run when a doc's category is questioned, or on "重新分类"):
+1. Read the doc's abstract — does the L1/L2 category describe **what the tool does**, not where it was first dumped? A learning app does not belong in 媒体创作; a publishing skill does not belong in 视频制作; a generic research/teaching skill does not belong in Obsidian生态.
+2. Same GitHub repo split across multiple docs (e.g. one repo → 4 sub-skill docs) is a dedup violation: keep the sub-skill split only if each doc has distinct real content; otherwise merge.
+3. Stub docs (abstract is one short sentence, `<details>` blocks contain template-echo text like "提供XX功能") are low-quality: mark `⚠️ stub` and offer F4 content completion.
+4. Move = `mv` + update `aliases[1]` to the new directory's Chinese domain name + renumber by stars + rebuild hub index + schema validation.
+5. **No matching category exists → create a new L1 directory** (`{SCOPE}/{NN}-{中文能力域}` with the next free NN; emoji allowed in L1 names). Do not force a doc into a semantically wrong category just to avoid creating a directory. After creating: place docs inside (renumber by stars), add the new section to `{VAULT_BASE}/00.索引-*.md`, keep L1 numbering gap-free (renumber sibling L1 dirs if a middle number was vacated).
 
 Results:
 - **Specific doc found** → I3 (update content)
@@ -507,4 +514,6 @@ Report also lists all markers generated during this repair (`⚠️ pending` / `
 | General | Skill repo synced from cloud storage | Files may arrive CRLF; if bash errors (`command not found` on shebang lines) or every file fails section checks, convert CRLF→LF first (see Frontmatter Rule line-endings) |
 | General | Python `ModuleNotFoundError: schema` on network volumes (SMB/NFS) | `sys.path` lookup is unreliable on SMB mounts; `VALIDATE_SCHEMA.py` uses explicit `importlib.util.spec_from_file_location` — keep that pattern when editing |
 | Format Repair | Cross-device sync | After vault sync (SynologyDrive/other cloud), device B needs to run Format Repair workflow to update `使用设备` etc. |
+| Doc Management | Doc sits in a category unrelated to its function | Run the classification sanity check in I2; move to the ability-domain directory, never leave a doc where it was first dumped |
+| Doc Management | Same repo split into multiple docs (sub-skills) | Allowed only if each doc has distinct real content; stub-quality duplicates → merge into one doc |
 | Format Repair | Another device is writing the same vault | Check for recent writes (files modified in the last 30 min) and empty `XX 2`-style conflict dirs before any bulk fix; if concurrent writes are detected, stop and ask the user to pause the other device first |
