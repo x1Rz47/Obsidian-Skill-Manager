@@ -1,11 +1,11 @@
 #!/bin/bash
-# validate-format.sh — Check every 知识库 file's section format against TEMPLATE.md
-# Usage: ./validate-format.sh <vault_dir>
+# VALIDATE-FORMAT.SH — Check every 知识库 file's section format against TEMPLATE.MD
+# Usage: ./VALIDATE-FORMAT.SH <vault_dir>
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$SCRIPT_DIR/lib.sh"
+source "$SCRIPT_DIR/LIB.SH"
 
 VAULT="${1:-}"
 if [ -z "$VAULT" ]; then
@@ -98,11 +98,11 @@ echo "Files with errors: $total_errors"
 echo "Directories with sorting errors: $sort_errors"
 
 if [ "$total_errors" -eq 0 ] && [ "$sort_errors" -eq 0 ]; then
-  echo "All files match TEMPLATE.md format ✅"
+  echo "All files match TEMPLATE.MD format ✅"
   echo ""
   echo "=== Schema Validate（更严格的单一入口）==="
   PY=$(command -v python3 || command -v python3.12 || echo python3)
-  "$PY" "$SCRIPT_DIR/validate_schema.py" "$VAULT"
+  "$PY" "$SCRIPT_DIR/VALIDATE_SCHEMA.py" "$VAULT"
   exit $?
   exit 0
 else

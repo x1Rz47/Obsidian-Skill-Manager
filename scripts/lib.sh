@@ -1,9 +1,9 @@
 #!/bin/bash
-# lib.sh — Common functions for 知识库 template format operations
-# Usage: source "$(dirname "$0")/lib.sh"
+# LIB.SH — Common functions for 知识库 template format operations
+# Usage: source "$(dirname "$0")/LIB.SH"
 
 SKILL_DIR="$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}")")" && pwd)"
-TEMPLATE="$SKILL_DIR/TEMPLATE.md"
+TEMPLATE="$SKILL_DIR/TEMPLATE.MD"
 
 # Section → skeleton mapping (no emoji keys: use name suffix for lookup)
 # Skeleton types: info_callout, warning_callout, abstract_callout, details_blocks, table_header
@@ -74,7 +74,7 @@ ensure_template_sections() {
   local missing=""
   local order=""
 
-  # Collect missing sections from TEMPLATE.md
+  # Collect missing sections from TEMPLATE.MD
   while IFS= read -r section; do
     if ! grep -q "^## $section\$" "$file" 2>/dev/null; then
       missing="$missing  $section"
@@ -482,7 +482,7 @@ validate_aliases_unique() {
 }
 
 # Validate frontmatter: aliases uniqueness + (future) other frontmatter checks
-# Call this from validate-format.sh after section validation
+# Call this from VALIDATE-FORMAT.SH after section validation
 validate_frontmatter() {
   local file="$1"
   validate_aliases_unique "$file"
@@ -548,7 +548,7 @@ validate_directory_sorting() {
 }
 
 # Detect if section content is still using TEMPLATE placeholder text
-# TEMPLATE.md 里的占位符标记文本只该出现在模板里，出现在实际文档说明段还是模板状态
+# TEMPLATE.MD 里的占位符标记文本只该出现在模板里，出现在实际文档说明段还是模板状态
 # 命中即返回 0（true = 是 placeholder），不命中返回 1（false = 已填真实内容）
 has_placeholder_content() {
   local content="$1"

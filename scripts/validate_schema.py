@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Schema 驱动的文档校验器（单一入口，替代 8 个独立检测函数）
-用法：python3 validate_schema.py <vault_dir>
+用法：python3 VALIDATE_SCHEMA.py <vault_dir>
 """
 import os, re, sys, unicodedata
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import importlib.util
+_spec = importlib.util.spec_from_file_location(
+    "schema", os.path.join(os.path.dirname(os.path.abspath(__file__)), "SCHEMA.py"))
+_mod = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_mod)
+sys.modules["schema"] = _mod
 from schema import (
     FRONTMATTER_ORDER, SECTION_ORDER, SECTIONS,
     FORBIDDEN_PATTERNS, FORBIDDEN_STRUCTURES

@@ -1,8 +1,8 @@
 ---
 name: obsidian-skill-manager
-description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when vault documentation needs fixing, format-checking, or template syncing. Also use when the user says "更新目录", "重新分类", "重新编号", "重整", fix docs, fix format, "修复文档", "修复格式", or "检查格式". Compatible with any SKILL.md-based AI coding assistant.
+description: Use when the user asks to install, download, add, set up, deploy, or sync software components. Also use when vault documentation needs fixing, format-checking, or template syncing. Also use when the user says "更新目录", "重新分类", "重新编号", "重整", fix docs, fix format, "修复文档", "修复格式", or "检查格式". Compatible with any SKILL.MD-based AI coding assistant.
 ---
-<!-- WARNING: All section lists must be read from TEMPLATE.md, never hardcoded. -->
+<!-- WARNING: All section lists must be read from TEMPLATE.MD, never hardcoded. -->
 
 # Obsidian Skill Manager
 
@@ -18,7 +18,7 @@ This skill activates in three modes:
 
 ## Vault Configuration
 
-`{TEMPLATE}` = `{SKILL_DIR}/TEMPLATE.md`.
+`{TEMPLATE}` = `{SKILL_DIR}/TEMPLATE.MD`.
 
 ### Device → Vault Mapping
 
@@ -28,12 +28,12 @@ Variables are resolved at runtime:
 |----------|--------|
 | `{HOSTNAME}` | `hostname -s` (macOS) / `hostname` (Windows) |
 | `{SKILL_DIR}` | Auto-detected from skill install location |
-| `{VAULT_BASE}` | Looked up from `{SKILL_DIR}/SKILL.local.md` by hostname |
+| `{VAULT_BASE}` | Looked up from `{SKILL_DIR}/SKILL.LOCAL.MD` by hostname |
 | `{SCOPE}` | `{VAULT_BASE}/01.辅助工具/` (computed from `{VAULT_BASE}`) |
-| `{TEMPLATE}` | `{SKILL_DIR}/TEMPLATE.md` |
+| `{TEMPLATE}` | `{SKILL_DIR}/TEMPLATE.MD` |
 
 Resolution order:
-1. If `{SKILL_DIR}/SKILL.local.md` exists, read its **Device Configuration** table
+1. If `{SKILL_DIR}/SKILL.LOCAL.MD` exists, read its **Device Configuration** table
 2. Match `{HOSTNAME}` against the table → determines `{VAULT_BASE}`
 3. If no match or no local config → ask user for their hostname and vault path
 
@@ -63,7 +63,7 @@ The `类型` field marks the tool's technical form, independent of directory loc
 | Value | Meaning | Example |
 |-------|---------|---------|
 | `Agent` | Autonomous AI Agent or orchestration framework | Deep-Agents, Remote-OpenCode |
-| `Skill` | Agent-executable SKILL.md instruction set | BrowserAct, Playwright, Agent-Reach |
+| `Skill` | Agent-executable SKILL.MD instruction set | BrowserAct, Playwright, Agent-Reach |
 | `Agent-Plugin` | Runtime extension injected into Agent | Supermemory, Morph, Vibeguard |
 | `Guide` | Reference doc / methodology / workflow guide | Cheat-On-Content, Obsidian-Markdown |
 | `MCP` | Model Context Protocol server | MarkItDown, CodeGraph, GBrain |
@@ -134,6 +134,8 @@ Each file's `aliases` follows these rules, max **5** entries:
 | 2 | Chinese name | If exists, write it. The directory's Chinese ability domain name (without NN), position-free | `视频制作` |
 | 3+ | Core tech keywords | At least 1, extracted from doc intro/core functions, can have multiple | `浏览器控制`, `Web自动化` |
 
+**Uniqueness:** an alias must not collide with another doc's alias across `{SCOPE}` (case-insensitive) — two docs share an alias (e.g. two "Playwright" docs) means one of them is a duplicate; resolve via I2 uniqueness check before writing. Aliases with different letter-casing (`egolite` vs `Egolite`) count as duplicates: keep the tool's official casing as entry 1, prefer the common lowercase form users actually type as a keyword entry.
+
 ### Frontmatter Rule
 
 Shared by **Doc Management**, **Tool Deploy**, and **Format Repair** workflows. Check every `.md` file before any other workflow logic:
@@ -147,6 +149,8 @@ Shared by **Doc Management**, **Tool Deploy**, and **Format Repair** workflows. 
 | `使用设备:` format error | Fix to YAML list (`  - Device`) or `N/A` |
 | `使用设备:` missing | Detect current device install status: if installed append device name (skip if exists), if not installed set `N/A` |
 | Booleans not lowercase | Fix: `True` → `true`, `False` → `false`, `Yes` → `yes` |
+
+**Line endings:** every file in this skill and every doc written to `{SCOPE}` must use LF. CRLF in `{TEMPLATE}` silently breaks all `grep "^## section$"` checks in bash (every file reports phantom "非标准段/缺失段"); CRLF in scripts breaks bash entirely (`command not found`). Before diagnosing "all files broken", check `file TEMPLATE.MD` first.
 
 ### Document Rule
 
@@ -181,7 +185,7 @@ When any workflow updates an existing doc, always do the following:
 | npm package | `npm list -g <pkg>` | `bun` |
 | pip package | `pip3 list \| grep <pkg>` (Mac) / `pip list \| findstr <pkg>` (Win) | `openai-whisper` |
 | MCP | Same as CLI, detect via package manager (`which` / `brew list` / `npm list -g` / `pip3 list`) | `MarkItDown` |
-| Agent / Skill / Agent-Plugin | Try `which <tool>` first; then check **all** agent skill directories: `~/.cc-switch/skills/` (super-source, 167+ skills) / `~/.config/opencode/skills/` / `~/.codex/skills/` / `~/.agents/skills/` / `~/.claude/skills/` / `~/.gemini/skills/`. A tool counts as installed if it exists in **any** of these dirs. Note: cc-switch is the master repo and often the only place a skill exists (e.g. SkillOpt, GBrain) — skipping it will miss real installs | `BrowserAct`, `SkillOpt` (only in opencode), `GBrain` (only in cc-switch + opencode) |
+| Agent / Skill / Agent-Plugin | Try `which <tool>` first; then check **all** agent skill directories: `~/.cc-switch/skills/` (super-source, 167+ skills) / `~/.config/opencode/skills/` / `~/.codex/skills/` / `~/.AGENTS/skills/` / `~/.claude/skills/` / `~/.gemini/skills/`. A tool counts as installed if it exists in **any** of these dirs. Note: cc-switch is the master repo and often the only place a skill exists (e.g. SkillOpt, GBrain) — skipping it will miss real installs | `BrowserAct`, `SkillOpt` (only in opencode), `GBrain` (only in cc-switch + opencode) |
 | GUI | `ls /Applications/*.app` (Mac) / `which <tool>` | `OmniVoice-Studio` |
 | Web | Cannot detect install state, always `N/A` (web apps have no local installation) | `Ian-Xiaohei-Illustrations` |
 | Collection / Guide / Model | Not installable, always `N/A` | `GStack`, `Superpowers` |
@@ -191,7 +195,7 @@ When any workflow updates an existing doc, always do the following:
 
 ## Schema Architecture
 
-Document validation is **schema-driven**, not pattern-matching. The single source of truth is `scripts/schema.py` (Python dict). `scripts/validate_schema.py` reads the schema and strictly checks every file:
+Document validation is **schema-driven**, not pattern-matching. The single source of truth is `SCRIPTS/SCHEMA.py` (Python dict). `SCRIPTS/VALIDATE_SCHEMA.py` reads the schema and strictly checks every file:
 
 - Frontmatter field completeness + order
 - Section structure completeness + order (non-standard sections rejected)
@@ -199,7 +203,15 @@ Document validation is **schema-driven**, not pattern-matching. The single sourc
 - Global forbidden patterns (URL/command hidden in comments, HTML-in-list, TEMPLATE placeholders, `> [!quote]` in 🧩)
 - Cross-section structures (duplicate `---`, aliases uniqueness)
 
-`validate-format.sh` (bash, legacy) calls `validate_schema.py` after its own checks pass. To change validation rules, edit `schema.py` — not the bash functions. The old bash checks in `lib.sh` are retained for backward compat but the Python schema is authoritative.
+`VALIDATE-FORMAT.SH` (bash, legacy) calls `VALIDATE_SCHEMA.py` after its own checks pass. To change validation rules, edit `SCHEMA.py` — not the bash functions. The old bash checks in `LIB.SH` are retained for backward compat but the Python schema is authoritative.
+
+**Closing check for every workflow** (cheap, catches most regressions):
+```bash
+SCRIPTS/VALIDATE_SCHEMA.py "{SCOPE}"
+```
+Run it after any write (create / update / rename / renumber) and include the result (total files / total errors) in the report. A workflow that ends with schema errors is not done.
+
+**Hub index maintenance**: renames, new docs, and category changes must be reflected in `{VAULT_BASE}/00.索引-*.md` (section counts and `[[NN-Name]]` links live there). When a rename breaks links, `grep -rl "\[\[旧名\]\]"` the whole vault — links to `{SCOPE}` docs exist outside `{SCOPE}` too.
 
 ### Doc Management Workflow
 
@@ -265,6 +277,7 @@ For "更新目录", "重新分类", "重新编号", "重整".
 4. Renumber all files by GitHub stars descending (`NN-English-name.md`)
 5. Fix filenames and aliases by [Naming Rule](#naming-rule) and [Alias Rule](#alias-rule)
 6. **Do not modify any doc body content**, leave `创建日期`, `更新日期`, `GitHub Star` etc. untouched
+7. **After renumbering**, repair links: update all `[[NN-Name]]` wiki links pointing to renamed files (search the whole vault, not just `{SCOPE}` — the hub index and cross-references live outside it), refresh hub index counts, then run `SCRIPTS/VALIDATE_SCHEMA.py "{SCOPE}"` to confirm 0 errors
 
 ---
 
@@ -279,6 +292,16 @@ Collect the following info:
 
 If GitHub fetch fails, set `GitHub Star: N/A`.
 
+**Star-fetching fallback order** (GitHub API is rate-limited to 60/h unauthenticated; do not stop at the first failure):
+1. GitHub API `api.github.com/repos/{owner}/{repo}` → `stargazers_count` (round: `21449` → `21.4K`)
+2. GitHub API blocked → fetch the repo HTML page and parse `"stargazerCount":\s*(\d+)`
+3. Both fail → retry once after 60s, then keep the original star and mark `⚠️ network_error` in the report
+
+**Uniqueness check before writing** (dedup gate — run every time):
+1. Search `{SCOPE}` for the same `GitHub 链接` (normalised, trailing `/` stripped, lowercase) — if found, this is an **update**, not a new doc: route to I3 and stop here
+2. Search for same/similar tool name in `aliases` and filename (case-insensitive, ignore `-`/space differences) — if found with a different repo, ask the user which one to keep
+3. Never create a second doc for a tool that already has one under a different category
+
 Generate doc with researched data:
 - Read `{TEMPLATE}` to get field order, section structure, and writing rules
 - Fill `GitHub 链接`, `GitHub Star`, intro, core features, `使用平台`
@@ -292,6 +315,11 @@ Check [Directory Hierarchy Rule](#directory-hierarchy-rule) before writing:
   2. Sort existing files by stars **descending**, determine where the new file's star count would be inserted
   3. **Renumber all affected files**: target gets `{insertion-NN}`, every subsequent file gets `NN+1` (rename the file)
   4. Write to `{SCOPE}/{category}/{NN}-{English-name}.md`
+
+**After any rename**, repair links:
+1. Update all `[[NN-Name]]` links to the renamed docs across the whole vault (at minimum `{SCOPE}`'s hub index)
+2. Rebuild/refresh the hub index (`{VAULT_BASE}/00.索引-*.md`) row count and section counts
+3. Run `SCRIPTS/VALIDATE_SCHEMA.py "{SCOPE}"` and fix any reported error before reporting done
 
 Tell user: "Document generated: {filename}"
 
@@ -322,7 +350,7 @@ Summary:
 #### D2: Detect Device + Scan & Match
 
 1. Determine current device:
-   - Read `SKILL.local.md`, get current hostname (`hostname -s`)
+   - Read `SKILL.LOCAL.MD`, get current hostname (`hostname -s`)
    - Look up `{VAULT_BASE}` from device config table
    - If not found, ask user for hostname and path
 2. Recursively traverse all `.md` files in `{SCOPE}`, parse frontmatter
@@ -385,7 +413,7 @@ Executed when doc formatting is broken. Covers template sync, format repair, and
 
 #### F2: Template Sync
 
-For each file in scope: read template (first time only), align field names (add/delete/rename fields), section structure (add/delete/reorder sections) against template, then run `fix-format.sh` to fix skeleton.
+For each file in scope: read template (first time only), align field names (add/delete/rename fields), section structure (add/delete/reorder sections) against template, then run `FIX-FORMAT.SH` to fix skeleton.
 
 Files that fail template sync are marked `⚠️ template_exception`, skip F3-F4.
 
@@ -416,7 +444,7 @@ For each file in scope, check and fix in the following module order:
 
 | Check | Detection | Fix |
 |-------|-----------|-----|
-| Section callout/skeleton anomaly | Expected skeleton per template (`[!abstract]`, `[!info]`, `[!warning]`, `<details>`, table, list) | Run `fix-format.sh` |
+| Section callout/skeleton anomaly | Expected skeleton per template (`[!abstract]`, `[!info]`, `[!warning]`, `<details>`, table, list) | Run `FIX-FORMAT.SH` |
 | Non-standard section present | File has `## ` section not in TEMPLATE (e.g. `📖 使用技巧`, `❓ 常见问题`, `📌 备注`) | Merge content into standard sections, delete the non-standard section |
 | Section order wrong | File sections not in TEMPLATE's 9-section order (ℹ️→🎯→📦→💿→💊→🧩→⌨️→⚠️→📝) | Reorder sections to match TEMPLATE |
 | Missing section | TEMPLATE defines section but file lacks it | Add section with placeholder content per template |
@@ -472,8 +500,11 @@ Report also lists all markers generated during this repair (`⚠️ pending` / `
 | General | File locked / cannot read/write | Skip file, report `⚠️ file_locked`, ask user to close and retry |
 | General | GitHub API rate limit / network failure | Retry after 60s; after 3 failures mark `⚠️ network_error`, skip online steps |
 | General | Filename contains illegal characters | Filter per [Naming Rule](#naming-rule) |
-| General | `{VAULT_BASE}` path doesn't exist | Ask user to check `SKILL.local.md` path config |
+| General | `{VAULT_BASE}` path doesn't exist | Ask user to check `SKILL.LOCAL.MD` path config |
 | General | `{TEMPLATE}` file missing | Ask user to reinstall skill |
 | General | Vault directory has no `.md` files | Report "No documents found", stop |
 | General | GitHub Star is 0 | `0` sorts as number 0 (less than all positive numbers), `N/A` sorts last |
+| General | Skill repo synced from cloud storage | Files may arrive CRLF; if bash errors (`command not found` on shebang lines) or every file fails section checks, convert CRLF→LF first (see Frontmatter Rule line-endings) |
+| General | Python `ModuleNotFoundError: schema` on network volumes (SMB/NFS) | `sys.path` lookup is unreliable on SMB mounts; `VALIDATE_SCHEMA.py` uses explicit `importlib.util.spec_from_file_location` — keep that pattern when editing |
 | Format Repair | Cross-device sync | After vault sync (SynologyDrive/other cloud), device B needs to run Format Repair workflow to update `使用设备` etc. |
+| Format Repair | Another device is writing the same vault | Check for recent writes (files modified in the last 30 min) and empty `XX 2`-style conflict dirs before any bulk fix; if concurrent writes are detected, stop and ask the user to pause the other device first |

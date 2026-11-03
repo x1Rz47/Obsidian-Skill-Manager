@@ -10,11 +10,11 @@ An AI agent skill for OpenCode, Claude Code, and Codex CLI that manages tool doc
 npx skills add x1Rz47/obsidian-skill-manager@obsidian-skill-manager
 ```
 
-Auto-detects all agents on your machine and symlinks the skill into each one's directory.
+Auto-detects all AGENTS on your machine and symlinks the skill into each one's directory.
 
 ## Configure
 
-Create `{SKILL_DIR}/SKILL.local.md` with your machine's hostname and vault path:
+Create `{SKILL_DIR}/SKILL.LOCAL.MD` with your machine's hostname and vault path:
 
 ```markdown
 ## Device Configuration
@@ -24,18 +24,18 @@ Create `{SKILL_DIR}/SKILL.local.md` with your machine's hostname and vault path:
 | my-hostname | My Mac | /path/to/vault/04.AI相关-🤖 |
 ```
 
-Find your hostname with `hostname -s` (macOS) or `hostname` (Windows). `SKILL.local.md` is gitignored and stays on your machine.
+Find your hostname with `hostname -s` (macOS) or `hostname` (Windows). `SKILL.LOCAL.MD` is gitignored and stays on your machine.
 
 The skill only manages documents under `{VAULT_BASE}/01.辅助工具/` (the `{SCOPE}`). Anything elsewhere in the vault (e.g. `02.工具使用/`) is out of scope.
 
 ## Validation
 
-- `scripts/validate_schema.py` — **authoritative** schema validator (Python 3, cross-platform). Strictly checks frontmatter, section order, skeletons, and forbidden patterns.
-- `scripts/validate-format.sh` / `fix-format.sh` — legacy bash wrappers that call the Python validator after their own checks. Require bash (WSL or Git Bash on Windows).
+- `SCRIPTS/VALIDATE_SCHEMA.py` — **authoritative** schema validator (Python 3, cross-platform). Strictly checks frontmatter, section order, skeletons, and forbidden patterns.
+- `SCRIPTS/VALIDATE-FORMAT.SH` / `FIX-FORMAT.SH` — legacy bash wrappers that call the Python validator after their own checks. Require bash (WSL or Git Bash on Windows).
 
 ## Workflows
 
-The skill activates on natural-language triggers. See [`SKILL.md`](SKILL.md) for the full trigger table and detailed procedures.
+The skill activates on natural-language triggers. See [`SKILL.MD`](SKILL.MD) for the full trigger table and detailed procedures.
 
 | Workflow | Trigger (natural language) | What it does |
 |----------|---------------------------|-------------|
@@ -50,7 +50,7 @@ Tools are categorized by **ability domain** (what capability does this tool give
 | Type | Meaning | Examples |
 |------|---------|---------|
 | **Agent** | Autonomous AI Agent or orchestration framework | Deep-Agents, Remote-OpenCode |
-| **Skill** | Agent-executable SKILL.md instruction set | BrowserAct, Playwright, Agent-Reach |
+| **Skill** | Agent-executable SKILL.MD instruction set | BrowserAct, Playwright, Agent-Reach |
 | **Agent-Plugin** | Runtime extension injected into Agent | Supermemory, Morph, Vibeguard |
 | **Guide** | Reference doc / methodology / workflow guide | Cheat-On-Content, Obsidian-Markdown |
 | **MCP** | Model Context Protocol server | MarkItDown, CodeGraph, GBrain |
@@ -78,10 +78,10 @@ Tools are categorized by **ability domain** (what capability does this tool give
 
 | File | Purpose |
 |------|---------|
-| [`SKILL.md`](SKILL.md) | Full skill instructions (3 workflows, schema architecture, edge cases, conventions) |
-| `SKILL.local.md` | Your device → vault mapping (gitignored, create after install) |
-| [`TEMPLATE.md`](TEMPLATE.md) | Canonical 知识库 document template |
-| `scripts/` | Format validators and fixers (`validate_schema.py` is authoritative; bash scripts are legacy) |
+| [`SKILL.MD`](SKILL.MD) | Full skill instructions (3 workflows, schema architecture, edge cases, conventions) |
+| `SKILL.LOCAL.MD` | Your device → vault mapping (gitignored, create after install) |
+| [`TEMPLATE.MD`](TEMPLATE.MD) | Canonical 知识库 document template |
+| `SCRIPTS/` | Format validators and fixers (`VALIDATE_SCHEMA.py` is authoritative; bash SCRIPTS are legacy) |
 
 ## License
 

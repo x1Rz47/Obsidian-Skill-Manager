@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""知识库文档 schema — TEMPLATE.md 的正式定义
-单一真相源：validate_schema.py 按 schema 严格校验
+"""知识库文档 schema — TEMPLATE.MD 的正式定义
+单一真相源：VALIDATE_SCHEMA.py 按 schema 严格校验
 修改本文件 = 修改所有文档的校验标准
 """
 

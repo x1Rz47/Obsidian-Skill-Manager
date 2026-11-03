@@ -1,11 +1,11 @@
 #!/bin/bash
-# fix-format.sh — Auto-fix every 知识库 file's section format to match TEMPLATE.md
-# Usage: ./fix-format.sh <vault_dir>
+# FIX-FORMAT.SH — Auto-fix every 知识库 file's section format to match TEMPLATE.MD
+# Usage: ./FIX-FORMAT.SH <vault_dir>
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-source "$SCRIPT_DIR/lib.sh"
+source "$SCRIPT_DIR/LIB.SH"
 
 VAULT="${1:-}"
 if [ -z "$VAULT" ]; then
@@ -62,5 +62,5 @@ echo "Files fixed: $fixed_files"
 echo "Total fixes applied: $total_fixes"
 
 if [ "$fixed_files" -eq 0 ]; then
-  echo "All files already match TEMPLATE.md format ✅"
+  echo "All files already match TEMPLATE.MD format ✅"
 fi
