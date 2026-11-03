@@ -193,12 +193,15 @@ clean_nested_callout() {
 }
 
 # Strip blockquote prefix (> ) from every line
+# Also handles legacy " > " format (leading space before >, produced by older fixer versions)
 strip_blockquote() {
   local content="$1"
   echo "$content" | awk '
     /^> / {print substr($0, 3); next}
     /^>$/ {print ""; next}
     /^>\[/ {next}  # skip callout header
+    /^ > / {print substr($0, 4); next}
+    /^ >$/ {print ""; next}
     {print}
   '
 }
@@ -214,9 +217,9 @@ wrap_in_callout() {
 
   while IFS= read -r line; do
     if [ -z "$line" ]; then
-      result+=$'\n'" >"
+      result+=$'\n'">"
     else
-      result+=$'\n'" > $line"
+      result+=$'\n'"> $line"
     fi
   done <<< "$content"
 
@@ -398,9 +401,9 @@ TEMPLATE_TABLE
     last=$(echo "$no_status" | grep -v '^[[:space:]]*$' | tail -1)
 
     if [ "$last" = ">" ] || [ "$last" = " >" ]; then
-      fixed="$no_status"$'\n'" > **状态**：$status_text"
+      fixed="$no_status"$'\n'"> **状态**：$status_text"
     else
-      fixed="$no_status"$'\n'" >"$'\n'" > **状态**：$status_text"
+      fixed="$no_status"$'\n'">"$'\n'"> **状态**：$status_text"
     fi
 
     if [ "$fixed" != "$current" ]; then
