@@ -39,7 +39,7 @@ Resolution order:
 
 ### Operational Scope
 
-This skill manages **only** documents under `{SCOPE}` (`{VAULT_BASE}/01.辅助工具/`). Any `.md` files elsewhere in the vault (e.g. `{VAULT_BASE}/02.工具使用/`) are **out of scope**: they are never scanned, searched, updated, restructured, installed, or format-repaired by any workflow in this skill. All workflows below operate on `{SCOPE}` only, unless a user explicitly passes a path inside it.
+This skill manages **only** documents under `{SCOPE}` (`{VAULT_BASE}/01.辅助工具/`). (Exception: hub-index maintenance and `[[link]]` repair may touch files outside `{SCOPE}` — the index and cross-references live there; never modify their body content.) Any `.md` files elsewhere in the vault (e.g. `{VAULT_BASE}/02.工具使用/`) are **out of scope**: they are never scanned, searched, updated, restructured, installed, or format-repaired by any workflow in this skill. All workflows below operate on `{SCOPE}` only, unless a user explicitly passes a path inside it.
 
 
 ## Rules
@@ -243,6 +243,7 @@ Search targets:
 3. Stub docs (abstract is one short sentence, `<details>` blocks contain template-echo text like "提供XX功能") are low-quality: mark `⚠️ stub` and offer F4 content completion.
 4. Move = `mv` + update `aliases[1]` to the new directory's Chinese domain name + renumber by stars + rebuild hub index + schema validation.
 5. **No matching category exists → create a new L1 directory** (`{SCOPE}/{NN}-{中文能力域}` with the next free NN; emoji allowed in L1 names). Do not force a doc into a semantically wrong category just to avoid creating a directory. After creating: place docs inside (renumber by stars), add the new section to `{VAULT_BASE}/00.索引-*.md`, keep L1 numbering gap-free (renumber sibling L1 dirs if a middle number was vacated).
+6. **No catch-all category names.** An L1/L2 name must state the ability domain it collects (e.g. `跨境电商`, `测试质量`) — never a placeholder like `领域技能` / `其他` / `杂项` / `临时`. A "doesn't fit anywhere" doc means either (a) the doc's real ability domain should become its own category, or (b) the doc belongs in an existing category under a different facet. Re-evaluate on every insertion; never let a catch-all absorb new docs.
 
 Results:
 - **Specific doc found** → I3 (update content)
@@ -516,4 +517,4 @@ Report also lists all markers generated during this repair (`⚠️ pending` / `
 | Format Repair | Cross-device sync | After vault sync (SynologyDrive/other cloud), device B needs to run Format Repair workflow to update `使用设备` etc. |
 | Doc Management | Doc sits in a category unrelated to its function | Run the classification sanity check in I2; move to the ability-domain directory, never leave a doc where it was first dumped |
 | Doc Management | Same repo split into multiple docs (sub-skills) | Allowed only if each doc has distinct real content; stub-quality duplicates → merge into one doc |
-| Format Repair | Another device is writing the same vault | Check for recent writes (files modified in the last 30 min) and empty `XX 2`-style conflict dirs before any bulk fix; if concurrent writes are detected, stop and ask the user to pause the other device first |
+| General | Another device is writing the same vault | Before ANY bulk operation (restructure, batch update, full-vault fix): check for recent writes (files modified in the last 30 min) and empty `XX 2`-style / `_Conflict` files; if concurrent writes are detected, stop and ask the user to pause the other device first |
